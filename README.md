@@ -55,15 +55,14 @@ Dataset: [LoCoMo-10](https://github.com/snap-stanford/locomo) (10 conversations,
 | System | LLM-Judge | BLEU-1 | F1 |
 |--------|-----------|--------|-----|
 | **M-flow** | **76.5%** | **0.422** | **0.503** |
-| Mem0 (published) | 66.9% | — | — |
-| Mem0 with graph (published) | 68.5% | — | — |
+| Mem0 Cloud (tested) | 40.4% | 0.186 | 0.196 |
 
-| Category | M-flow | Mem0 |
-|----------|--------|------|
-| Single-hop (factual) | 68.5% | 67.1% |
-| Temporal reasoning | **78.8%** | 55.5% |
-| Multi-hop reasoning | 48.0% | 51.1% |
-| Open-domain (event detail) | **81.5%** | 72.9% |
+| Category | M-flow | Mem0 Cloud (tested) |
+|----------|--------|---------------------|
+| Single-hop (factual) | 68.5% | 44.7% |
+| Temporal reasoning | **78.8%** | 7.5% |
+| Multi-hop reasoning | 48.0% | 39.6% |
+| Open-domain (event detail) | **81.5%** | 49.1% |
 
 ## Features
 
