@@ -58,7 +58,7 @@ Dataset: [LoCoMo-10](https://github.com/snap-research/LoCoMo) (10 conversations,
 | Cognee Cloud | 79.4% | 10 |
 | Zep Cloud | 73.4% | 10 |
 | Mem0ᵍ (published) | 68.5% | — |
-| Supermemory | 64.4% | 10 |
+| Supermemory Cloud | 64.4% | 10 |
 
 | Cat | Type | M-flow |
 |:---:|------|:------:|
