@@ -30,9 +30,30 @@ RAG embeds chunks and ranks by vector similarity. GraphRAG goes further — it e
 
 M-flow takes a different approach: the graph is not a preprocessing step — it is the scoring engine. When a query arrives, vector search casts a wide net across multiple granularities to find entry points. Then **the graph takes over** — propagating evidence along typed, semantically weighted edges, and scoring each knowledge unit by the tightest chain of reasoning that connects it to the query.
 
-The sets of "similar" and "relevant" results overlap — but they are not the same. A discussion of "cost overruns in Q3" is highly relevant to a query about "budget impact" despite low surface similarity. A passage about "budget templates" is maximally similar but answers a different question entirely. This difference in retrieval logic — **from distance-based ranking to path-based reasoning** — is what drives M-flow's consistent advantage across benchmarks.
+Similar ≠ relevant. Consider the query **"Why did the migration fail?"**
 
-**M-flow operates like a cognitive system: it captures signal at the sharpest point of detail, traces associations through structured memory, and arrives at the right answer the way human recall does — one strong connection is enough to surface an entire memory.**
+**Traditional retrieval** — matches by surface similarity:
+```
+Query: "Why did the migration fail?"
+  ↓ embed → cosine similarity
+  ✗ "Database migration best practices checklist"     ← keywords match, wrong answer
+```
+
+**M-flow retrieval** — traces through the knowledge graph:
+
+```mermaid
+flowchart LR
+    Q["Query: Why did the\nmigration fail?"] -->|vector search| FP["FacetPoint\nconnection pool\nexhausted at 2:47 AM"]
+    FP -->|"pool failure caused\nservice downtime"| F["Facet\nRedis failure\nanalysis"]
+    F -->|"core incident\ndetails"| E["Episode\nProduction outage\nFeb 12"]
+    E -->|"✓ result"| R["Redis connection pool\nexhausted under peak load"]
+```
+
+> Zero keyword overlap with "migration" — found through graph path, not text similarity.
+
+The graph finds the answer not by matching words, but by following the chain of evidence. This difference — **from distance-based ranking to path-based reasoning** — is what drives M-flow's consistent advantage across benchmarks.
+
+**M-flow operates like a cognitive system: it captures signal at the sharpest point of detail, traces associations through structured memory, and arrives at the right answer the way human recall does.**
 
 ## How It Works
 
