@@ -3,4 +3,4 @@ name: mflow
 description: Helm chart for the M-Flow memory-augmented knowledge graph backend
 type: application
 version: 0.1.0
-appVersion: "0.3.1"
+appVersion: "0.3.4"

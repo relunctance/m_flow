@@ -5,6 +5,56 @@ All notable changes to M-flow will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] - 2026-04-13
+
+### Fixed
+- **Critical**: Remove `max_tokens` parameter from LLM calls — incompatible with GPT-5 series,
+  caused all LLM-dependent operations to fail with "Connection error" after 120s retry
+- **Critical**: Fix session/conversation history crash — 3 retrievers called `compress_text(str)`
+  but function requires `list[ContentFragment]`; replaced with correct `summarize_text(str)`
+- Fix `LLMGateway.transcribe_audio` calling non-existent `create_transcript` method on adapter
+- Fix `LLMGateway.describe_image` calling non-existent `transcribe_image` method on adapter
+- Fix UUID serialization in search results, cache adapters, and graph property encoding
+- Fix `_hash_sensitive` dead code — unreachable `return obj` caused telemetry data corruption
+- Fix CLI `_ToggleDebug`/`_LaunchUi` argparse `dest` keyword conflict
+- Fix ImageLoader JPEG extension mismatch (`.jpe`/`.jpeg` had leading dots)
+- Fix Bedrock adapter `show_prompt` calling non-existent `LLMService.read_query_prompt`
+- Fix `OpenAIAdapter.describe_image` blocking event loop (sync `litellm.completion` → async `acompletion`)
+- Fix `OpenAIAdapter.transcribe_audio` blocking event loop (`litellm.transcription` → `atranscription`)
+- Fix retry decorator across all 14 LLM/embedding adapters — now excludes `BadRequestError`
+  and `AuthenticationError` to prevent 120-second retry storms on deterministic client errors
+- Fix dedup `_build_modern_id` tenant_id normalization (None → empty string)
+- Fix graph relationship ledger UUID collision on batch insert
+- Fix PostgreSQL `delete_database` missing `cache_clear()` (SQLite branch already had it)
+- Remove WARNING-level debug log that printed user input on every structured extraction call
+
+### Changed
+- Replace `Concept_name` with `Entity_name` in vector collection references (class renamed during migration)
+- Update ruff configuration and format entire codebase (311+ files)
+
+### Security
+- Pin all GitHub Actions to exact commit SHA (81 GitHub-owned + 21 third-party)
+- Add `permissions: {contents: read}` to 7 workflow files lacking token restrictions
+- Add `.github/dependabot.yml` for automated dependency updates
+- Fix OpenSSF Scorecard SARIF upload (codeql-action SHA dereference)
+
+### CI
+- Configure GitHub Secrets for LLM/embedding API keys
+- Fix workflow YAML syntax errors (matrix refs in workflow_call job-level conditions)
+- Fix `uv.lock` consistency
+- Update test assertions to match current API signatures and edge type names
+- Remove 6 phantom workflow jobs referencing non-existent test scripts
+- Skip S3/Modal tests requiring external paid services
+
+## [0.3.3] - 2026-04-12
+
+### Added
+- Episode naming in precise mode when content routing is disabled
+- New LLM prompt `precise_name_single_content.txt` for single-content Episode naming
+
+### Fixed
+- Generate meaningful Episode names instead of hardcoded "Content" in precise mode
+
 ## [0.3.2] - 2026-04-05
 
 ### Added
