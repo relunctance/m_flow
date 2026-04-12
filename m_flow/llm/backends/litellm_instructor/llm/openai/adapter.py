@@ -231,7 +231,13 @@ class OpenAIAdapter(LLMBackend):
     @retry(
         stop=stop_after_delay(_MAX_RETRY_DELAY),
         wait=wait_exponential_jitter(_MIN_WAIT, _MAX_WAIT),
-        retry=retry_if_not_exception_type(litellm.exceptions.NotFoundError),
+        retry=retry_if_not_exception_type(
+            (
+                litellm.exceptions.NotFoundError,
+                litellm.exceptions.BadRequestError,
+                litellm.exceptions.AuthenticationError,
+            )
+        ),
         before_sleep=before_sleep_log(_log, logging.DEBUG),
         reraise=True,
     )
@@ -310,7 +316,13 @@ class OpenAIAdapter(LLMBackend):
     @retry(
         stop=stop_after_delay(_MAX_RETRY_DELAY),
         wait=wait_exponential_jitter(_FAST_MIN_WAIT, _MAX_WAIT),
-        retry=retry_if_not_exception_type(litellm.exceptions.NotFoundError),
+        retry=retry_if_not_exception_type(
+            (
+                litellm.exceptions.NotFoundError,
+                litellm.exceptions.BadRequestError,
+                litellm.exceptions.AuthenticationError,
+            )
+        ),
         before_sleep=before_sleep_log(_log, logging.DEBUG),
         reraise=True,
     )
@@ -351,7 +363,13 @@ class OpenAIAdapter(LLMBackend):
     @retry(
         stop=stop_after_delay(_MAX_RETRY_DELAY),
         wait=wait_exponential_jitter(_FAST_MIN_WAIT, _MAX_WAIT),
-        retry=retry_if_not_exception_type(litellm.exceptions.NotFoundError),
+        retry=retry_if_not_exception_type(
+            (
+                litellm.exceptions.NotFoundError,
+                litellm.exceptions.BadRequestError,
+                litellm.exceptions.AuthenticationError,
+            )
+        ),
         before_sleep=before_sleep_log(_log, logging.DEBUG),
         reraise=True,
     )
@@ -367,7 +385,7 @@ class OpenAIAdapter(LLMBackend):
             Transcription result
         """
         async with open_data_file(input, mode="rb") as audio:
-            return litellm.transcription(
+            return await litellm.atranscription(
                 model=self._transcription_model,
                 file=audio,
                 api_key=self._api_key,
@@ -380,7 +398,13 @@ class OpenAIAdapter(LLMBackend):
     @retry(
         stop=stop_after_delay(_MAX_RETRY_DELAY),
         wait=wait_exponential_jitter(_FAST_MIN_WAIT, _MAX_WAIT),
-        retry=retry_if_not_exception_type(litellm.exceptions.NotFoundError),
+        retry=retry_if_not_exception_type(
+            (
+                litellm.exceptions.NotFoundError,
+                litellm.exceptions.BadRequestError,
+                litellm.exceptions.AuthenticationError,
+            )
+        ),
         before_sleep=before_sleep_log(_log, logging.DEBUG),
         reraise=True,
     )

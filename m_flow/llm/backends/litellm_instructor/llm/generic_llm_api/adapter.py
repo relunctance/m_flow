@@ -119,7 +119,13 @@ class GenericAPIAdapter(LLMBackend):
     @retry(
         stop=stop_after_delay(120),
         wait=wait_exponential_jitter(5, 120),
-        retry=retry_if_not_exception_type(litellm.exceptions.NotFoundError),
+        retry=retry_if_not_exception_type(
+            (
+                litellm.exceptions.NotFoundError,
+                litellm.exceptions.BadRequestError,
+                litellm.exceptions.AuthenticationError,
+            )
+        ),
         before_sleep=before_sleep_log(_log, logging.DEBUG),
         reraise=True,
     )

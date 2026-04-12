@@ -101,7 +101,13 @@ class OllamaEmbeddingEngine(EmbeddingEngine):
     @retry(
         stop=stop_after_delay(128),
         wait=wait_exponential_jitter(8, 128),
-        retry=retry_if_not_exception_type(litellm.exceptions.NotFoundError),
+        retry=retry_if_not_exception_type(
+            (
+                litellm.exceptions.NotFoundError,
+                litellm.exceptions.BadRequestError,
+                litellm.exceptions.AuthenticationError,
+            )
+        ),
         before_sleep=before_sleep_log(_engine_log, logging.DEBUG),
         reraise=True,
     )

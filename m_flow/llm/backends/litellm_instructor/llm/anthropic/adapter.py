@@ -71,7 +71,13 @@ class AnthropicAdapter(LLMBackend):
     @retry(
         stop=stop_after_delay(_RETRY_CEILING_SECS),
         wait=wait_exponential_jitter(_RETRY_BASE_WAIT, _RETRY_CEILING_SECS),
-        retry=retry_if_not_exception_type(litellm.exceptions.NotFoundError),
+        retry=retry_if_not_exception_type(
+            (
+                litellm.exceptions.NotFoundError,
+                litellm.exceptions.BadRequestError,
+                litellm.exceptions.AuthenticationError,
+            )
+        ),
         before_sleep=before_sleep_log(_logger, logging.DEBUG),
         reraise=True,
     )
