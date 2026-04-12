@@ -147,15 +147,15 @@ class LLMService:
                 len(source_text),
             )
 
-            response = await litellm.acompletion(
-                model=cfg.llm_model,
-                messages=messages,
-                api_key=cfg.llm_api_key,
-                api_base=cfg.llm_endpoint or None,
-                api_version=cfg.llm_api_version or None,
-                max_tokens=cfg.llm_max_completion_tokens,
+            call_kwargs = {
+                "model": cfg.llm_model,
+                "messages": messages,
+                "api_key": cfg.llm_api_key,
+                "api_base": cfg.llm_endpoint or None,
+                "api_version": cfg.llm_api_version or None,
                 **kwargs,
-            )
+            }
+            response = await litellm.acompletion(**call_kwargs)
             reply = response.choices[0].message.content or ""
             _log.debug("text_completion response  len=%d", len(reply))
             return reply
