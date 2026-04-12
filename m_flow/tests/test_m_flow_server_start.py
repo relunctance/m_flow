@@ -74,8 +74,9 @@ class TestMflowServerStart(unittest.TestCase):
 
         root_resp = requests.get(f"{BASE_URL}/", timeout=REQUEST_TIMEOUT_STD)
         self.assertEqual(root_resp.status_code, 200)
-        self.assertIn("message", root_resp.json())
+        self.assertIn("status", root_resp.json())
         self.assertEqual(root_resp.json()["status"], "ok")
+        self.assertIn("service", root_resp.json())
 
         bearer_token = self._authenticate()
         auth_hdr = {"Authorization": bearer_token}

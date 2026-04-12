@@ -51,6 +51,7 @@ jobs:
       LLM_API_VERSION:  ${{ secrets.LLM_API_VERSION }}
       # --- Embeddings ---
       EMBEDDING_MODEL:        ${{ secrets.EMBEDDING_MODEL }}
+      EMBEDDING_DIMENSIONS: "1536"
       EMBEDDING_ENDPOINT:     ${{ secrets.EMBEDDING_ENDPOINT }}
       EMBEDDING_API_KEY:      ${{ secrets.EMBEDDING_API_KEY }}
       EMBEDDING_API_VERSION:  ${{ secrets.EMBEDDING_API_VERSION }}

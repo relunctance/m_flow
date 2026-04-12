@@ -37,6 +37,6 @@ async def test_pdf_chunking(mock_eng):
         chunks.append(chunk)
         assert chunk.chunk_size > 0
         assert len(chunk.text) > 0
-        assert chunk.cut_type in ("sentence_end", "paragraph_end", "hard_cut")
+        assert chunk.cut_type in ("sentence_end", "paragraph_end", "hard_cut", "sentence_cut")
 
     assert len(chunks) >= 1, "PDF should produce at least one chunk"

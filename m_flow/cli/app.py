@@ -38,7 +38,8 @@ _action_taken = False
 class _ToggleDebug(argparse.Action):
     """Enable verbose / debug output globally."""
 
-    def __init__(self, option_strings: Sequence[str], **kw: Any) -> None:
+    def __init__(self, option_strings: Sequence[str], dest: str = argparse.SUPPRESS, **kw: Any) -> None:
+        kw.pop("dest", None)
         super().__init__(
             option_strings=option_strings, nargs=0, dest=argparse.SUPPRESS, default=argparse.SUPPRESS, **kw
         )
@@ -51,7 +52,8 @@ class _ToggleDebug(argparse.Action):
 class _LaunchUi(argparse.Action):
     """Mark that the user requested the web UI."""
 
-    def __init__(self, option_strings: Sequence[str], **kw: Any) -> None:
+    def __init__(self, option_strings: Sequence[str], dest: str = argparse.SUPPRESS, **kw: Any) -> None:
+        kw.pop("dest", None)
         super().__init__(
             option_strings=option_strings, nargs=0, dest=argparse.SUPPRESS, default=argparse.SUPPRESS, **kw
         )

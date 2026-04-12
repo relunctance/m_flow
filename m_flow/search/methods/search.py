@@ -279,9 +279,9 @@ async def _format_standard_results(
 
         entry = {
             "search_result": [content] if content else None,
-            "dataset_id": datasets[0].id,
+            "dataset_id": str(datasets[0].id),
             "dataset_name": datasets[0].name,
-            "dataset_tenant_id": datasets[0].tenant_id,
+            "dataset_tenant_id": str(datasets[0].tenant_id) if datasets[0].tenant_id else None,
         }
         if verbose:
             entry["graphs"] = prepared["graphs"]

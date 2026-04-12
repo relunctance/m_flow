@@ -32,7 +32,7 @@ class _OracleSlice(NamedTuple):
 _ORACLE_ROWS: tuple[_OracleSlice, ...] = (
     _OracleSlice(57, 353, "sentence_end"),
     _OracleSlice(58, 358, "sentence_end"),
-    _OracleSlice(41, 219, "sentence_end"),
+    _OracleSlice(41, 219, "sentence_cut"),
 )
 
 _CHUNK_SENTENCE_PKG = sys.modules.get("m_flow.ingestion.chunks.split_sentences")

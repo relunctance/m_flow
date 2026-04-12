@@ -60,7 +60,7 @@ def _hash_sensitive(obj: Any, keys: List[str]) -> Any:
         }
     if isinstance(obj, list):
         return [_hash_sensitive(item, keys) for item in obj]
-        return obj
+    return obj
 
 
 def emit_telemetry(
