@@ -23,6 +23,7 @@ from m_flow.cli.commands.delete_command import DeleteCommand
 from m_flow.cli.commands.config_command import ConfigCommand
 from m_flow.cli.exceptions import CliCommandException
 from m_flow.data.methods.get_deletion_counts import DeletionCountsPreview
+from m_flow.shared.enums.content_type import ContentType
 
 
 def _execute_coroutine(coro):
@@ -204,6 +205,7 @@ class TestMemorizeEdgeCases:
                 chunker="TextChunker",
                 background=False,
                 verbose=False,
+                content_type="text",
             )
             cmd.execute(cmd_args)
 
@@ -215,6 +217,7 @@ class TestMemorizeEdgeCases:
             chunk_size=-100,
             chunker=TextChunker,
             run_in_background=False,
+            content_type=ContentType.TEXT,
         )
 
     @patch("m_flow.cli.commands.memorize_command.asyncio.run")
@@ -245,6 +248,7 @@ class TestMemorizeEdgeCases:
                 chunker="LangchainChunker",
                 background=False,
                 verbose=True,
+                content_type="text",
             )
             cmd.execute(cmd_args)
 
@@ -264,6 +268,7 @@ class TestMemorizeEdgeCases:
                 chunker="TextChunker",
                 background=False,
                 verbose=False,
+                content_type="text",
             )
             cmd.execute(cmd_args)
 
@@ -274,6 +279,7 @@ class TestMemorizeEdgeCases:
             chunk_size=None,
             chunker=TextChunker,
             run_in_background=False,
+            content_type=ContentType.TEXT,
         )
 
 

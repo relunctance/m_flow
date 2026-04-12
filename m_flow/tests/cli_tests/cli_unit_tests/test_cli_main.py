@@ -37,7 +37,7 @@ class TestCommandDiscovery:
 class TestMainFunction:
     """main函数测试"""
 
-    @patch("m_flow.cli.app._create_parser")
+    @patch("m_flow.cli.app._build_parser")
     def test_no_cmd_prints_help(self, mock_cp):
         """测试无命令时打印帮助"""
         p = MagicMock()
@@ -46,7 +46,7 @@ class TestMainFunction:
         assert main() == -1
         p.print_help.assert_called_once()
 
-    @patch("m_flow.cli.app._create_parser")
+    @patch("m_flow.cli.app._build_parser")
     def test_valid_cmd_executes(self, mock_cp):
         """测试有效命令执行"""
         cmd = MagicMock()
@@ -58,7 +58,7 @@ class TestMainFunction:
         assert main() == 0
         cmd.execute.assert_called_once_with(args)
 
-    @patch("m_flow.cli.app._create_parser")
+    @patch("m_flow.cli.app._build_parser")
     @patch("m_flow.cli.debug.is_debug_enabled")
     def test_cmd_exception(self, mock_dbg, mock_cp):
         """测试命令异常返回错误码"""
@@ -70,7 +70,7 @@ class TestMainFunction:
         mock_cp.return_value = (p, {"x": cmd})
         assert main() == 2
 
-    @patch("m_flow.cli.app._create_parser")
+    @patch("m_flow.cli.app._build_parser")
     @patch("m_flow.cli.debug.is_debug_enabled")
     def test_generic_exception(self, mock_dbg, mock_cp):
         """测试通用异常返回-1"""
@@ -82,12 +82,12 @@ class TestMainFunction:
         mock_cp.return_value = (p, {"x": cmd})
         assert main() == -1
 
-    @patch("m_flow.cli.app._create_parser")
+    @patch("m_flow.cli.app._build_parser")
     @patch("m_flow.cli.debug.is_debug_enabled")
     def test_debug_reraises(self, mock_dbg, mock_cp):
         """测试调试模式重新抛出异常"""
         mock_dbg.return_value = True
-        exc = CliCommandException("err", error_code=2, raiseable_exception=ValueError("inner"))
+        exc = CliCommandException("err", error_code=2, cause=ValueError("inner"))
         cmd = MagicMock()
         cmd.execute.side_effect = exc
         p = MagicMock()
@@ -108,10 +108,13 @@ class TestParserArgs:
         assert "m_flow" in acts[0].version
 
     def test_debug_arg(self):
-        """测试调试参数"""
+        """测试调试参数（--debug 使用 SUPPRESS 作为 dest，需按 action 类型或选项字符串查找）"""
+        from m_flow.cli.app import _ToggleDebug
+
         p, _ = _create_parser()
-        acts = [a for a in p._actions if a.dest == "debug"]
+        acts = [a for a in p._actions if isinstance(a, _ToggleDebug)]
         assert len(acts) == 1
+        assert "--debug" in acts[0].option_strings
 
 
 class TestDebugAction:

@@ -63,7 +63,7 @@ class TestAddCommandUnit:
         """Verify command string, help, and docs URL."""
         cmd = AddCommand()
         assert cmd.command_string == "add"
-        assert "Add data" in cmd.help_string
+        assert "Ingest data into M-flow" in cmd.help_string
         assert cmd.docs_url is not None
 
     def test_parser_configuration(self) -> None:
@@ -125,7 +125,7 @@ class TestSearchCommandUnit:
         """Verify command string, help, and docs URL."""
         cmd = SearchCommand()
         assert cmd.command_string == "search"
-        assert "Search and query" in cmd.help_string
+        assert "Query the knowledge graph" in cmd.help_string
         assert cmd.docs_url is not None
 
     def test_parser_configuration(self) -> None:
@@ -225,6 +225,7 @@ class TestMemorizeCommandUnit:
                 chunker="TextChunker",
                 background=False,
                 verbose=False,
+                content_type="text",
             )
             cmd.execute(args)
 
@@ -242,6 +243,7 @@ class TestMemorizeCommandUnit:
             chunker="TextChunker",
             background=False,
             verbose=False,
+            content_type="text",
         )
 
         with pytest.raises(CliCommandException):
@@ -260,7 +262,7 @@ class TestDeleteCommandUnit:
         """Verify command string, help, and docs URL."""
         cmd = DeleteCommand()
         assert cmd.command_string == "delete"
-        assert "Delete data" in cmd.help_string
+        assert "Remove data from M-flow" in cmd.help_string
 
     def test_parser_configuration(self) -> None:
         """Verify parser accepts delete arguments."""
@@ -338,7 +340,7 @@ class TestConfigCommandUnit:
         """Verify command string, help, and docs URL."""
         cmd = ConfigCommand()
         assert cmd.command_string == "config"
-        assert "Manage m_flow configuration" in cmd.help_string
+        assert "Manage M-flow configuration" in cmd.help_string
 
     def test_parser_has_subcommands(self) -> None:
         """Verify config has get/set/list/unset/reset subcommands."""

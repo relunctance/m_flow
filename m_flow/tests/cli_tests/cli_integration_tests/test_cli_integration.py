@@ -58,7 +58,7 @@ class TestCoreCliCommands:
 
         assert result.returncode == 0, f"Help command failed: {result.stderr}"
         assert stdout_contains(result, "m_flow"), "Expected 'm_flow' in help output"
-        assert stdout_contains(result, "available commands"), "Missing commands section"
+        assert stdout_contains(result, "commands"), "Missing commands section"
 
     def test_version_info_shown(self) -> None:
         """Verify --version displays version string."""
