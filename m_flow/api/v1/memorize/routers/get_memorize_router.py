@@ -33,14 +33,22 @@ from m_flow.shared.logging_utils import get_logger
 from m_flow.shared.utils import send_telemetry
 from m_flow import __version__ as m_flow_version
 from m_flow.ingestion.chunking.TextChunker import TextChunker
-from m_flow.ingestion.chunking.LangchainChunker import LangchainChunker
 
 logger = get_logger("api.memorize")
 
-CHUNKER_MAP = {
-    "TextChunker": TextChunker,
-    "LangchainChunker": LangchainChunker,
-}
+
+def _get_chunker_map():
+    mapping = {"TextChunker": TextChunker}
+    try:
+        from m_flow.ingestion.chunking.LangchainChunker import LangchainChunker
+
+        mapping["LangchainChunker"] = LangchainChunker
+    except ImportError:
+        logger.debug("langchain_text_splitters not installed; LangchainChunker unavailable")
+    return mapping
+
+
+CHUNKER_MAP = _get_chunker_map()
 
 
 class MemorizePayloadDTO(InDTO):

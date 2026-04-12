@@ -178,7 +178,7 @@ async def test_deduplication_postgres() -> None:
     )
     m_flow.config.set_relational_db_config(
         {
-            "db_name": "mflow_store",
+            "db_name": "m_flow_db",
             "db_host": "127.0.0.1",
             "db_port": "5432",
             "db_username": "m_flow",

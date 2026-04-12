@@ -34,6 +34,7 @@ class TestTelemetry(unittest.TestCase):
         self.assertTrue(len(content) > 0)
         return path
 
+    @patch("m_flow.shared.utils._TELEMETRY_ENDPOINT", "https://fake-endpoint.test")
     @patch("m_flow.shared.utils.requests.post")
     def test_enabled(self, mock_post: MagicMock):
         """测试启用遥测"""

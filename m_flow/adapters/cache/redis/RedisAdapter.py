@@ -43,8 +43,6 @@ class RedisAdapter(CacheDBInterface):
     ) -> None:
         super().__init__(host, port, lock_name)
 
-        self.host = host
-        self.port = port
         self.connection_timeout = connection_timeout
         self.timeout = timeout
         self.blocking_timeout = blocking_timeout
