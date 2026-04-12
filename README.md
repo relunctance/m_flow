@@ -4,6 +4,8 @@
 
 **Graph RAG finds what's similar. M-flow finds what's relevant.**
 
+Retrieval through reasoning and association — M-flow operates like a cognitive memory system.
+
 [m-flow.ai](https://m-flow.ai) ·
 [flowelement.ai](https://flowelement.ai) ·
 [Quick Start](#quick-start) ·
@@ -29,6 +31,8 @@ RAG embeds chunks and ranks by vector similarity. GraphRAG goes further — it e
 M-flow takes a different approach: the graph is not a preprocessing step — it is the scoring engine. When a query arrives, vector search casts a wide net across multiple granularities to find entry points. Then **the graph takes over** — propagating evidence along typed, semantically weighted edges, and scoring each knowledge unit by the tightest chain of reasoning that connects it to the query.
 
 The sets of "similar" and "relevant" results overlap — but they are not the same. A discussion of "cost overruns in Q3" is highly relevant to a query about "budget impact" despite low surface similarity. A passage about "budget templates" is maximally similar but answers a different question entirely. This difference in retrieval logic — **from distance-based ranking to path-based reasoning** — is what drives M-flow's consistent advantage across benchmarks.
+
+**M-flow operates like a cognitive system: it captures signal at the sharpest point of detail, traces associations through structured memory, and arrives at the right answer the way human recall does — one strong connection is enough to surface an entire memory.**
 
 ## How It Works
 
