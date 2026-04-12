@@ -43,10 +43,10 @@ Query: "Why did the migration fail?"
 
 ```mermaid
 flowchart LR
-    Q["Query: Why did the\nmigration fail?"] -->|vector search| FP["FacetPoint\nconnection pool\nexhausted at 2:47 AM"]
-    FP -->|"pool failure caused\nservice downtime"| F["Facet\nRedis failure\nanalysis"]
-    F -->|"core incident\ndetails"| E["Episode\nProduction outage\nFeb 12"]
-    E -->|"✓ result"| R["Redis connection pool\nexhausted under peak load"]
+    Q["Query: Why did the\nmigration fail?"] -->|search| FP["FacetPoint\nconnection pool\nexhausted at 2:47 AM"]
+    FP -->|"edge:pool failure caused\nservice downtime"| F["Facet\nRedis failure\nanalysis"]
+    F -->|"edge:core incident\ndetails"| E["Episode\nProduction outage\nFeb 12"]
+    E -->|"✓ correct result"| R["Redis connection pool\nexhausted under peak load"]
 ```
 
 > Zero keyword overlap with "migration" — found through graph path, not text similarity.
