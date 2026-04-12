@@ -53,9 +53,9 @@ def _serialize_for_chroma(data: dict) -> dict:
         if isinstance(val, UUID):
             result[key] = str(val)
         elif isinstance(val, dict):
-            result[f"{key}__dict"] = json.dumps(val)
+            result[f"{key}__dict"] = json.dumps(val, default=str)
         elif isinstance(val, list):
-            result[f"{key}__list"] = json.dumps(val)
+            result[f"{key}__list"] = json.dumps(val, default=str)
         elif isinstance(val, (str, int, float, bool)) or val is None:
             result[key] = val
         else:

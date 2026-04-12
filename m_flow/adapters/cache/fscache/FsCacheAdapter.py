@@ -75,7 +75,7 @@ class FSCacheAdapter(CacheDBInterface):
             entries = json.loads(raw) if raw else []
             entries.append(entry)
 
-            self.cache.set(key, json.dumps(entries), expire=ttl)
+            self.cache.set(key, json.dumps(entries, default=str), expire=ttl)
 
         except Exception as e:
             raise CacheConnectionError(f"FSCache add_qa failed: {e}") from e

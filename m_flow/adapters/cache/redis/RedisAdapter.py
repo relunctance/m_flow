@@ -143,7 +143,7 @@ class RedisAdapter(CacheDBInterface):
                 "answer": answer,
             }
 
-            await self.async_redis.rpush(key, json.dumps(entry))
+            await self.async_redis.rpush(key, json.dumps(entry, default=str))
 
             if ttl:
                 await self.async_redis.expire(key, ttl)
