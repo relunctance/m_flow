@@ -80,9 +80,7 @@ async def _check_no_running_pipelines() -> None:
 class SizeCheckRequest(BaseModel):
     """Request body for episode size check."""
 
-    episode_ids: List[str] = Field(
-        ..., min_length=1, description="List of Episode IDs to check"
-    )
+    episode_ids: List[str] = Field(..., min_length=1, description="List of Episode IDs to check")
 
 
 class SizeCheckResult(BaseModel):

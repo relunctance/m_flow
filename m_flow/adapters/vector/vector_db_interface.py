@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from m_flow.core import MemoryNode
     from m_flow.auth.models import User
 
+
 class VectorProvider(Protocol):
     """
     Contract for vector store backends (Qdrant, LanceDB, Weaviate, etc.).
@@ -176,4 +177,3 @@ class VectorProvider(Protocol):
     ) -> None:
         """Deprovision the vector store for a dataset."""
         pass
-

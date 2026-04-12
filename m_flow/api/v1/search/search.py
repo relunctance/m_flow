@@ -235,29 +235,17 @@ async def search(
         effective_config = config
 
     # Direct parameters override config (only when parameter is not None)
-    final_system_prompt = (
-        system_prompt if system_prompt is not None else effective_config.system_prompt
-    )
+    final_system_prompt = system_prompt if system_prompt is not None else effective_config.system_prompt
     final_system_prompt_path = (
-        system_prompt_path
-        if system_prompt_path is not None
-        else effective_config.system_prompt_path
+        system_prompt_path if system_prompt_path is not None else effective_config.system_prompt_path
     )
-    final_save_interaction = (
-        save_interaction if save_interaction is not None else effective_config.save_interaction
-    )
+    final_save_interaction = save_interaction if save_interaction is not None else effective_config.save_interaction
     final_use_combined_context = (
-        use_combined_context
-        if use_combined_context is not None
-        else effective_config.use_combined_context
+        use_combined_context if use_combined_context is not None else effective_config.use_combined_context
     )
-    final_wide_search_top_k = (
-        wide_search_top_k if wide_search_top_k is not None else effective_config.wide_search_top_k
-    )
+    final_wide_search_top_k = wide_search_top_k if wide_search_top_k is not None else effective_config.wide_search_top_k
     final_triplet_distance_penalty = (
-        triplet_distance_penalty
-        if triplet_distance_penalty is not None
-        else effective_config.triplet_distance_penalty
+        triplet_distance_penalty if triplet_distance_penalty is not None else effective_config.triplet_distance_penalty
     )
     final_verbose = verbose if verbose is not None else effective_config.verbose
 
@@ -375,8 +363,7 @@ async def query(
 
     if mode.lower() not in _MODE_MAP:
         _log.warning(
-            f"[query] Unknown mode '{mode}', falling back to 'episodic'. "
-            f"Valid modes: {list(_MODE_MAP.keys())}"
+            f"[query] Unknown mode '{mode}', falling back to 'episodic'. Valid modes: {list(_MODE_MAP.keys())}"
         )
 
     # Call underlying search API

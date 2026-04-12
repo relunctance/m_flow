@@ -28,17 +28,13 @@ class _HitResult:
 def _build_vector_engine(*, search_rv=None, embed_rv=None):
     engine = AsyncMock()
     engine.embedding_engine = AsyncMock()
-    engine.embedding_engine.embed_text = AsyncMock(
-        return_value=embed_rv if embed_rv is not None else [[0.5, 0.6, 0.7]]
-    )
+    engine.embedding_engine.embed_text = AsyncMock(return_value=embed_rv if embed_rv is not None else [[0.5, 0.6, 0.7]])
     if callable(search_rv):
         engine.search = AsyncMock(side_effect=search_rv)
     else:
         fixed = search_rv if search_rv is not None else []
 
-        async def _typed_search(
-            collection_name, query_vector, limit=None, where_filter=None
-        ):
+        async def _typed_search(collection_name, query_vector, limit=None, where_filter=None):
             return fixed
 
         engine.search = AsyncMock(side_effect=_typed_search, wraps=_typed_search)
@@ -49,9 +45,7 @@ def _build_fragment(*, importance_rv=None):
     frag = AsyncMock()
     frag.map_vector_distances_to_graph_nodes = AsyncMock()
     frag.map_vector_distances_to_graph_edges = AsyncMock()
-    frag.calculate_top_triplet_importances = AsyncMock(
-        return_value=importance_rv if importance_rv is not None else []
-    )
+    frag.calculate_top_triplet_importances = AsyncMock(return_value=importance_rv if importance_rv is not None else [])
     return frag
 
 
@@ -84,9 +78,7 @@ class TestWideSearchLimit:
     async def test_applied_in_global_mode(self):
         engine = _build_vector_engine()
         with patch(_VEC_ENGINE_PATH, return_value=engine):
-            await fine_grained_triplet_search(
-                query="sample", node_name=None, wide_search_top_k=75
-            )
+            await fine_grained_triplet_search(query="sample", node_name=None, wide_search_top_k=75)
         for invocation in engine.search.call_args_list:
             assert invocation[1]["limit"] == 75
 
@@ -94,9 +86,7 @@ class TestWideSearchLimit:
     async def test_none_in_filtered_mode(self):
         engine = _build_vector_engine()
         with patch(_VEC_ENGINE_PATH, return_value=engine):
-            await fine_grained_triplet_search(
-                query="sample", node_name=["NodeA"], wide_search_top_k=50
-            )
+            await fine_grained_triplet_search(query="sample", node_name=["NodeA"], wide_search_top_k=50)
         for invocation in engine.search.call_args_list:
             assert invocation[1]["limit"] is None
 
@@ -142,14 +132,10 @@ class TestCollectionSelection:
         engine = _build_vector_engine()
         cols_without_edge = ["Entity_name", "FragmentDigest_text"]
         with patch(_VEC_ENGINE_PATH, return_value=engine):
-            await fine_grained_triplet_search(
-                query="anything", collections=cols_without_edge
-            )
+            await fine_grained_triplet_search(query="anything", collections=cols_without_edge)
         searched = {c[1]["collection_name"] for c in engine.search.call_args_list}
         assert "RelationType_relationship_name" in searched
-        assert searched == set(cols_without_edge) | {
-            "RelationType_relationship_name"
-        }
+        assert searched == set(cols_without_edge) | {"RelationType_relationship_name"}
 
 
 # ---------------------------------------------------------------------------
@@ -356,9 +342,7 @@ class TestMemoryFragmentLifecycle:
 
         with patch(_VEC_ENGINE_PATH, return_value=engine):
             with patch(_FRAGMENT_PATH, return_value=frag):
-                await fine_grained_triplet_search(
-                    query="topk", top_k=desired_k, node_name=["n"]
-                )
+                await fine_grained_triplet_search(query="topk", top_k=desired_k, node_name=["n"])
 
         frag.calculate_top_triplet_importances.assert_called_once_with(k=desired_k)
 
@@ -372,9 +356,7 @@ class TestGetMemoryFragmentErrors:
     @pytest.mark.asyncio
     async def test_returns_empty_graph_on_concept_not_found(self):
         graph_engine = AsyncMock()
-        graph_engine.project_graph_from_db = AsyncMock(
-            side_effect=ConceptNotFoundError("missing concept")
-        )
+        graph_engine.project_graph_from_db = AsyncMock(side_effect=ConceptNotFoundError("missing concept"))
         with patch(_GRAPH_ENGINE_PATH, return_value=graph_engine):
             result = await get_memory_fragment()
 
@@ -384,9 +366,7 @@ class TestGetMemoryFragmentErrors:
     @pytest.mark.asyncio
     async def test_returns_empty_graph_on_unexpected_error(self):
         graph_engine = AsyncMock()
-        graph_engine.project_graph_from_db = AsyncMock(
-            side_effect=Exception("unexpected failure")
-        )
+        graph_engine.project_graph_from_db = AsyncMock(side_effect=Exception("unexpected failure"))
         with patch(_GRAPH_ENGINE_PATH, return_value=graph_engine):
             result = await get_memory_fragment()
 

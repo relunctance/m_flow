@@ -145,7 +145,8 @@ async def dispatch_remote(
         ctx["workflow_run_id"] = str(run_id)
 
         # Build broadcast arguments
-        broadcast = lambda v: [v] * count
+        def broadcast(v):
+            return [v] * count
 
         map_args = [
             items,

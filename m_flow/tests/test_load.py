@@ -22,10 +22,7 @@ async def _process_and_search(n: int) -> float:
     await m_flow.memorize()
 
     await asyncio.gather(
-        *[
-            m_flow.search(query_text="文档相关内容", query_type=RecallMode.TRIPLET_COMPLETION)
-            for _ in range(n)
-        ]
+        *[m_flow.search(query_text="文档相关内容", query_type=RecallMode.TRIPLET_COMPLETION) for _ in range(n)]
     )
 
     return time.time() - t0

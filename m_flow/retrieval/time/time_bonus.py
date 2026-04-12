@@ -63,9 +63,7 @@ class TimeBonusConfig:
     enable_mismatch_penalty: bool = False  # Whether to enable mismatch penalty
     mismatch_penalty_max: float = 0.03  # Maximum penalty value (added to score)
     mismatch_conf_threshold: float = 0.7  # Only penalize if query time confidence above this value
-    mismatch_require_candidate_time: bool = (
-        True  # Whether to require candidate to have time for penalty
-    )
+    mismatch_require_candidate_time: bool = True  # Whether to require candidate to have time for penalty
     # If mismatch_require_candidate_time=True, only penalize when candidate has time but doesn't match
     # If mismatch_require_candidate_time=False, candidates without time fields will also be penalized
 
@@ -149,9 +147,7 @@ def compute_time_match(
         # Apply wide range decay
         query_days = query_time.duration_days
         if query_days > config.wide_range_penalty_days:
-            range_factor = max(
-                config.wide_range_min_weight, config.wide_range_penalty_days / query_days
-            )
+            range_factor = max(config.wide_range_min_weight, config.wide_range_penalty_days / query_days)
             match_score *= range_factor
 
         # Multiply by query time confidence
@@ -168,9 +164,7 @@ def compute_time_match(
         # Only consider penalty when there's no match (bonus=0)
         # and query time confidence is high enough
         if query_time.confidence >= config.mismatch_conf_threshold:
-            has_candidate_time = (
-                mentioned_start is not None and mentioned_end is not None
-            ) or created_at is not None
+            has_candidate_time = (mentioned_start is not None and mentioned_end is not None) or created_at is not None
 
             if has_candidate_time:
                 # Candidate has time but doesn't match -> mismatch penalty

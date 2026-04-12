@@ -44,12 +44,14 @@ else:
         type: str
         description: str
 
+
 class KGRelation(BaseModel):
     """Directed relationship between two nodes."""
 
     source_node_id: str
     target_node_id: str
     relationship_name: str
+
 
 class ExtractedGraph(BaseModel):
     """Container for LLM-extracted knowledge."""
@@ -61,23 +63,28 @@ class ExtractedGraph(BaseModel):
         summary: str = ""
         description: str = ""
 
+
 # ---------------------------------------------------------------------------
 # Query helpers
 # ---------------------------------------------------------------------------
+
 
 class GQLQuery(BaseModel):
     """GraphQL query wrapper."""
 
     query: str
 
+
 class AnswerPayload(BaseModel):
     """Single answer response."""
 
     answer: str
 
+
 # ---------------------------------------------------------------------------
 # Chunking
 # ---------------------------------------------------------------------------
+
 
 class ChunkMode(str, Enum):
     """Text segmentation strategies."""
@@ -88,6 +95,7 @@ class ChunkMode(str, Enum):
     CODE = "code"
     LANGCHAIN_CHARACTER = "langchain_character"
 
+
 class ChunkBackend(str, Enum):
     """Underlying chunking engine."""
 
@@ -95,17 +103,20 @@ class ChunkBackend(str, Enum):
     DEFAULT_ENGINE = "default"
     HAYSTACK_ENGINE = "haystack"
 
+
 # Aliases
 
 # ---------------------------------------------------------------------------
 # Summaries
 # ---------------------------------------------------------------------------
 
+
 class GraphSummary(BaseModel):
     """Summary containing nodes and edges."""
 
     nodes: List[KGNode] = Field(default_factory=list)
     edges: List[KGRelation] = Field(default_factory=list)
+
 
 class CompressedText(BaseModel):
     """Compressed representation preserving key facts."""
@@ -115,6 +126,7 @@ class CompressedText(BaseModel):
 
     class Config:
         populate_by_name = True
+
 
 class TopicSection(BaseModel):
     """Thematic segment of a document."""
@@ -129,7 +141,9 @@ class TopicSection(BaseModel):
     class Config:
         populate_by_name = True
 
+
 Section = TopicSection
+
 
 class MultiSectionSummary(BaseModel):
     """Structured summary with logical sections."""
@@ -146,11 +160,13 @@ class MultiSectionSummary(BaseModel):
             segments.append(f"【{p.heading}】{p.text}")
         return " ".join(segments)
 
+
 SectionedSummary = MultiSectionSummary
 
 # ---------------------------------------------------------------------------
 # Unified Episodic + Procedural Routing Output
 # ---------------------------------------------------------------------------
+
 
 class ProceduralCandidate(BaseModel):
     """
@@ -170,10 +186,12 @@ class ProceduralCandidate(BaseModel):
         ..., description="Type: 'user_preference' | 'user_habit' | 'reusable_process' | 'persona'"
     )
 
+
 class ProceduralCandidateList(BaseModel):
     """List of 0-N procedural candidates."""
 
     candidates: List[ProceduralCandidate] = Field(default_factory=list)
+
 
 class SectionedSummaryWithProcedural(BaseModel):
     """
@@ -205,11 +223,13 @@ class SectionedSummaryWithProcedural(BaseModel):
         """Convert to plain SectionedSummary (without procedural)."""
         return MultiSectionSummary(topic=self.topic, parts=self.parts)
 
+
 class ChunkDigest(BaseModel):
     """Brief summary with chunk reference."""
 
     text: str
     chunk_id: str
+
 
 class ChunkDigestList(BaseModel):
     """Collection of chunk digests."""
@@ -219,9 +239,11 @@ class ChunkDigestList(BaseModel):
     class Config:
         populate_by_name = True
 
+
 # ---------------------------------------------------------------------------
 # Content classification enums
 # ---------------------------------------------------------------------------
+
 
 class TextCategory(str, Enum):
     """Fine-grained text content labels for document classification."""
@@ -273,6 +295,7 @@ class TextCategory(str, Enum):
     REGULATORY = "regulatory_doc"
     OTHER = "other_text"
 
+
 class AudioCategory(str, Enum):
     MUSIC = "music"
     PODCAST = "podcast"
@@ -280,6 +303,7 @@ class AudioCategory(str, Enum):
     INTERVIEW = "interview"
     SFX = "sound_effect"
     OTHER = "other_audio"
+
 
 class ImageCategory(str, Enum):
     PHOTO = "photo"
@@ -289,7 +313,9 @@ class ImageCategory(str, Enum):
     SCREENSHOT = "screenshot"
     OTHER = "other_image"
 
+
 ImageSubclass = ImageCategory
+
 
 class VideoCategory(str, Enum):
     FILM = "film"
@@ -299,7 +325,9 @@ class VideoCategory(str, Enum):
     LIVE = "live_event"
     OTHER = "other_video"
 
+
 VideoSubclass = VideoCategory
+
 
 class MultimediaCategory(str, Enum):
     INTERACTIVE = "interactive"
@@ -309,7 +337,9 @@ class MultimediaCategory(str, Enum):
     EXHIBITION = "virtual_exhibition"
     OTHER = "other_multimedia"
 
+
 MultimediaSubclass = MultimediaCategory
+
 
 class ThreeDCategory(str, Enum):
     ARCHITECTURE = "architecture_3d"
@@ -319,7 +349,9 @@ class ThreeDCategory(str, Enum):
     VR_OBJ = "vr_object"
     OTHER = "other_3d"
 
+
 Model3DSubclass = ThreeDCategory
+
 
 class ProceduralCategory(str, Enum):
     GUIDE = "how_to_guide"
@@ -328,11 +360,13 @@ class ProceduralCategory(str, Enum):
     RECIPE = "recipe"
     OTHER = "other_procedural"
 
+
 ProceduralSubclass = ProceduralCategory
 
 # ---------------------------------------------------------------------------
 # Content type wrappers
 # ---------------------------------------------------------------------------
+
 
 class BaseContentType(BaseModel):
     kind: str = Field(..., alias="type")
@@ -340,39 +374,50 @@ class BaseContentType(BaseModel):
     class Config:
         populate_by_name = True
 
+
 ContentType = BaseContentType
+
 
 class TextualContent(BaseContentType):
     kind: str = "text"
     categories: List[TextCategory] = Field(..., alias="subclass")
 
+
 TextContent = TextualContent
+
 
 class AudioContent(BaseContentType):
     kind: str = "audio"
     categories: List[AudioCategory] = Field(..., alias="subclass")
 
+
 class ImageContent(BaseContentType):
     kind: str = "image"
     categories: List[ImageCategory] = Field(..., alias="subclass")
+
 
 class VideoContent(BaseContentType):
     kind: str = "video"
     categories: List[VideoCategory] = Field(..., alias="subclass")
 
+
 class MultimediaContent(BaseContentType):
     kind: str = "multimedia"
     categories: List[MultimediaCategory] = Field(..., alias="subclass")
+
 
 class ThreeDContent(BaseContentType):
     kind: str = "3d_model"
     categories: List[ThreeDCategory] = Field(..., alias="subclass")
 
+
 Model3DContent = ThreeDContent
+
 
 class ProceduralContent(BaseContentType):
     kind: str = "procedural"
     categories: List[ProceduralCategory] = Field(..., alias="subclass")
+
 
 AnyContentLabel = Union[
     TextualContent,
@@ -384,21 +429,26 @@ AnyContentLabel = Union[
     ProceduralContent,
 ]
 
+
 class ContentPrediction(BaseModel):
     label: AnyContentLabel
+
 
 # ---------------------------------------------------------------------------
 # Graph DB type
 # ---------------------------------------------------------------------------
+
 
 class GraphStore(Enum):
     NETWORKX = auto()
     NEO4J = auto()
     KUZU = auto()
 
+
 # ---------------------------------------------------------------------------
 # Document / relationship helpers
 # ---------------------------------------------------------------------------
+
 
 class RelationSpec(BaseModel):
     kind: str = Field(..., alias="type")
@@ -409,25 +459,30 @@ class RelationSpec(BaseModel):
     class Config:
         populate_by_name = True
 
+
 class DocType(BaseModel):
     type_id: str
     description: str
     default_relationship: RelationSpec = RelationSpec(kind="is_type")
+
 
 class CategorySpec(BaseModel):
     category_id: str
     name: str
     default_relationship: RelationSpec = RelationSpec(kind="categorized_as")
 
+
 class DocMeta(BaseModel):
     id: str
     type: str
     title: str
 
+
 class LocationSpec(BaseModel):
     location_id: str
     description: str
     default_relationship: RelationSpec = RelationSpec(kind="located_in")
+
 
 class UserAttrs(BaseModel):
     custom: Optional[Dict[str, Any]] = Field(None, alias="custom_properties")
@@ -435,6 +490,7 @@ class UserAttrs(BaseModel):
 
     class Config:
         populate_by_name = True
+
 
 class GraphModelDefaults(BaseModel):
     node_id: str
@@ -445,4 +501,3 @@ class GraphModelDefaults(BaseModel):
 
     class Config:
         populate_by_name = True
-

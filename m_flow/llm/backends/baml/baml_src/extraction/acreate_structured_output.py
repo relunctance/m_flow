@@ -155,9 +155,7 @@ def _run_demo():
     try:
         demo_input = "DEMO INPUT"
         demo_prompt = "DEMO SYSTEM PROMPT"
-        event_loop.run_until_complete(
-            acreate_structured_output(demo_input, demo_prompt, DemoEntity)
-        )
+        event_loop.run_until_complete(acreate_structured_output(demo_input, demo_prompt, DemoEntity))
     finally:
         event_loop.run_until_complete(event_loop.shutdown_asyncgens())
 

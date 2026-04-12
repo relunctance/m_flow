@@ -54,9 +54,7 @@ def create_extraction_rules() -> dict:
 
 def validate_saved_file(file_path: str, expected_extension: str) -> Path:
     """Verify file exists, has content, and correct extension."""
-    assert file_path.endswith(expected_extension), (
-        f"Expected extension {expected_extension}, got {file_path}"
-    )
+    assert file_path.endswith(expected_extension), f"Expected extension {expected_extension}, got {file_path}"
 
     resolved_path = Path(file_path)
     assert resolved_path.exists(), f"File not found: {file_path}"
@@ -261,9 +259,7 @@ class TestBeautifulSoupLoaderOperations:
 
         # Test with extraction rules
         rules = create_extraction_rules()
-        await engine.load_file(
-            file_path, preferred_loaders={"beautiful_soup_loader": {"extraction_rules": rules}}
-        )
+        await engine.load_file(file_path, preferred_loaders={"beautiful_soup_loader": {"extraction_rules": rules}})
 
     @pytest.mark.asyncio
     async def test_loader_with_full_extraction_rules(self) -> None:
@@ -312,6 +308,4 @@ class TestBeautifulSoupLoaderOperations:
         txt_file = validate_saved_file(txt_path, TEXT_FILE_EXTENSION)
 
         # Verify base names match (same document, different format)
-        assert html_file.stem == txt_file.stem, (
-            f"Base names should match: {html_file.stem} != {txt_file.stem}"
-        )
+        assert html_file.stem == txt_file.stem, f"Base names should match: {html_file.stem} != {txt_file.stem}"

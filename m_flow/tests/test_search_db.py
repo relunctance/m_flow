@@ -28,9 +28,7 @@ async def main():
     text_1 = """Germany is located in europe right next to the Netherlands"""
     await m_flow.add(text_1, dataset_name)
 
-    explanation_file_path_quantum = os.path.join(
-        pathlib.Path(__file__).parent, "test_data/Quantum_computers.txt"
-    )
+    explanation_file_path_quantum = os.path.join(pathlib.Path(__file__).parent, "test_data/Quantum_computers.txt")
 
     await m_flow.add([explanation_file_path_quantum], dataset_name)
 
@@ -39,9 +37,7 @@ async def main():
     # create_triplet_embeddings + MemoryTriplet_text assertion removed (Phase 8, 2026-02-06)
 
     # Test UnifiedTripletSearch
-    context_gk = await UnifiedTripletSearch().get_context(
-        query="Next to which country is Germany located?"
-    )
+    context_gk = await UnifiedTripletSearch().get_context(query="Next to which country is Germany located?")
 
     for name, context in [
         ("UnifiedTripletSearch", context_gk),
@@ -55,9 +51,7 @@ async def main():
             f"{name}: Context did not contain 'germany' or 'netherlands'; got: {context!r}"
         )
 
-    triplets_gk = await UnifiedTripletSearch().get_triplets(
-        query="Next to which country is Germany located?"
-    )
+    triplets_gk = await UnifiedTripletSearch().get_triplets(query="Next to which country is Germany located?")
 
     for name, triplets in [
         ("UnifiedTripletSearch", triplets_gk),
@@ -69,12 +63,8 @@ async def main():
             distance = edge.attributes.get("vector_distance")
             node1_distance = edge.node1.attributes.get("vector_distance")
             node2_distance = edge.node2.attributes.get("vector_distance")
-            assert isinstance(distance, float), (
-                f"{name}: vector_distance should be float, got {type(distance)}"
-            )
-            assert 0 <= distance <= 1, (
-                f"{name}: edge vector_distance {distance} out of [0,1], this shouldn't happen"
-            )
+            assert isinstance(distance, float), f"{name}: vector_distance should be float, got {type(distance)}"
+            assert 0 <= distance <= 1, f"{name}: edge vector_distance {distance} out of [0,1], this shouldn't happen"
             assert 0 <= node1_distance <= 1, (
                 f"{name}: node_1 vector_distance {distance} out of [0,1], this shouldn't happen"
             )
@@ -93,9 +83,7 @@ async def main():
         ("TRIPLET_COMPLETION", completion_gk),
     ]:
         assert isinstance(search_results, list), f"{name}: should return a list"
-        assert len(search_results) == 1, (
-            f"{name}: expected single-element list, got {len(search_results)}"
-        )
+        assert len(search_results) == 1, f"{name}: expected single-element list, got {len(search_results)}"
 
         from m_flow.context_global_variables import backend_access_control_enabled
 
@@ -105,9 +93,7 @@ async def main():
             text = search_results[0]
         assert isinstance(text, str), f"{name}: element should be a string"
         assert text.strip(), f"{name}: string should not be empty"
-        assert "netherlands" in text.lower(), (
-            f"{name}: expected 'netherlands' in result, got: {text!r}"
-        )
+        assert "netherlands" in text.lower(), f"{name}: expected 'netherlands' in result, got: {text!r}"
 
     graph_engine = await get_graph_provider()
     graph = await graph_engine.get_graph_data()

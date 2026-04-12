@@ -44,8 +44,7 @@ async def _crawler_fetch(urls: Union[str, List[str]]) -> UrlsToHtmls:
     cfg = DefaultCrawlerConfig()
 
     _log.debug(
-        f"Crawler config: concurrency={cfg.concurrency}, "
-        f"timeout={cfg.timeout}s, max_delay={cfg.max_crawl_delay}s"
+        f"Crawler config: concurrency={cfg.concurrency}, timeout={cfg.timeout}s, max_delay={cfg.max_crawl_delay}s"
     )
 
     crawler = DefaultUrlCrawler(

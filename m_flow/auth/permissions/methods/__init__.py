@@ -13,7 +13,9 @@ from .check_permission_on_dataset import check_permission_on_dataset as check_pe
 from ._get_or_create_permission import get_or_create_permission as get_or_create_permission
 
 # Permission granting
-from .authorized_give_permission_on_datasets import authorized_give_permission_on_datasets as authorized_give_permission_on_datasets
+from .authorized_give_permission_on_datasets import (
+    authorized_give_permission_on_datasets as authorized_give_permission_on_datasets,
+)
 from .give_permission_on_dataset import give_permission_on_dataset as give_permission_on_dataset
 
 # Default permission setup
@@ -27,5 +29,7 @@ from .get_document_ids_for_user import get_document_ids_for_user as get_document
 from .get_principal import get_principal as get_principal
 from .get_principal_datasets import get_principal_datasets as get_principal_datasets
 from .get_role import get_role as get_role
-from .get_specific_user_permission_datasets import get_specific_user_permission_datasets as get_specific_user_permission_datasets
+from .get_specific_user_permission_datasets import (
+    get_specific_user_permission_datasets as get_specific_user_permission_datasets,
+)
 from .get_tenant import get_tenant as get_tenant

@@ -74,9 +74,7 @@ class TestCacheDisabled:
         ):
             pass
         after_second = tracker.invocations
-        assert after_second > after_first, (
-            f"关闭缓存后应重跑: 第一次 {after_first}, 第二次 {after_second}"
-        )
+        assert after_second > after_first, f"关闭缓存后应重跑: 第一次 {after_first}, 第二次 {after_second}"
 
 
 class TestCacheWithStatusReset:
@@ -118,9 +116,7 @@ class TestCacheWithStatusReset:
         after_cached = tracker.invocations
         assert after_cached == after_first, "开启缓存后应跳过"
 
-        await reset_dataset_pipeline_run_status(
-            captured[0].dataset_id, current_user, pipeline_names=[pipe]
-        )
+        await reset_dataset_pipeline_run_status(captured[0].dataset_id, current_user, pipeline_names=[pipe])
 
         async for _ in execute_workflow(
             tasks=job_list,
@@ -132,6 +128,4 @@ class TestCacheWithStatusReset:
         ):
             pass
         after_reset = tracker.invocations
-        assert after_reset > after_cached, (
-            f"重置后应执行: 缓存后 {after_cached}, 重置后 {after_reset}"
-        )
+        assert after_reset > after_cached, f"重置后应执行: 缓存后 {after_cached}, 重置后 {after_reset}"

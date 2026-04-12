@@ -33,16 +33,16 @@ logger = structlog.get_logger("summarize_by_event")
 def _format_reference_date(reference_date: Optional[Union[int, datetime]]) -> Optional[str]:
     """
     Format reference date for injection into prompt.
-    
+
     Args:
         reference_date: Either milliseconds timestamp (int) or datetime object
-        
+
     Returns:
         Formatted date string like "October 15, 2023" or None
     """
     if reference_date is None:
         return None
-    
+
     try:
         if isinstance(reference_date, int):
             # Milliseconds timestamp
@@ -52,7 +52,7 @@ def _format_reference_date(reference_date: Optional[Union[int, datetime]]) -> Op
             dt = reference_date
         else:
             return None
-        
+
         return dt.strftime("%B %d, %Y")
     except (ValueError, OSError, TypeError):
         return None
@@ -61,14 +61,14 @@ def _format_reference_date(reference_date: Optional[Union[int, datetime]]) -> Op
 def _inject_date_context(prompt: str, reference_date: Optional[Union[int, datetime]]) -> str:
     """
     Inject reference date context into prompt.
-    
+
     Looks for the placeholder in the prompt and replaces it with actual date.
     If no placeholder found, appends date context to the prompt.
-    
+
     Args:
         prompt: Original prompt text
         reference_date: Reference date (ms timestamp or datetime)
-        
+
     Returns:
         Modified prompt with date context
     """
@@ -76,17 +76,17 @@ def _inject_date_context(prompt: str, reference_date: Optional[Union[int, dateti
     if not date_str:
         # No valid date, remove placeholder if exists
         return prompt.replace("\n\nReference Date: {{REFERENCE_DATE}}", "")
-    
+
     # Check for placeholder
     placeholder = "{{REFERENCE_DATE}}"
     if placeholder in prompt:
         return prompt.replace(placeholder, date_str)
-    
+
     # No placeholder, append date context before "Language:" line if exists
     date_context = f"\nReference Date: {date_str} (use this to convert relative times like 'yesterday', 'last week')"
     if "\nLanguage:" in prompt:
         return prompt.replace("\nLanguage:", f"{date_context}\n\nLanguage:")
-    
+
     # Fallback: append at end
     return prompt + date_context
 
@@ -107,6 +107,7 @@ class SummarizeResult:
 def _extract_episode_name(raw_text: str) -> str:
     """Extract 'Episode Name: ...' from LLM output."""
     import re
+
     match = re.search(r"^Episode Name:\s*(.+?)(?:\n|$)", raw_text, re.I | re.M)
     return match.group(1).strip() if match else ""
 
@@ -165,6 +166,7 @@ async def summarize_by_event(
         from m_flow.knowledge.summarization.precise_summarize import (
             precise_summarize_by_event,
         )
+
         try:
             sections = await precise_summarize_by_event(
                 event_sentences=event_sentences,
@@ -172,17 +174,13 @@ async def summarize_by_event(
                 session_date_header=session_date_header,
                 generate_episode_name=generate_episode_name,
             )
-            logger.info(
-                f"[summarize_by_event] Precise mode: {len(sections)} sections"
-            )
+            logger.info(f"[summarize_by_event] Precise mode: {len(sections)} sections")
             if generate_episode_name:
                 ep_name = sections[0].heading if sections else event_topic
                 return SummarizeResult(sections=sections, episode_name=ep_name)
             return sections
         except Exception as e:
-            logger.warning(
-                f"[summarize_by_event] Precise mode failed: {e}, falling back to original"
-            )
+            logger.warning(f"[summarize_by_event] Precise mode failed: {e}, falling back to original")
 
     # Original mode: single-prompt
     # Wrap content in explicit tags to prevent LLM from treating it as an instruction
@@ -192,13 +190,8 @@ async def summarize_by_event(
         if is_atomic:
             system_prompt = read_query_prompt("summarize_content_atomic.txt")
             system_prompt = _inject_date_context(system_prompt, reference_date)
-            result = await LLMService.extract_structured(
-                wrapped_text, system_prompt, Section
-            )
-            logger.info(
-                f"[summarize_by_event] Atomic: generated 1 section, "
-                f"title='{result.heading[:30]}...'"
-            )
+            result = await LLMService.extract_structured(wrapped_text, system_prompt, Section)
+            logger.info(f"[summarize_by_event] Atomic: generated 1 section, title='{result.heading[:30]}...'")
             if generate_episode_name:
                 return SummarizeResult(
                     sections=[result],
@@ -207,15 +200,11 @@ async def summarize_by_event(
             return [result]
         else:
             prompt_file = (
-                "summarize_content_text_with_naming.txt"
-                if generate_episode_name
-                else "summarize_content_text.txt"
+                "summarize_content_text_with_naming.txt" if generate_episode_name else "summarize_content_text.txt"
             )
             system_prompt = read_query_prompt(prompt_file)
             system_prompt = _inject_date_context(system_prompt, reference_date)
-            raw_text = await LLMService.complete_text(
-                wrapped_text, system_prompt
-            )
+            raw_text = await LLMService.complete_text(wrapped_text, system_prompt)
 
             episode_name = _extract_episode_name(raw_text) if generate_episode_name else ""
 
@@ -227,8 +216,7 @@ async def summarize_by_event(
             sections = result.parts or []
             logger.info(
                 f"[summarize_by_event] Text mode: generated {len(sections)} sections, "
-                f"topic='{event_topic[:30]}...'"
-                + (f", episode_name='{episode_name[:40]}'" if episode_name else "")
+                f"topic='{event_topic[:30]}...'" + (f", episode_name='{episode_name[:40]}'" if episode_name else "")
             )
 
             if generate_episode_name:
@@ -287,16 +275,11 @@ async def summarize_by_event_with_procedural(
         if is_atomic:
             system_prompt = read_query_prompt("summarize_content_atomic.txt")
             system_prompt = _inject_date_context(system_prompt, reference_date)
-            section_result = await LLMService.extract_structured(
-                combined_text, system_prompt, Section
-            )
+            section_result = await LLMService.extract_structured(combined_text, system_prompt, Section)
 
             candidates = await _quick_procedural_route_v2(combined_text)
 
-            logger.info(
-                f"[summarize_by_event_with_procedural] Atomic: 1 section, "
-                f"{len(candidates)} candidates"
-            )
+            logger.info(f"[summarize_by_event_with_procedural] Atomic: 1 section, {len(candidates)} candidates")
             return SummarizeResult(
                 sections=[section_result],
                 candidates=candidates,
@@ -304,15 +287,11 @@ async def summarize_by_event_with_procedural(
             )
         else:
             prompt_file = (
-                "summarize_content_text_with_naming.txt"
-                if generate_episode_name
-                else "summarize_content_text.txt"
+                "summarize_content_text_with_naming.txt" if generate_episode_name else "summarize_content_text.txt"
             )
             text_prompt = read_query_prompt(prompt_file)
             text_prompt = _inject_date_context(text_prompt, reference_date)
-            raw_text = await LLMService.complete_text(
-                combined_text, text_prompt
-            )
+            raw_text = await LLMService.complete_text(combined_text, text_prompt)
 
             episode_name = _extract_episode_name(raw_text) if generate_episode_name else ""
 
@@ -370,9 +349,7 @@ async def _quick_procedural_route_v2(content: str) -> List[ProceduralCandidate]:
     Returns 0-N ProceduralCandidate items.
     """
     try:
-        result = await LLMService.extract_structured(
-            content[:1500], QUICK_ROUTING_PROMPT, ProceduralCandidateList
-        )
+        result = await LLMService.extract_structured(content[:1500], QUICK_ROUTING_PROMPT, ProceduralCandidateList)
         return result.candidates or []
     except Exception as e:
         logger.warning(f"[_quick_procedural_route_v2] Failed: {e}")

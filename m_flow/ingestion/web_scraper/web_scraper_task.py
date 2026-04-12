@@ -229,9 +229,7 @@ async def web_scraper_task(
     db = await get_graph_provider()
 
     urls = [url] if isinstance(url, str) else url
-    bs_cfg, tv_cfg, tool = _validate_config(
-        tavily_api_key, extraction_rules, tavily_config, soup_crawler_config
-    )
+    bs_cfg, tv_cfg, tool = _validate_config(tavily_api_key, extraction_rules, tavily_config, soup_crawler_config)
 
     ts = datetime.now()
     job_id = job_name or f"scrape_{ts:%Y%m%d_%H%M%S}"
@@ -303,17 +301,13 @@ async def web_scraper_task(
             content_type="text/html",
             page_size=len(content_str),
             extraction_rules=extraction_rules or {},
-            description=_build_page_description(
-                parsed.path.lstrip("/"), page_url, ts, content_str, len(content_str)
-            ),
+            description=_build_page_description(parsed.path.lstrip("/"), page_url, ts, content_str, len(content_str)),
         )
         pages.append(page)
 
     # Update job status
     scraping_job.status = "completed" if pages else "failed"
-    scraping_job.description = _build_job_description(
-        job_id, urls, scraping_job.status, schedule, ts, next_run
-    )
+    scraping_job.description = _build_job_description(job_id, urls, scraping_job.status, schedule, ts, next_run)
 
     # Build graph nodes and edges
     nodes: Dict[Any, Any] = {scraping_job.id: scraping_job}

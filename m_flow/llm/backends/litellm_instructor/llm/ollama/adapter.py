@@ -72,9 +72,7 @@ class OllamaAPIAdapter(LLMBackend):
         self.instructor_mode = instructor_mode or self.default_instructor_mode
 
         raw_client = OpenAI(base_url=endpoint, api_key=api_key)
-        self.aclient = instructor.from_openai(
-            raw_client, mode=instructor.Mode(self.instructor_mode)
-        )
+        self.aclient = instructor.from_openai(raw_client, mode=instructor.Mode(self.instructor_mode))
 
     @retry(**_RETRY_CFG)
     async def extract_structured(
@@ -100,9 +98,7 @@ class OllamaAPIAdapter(LLMBackend):
     async def transcribe_audio(self, input_file: str, **kwargs) -> str:
         """Transcribe audio via Whisper model."""
         async with open_data_file(input_file, mode="rb") as fp:
-            resp = self.aclient.audio.transcriptions.create(
-                model="whisper-1", file=fp, language="en"
-            )
+            resp = self.aclient.audio.transcriptions.create(model="whisper-1", file=fp, language="en")
 
         if not getattr(resp, "text", None):
             raise ValueError("Audio transcription yielded no text")

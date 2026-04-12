@@ -109,6 +109,4 @@ async def test_audio_document_chunk_boundaries():
             observed = _actual_triplet(live_chunk)
             golden = _expected_triplet(oracle_row)
             if observed != golden:
-                raise AssertionError(
-                    f"chunk index {slot - 1}: expected {golden}, observed {observed}"
-                )
+                raise AssertionError(f"chunk index {slot - 1}: expected {golden}, observed {observed}")

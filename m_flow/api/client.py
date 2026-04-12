@@ -81,23 +81,24 @@ async def _app_lifecycle(app: FastAPI) -> AsyncGenerator[None, None]:
 
     _log.info("Backend server has started")
     yield
-    
+
     # -------------------------------------------------------------------------
     # Graceful shutdown: checkpoint graph database before exit
     # -------------------------------------------------------------------------
     _log.info("Shutting down - initiating graph database checkpoint...")
     try:
         from m_flow.adapters.graph.get_graph_adapter import get_graph_provider
+
         graph_engine = await get_graph_provider()
-        if hasattr(graph_engine, 'checkpoint'):
+        if hasattr(graph_engine, "checkpoint"):
             await graph_engine.checkpoint()
             _log.info("Graph database checkpoint completed before shutdown")
-        if hasattr(graph_engine, 'close'):
+        if hasattr(graph_engine, "close"):
             graph_engine.close()
             _log.info("Graph database connection closed")
     except Exception as e:
         _log.warning(f"Shutdown checkpoint failed: {e}")
-    
+
     _log.info("Backend server shutdown complete")
 
 
@@ -216,10 +217,7 @@ async def _health_probe() -> JSONResponse:
 
     try:
         # Total timeout of 3 seconds for all health probes
-        report = await asyncio.wait_for(
-            health_checker.get_health_status(detailed=False),
-            timeout=3.0
-        )
+        report = await asyncio.wait_for(health_checker.get_health_status(detailed=False), timeout=3.0)
         is_healthy = report.status != HealthStatus.UNHEALTHY
         return JSONResponse(
             status_code=200 if is_healthy else 503,

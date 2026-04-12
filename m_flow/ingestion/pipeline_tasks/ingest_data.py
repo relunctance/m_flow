@@ -142,9 +142,7 @@ async def _process_single_item(
     # Check for existing record and update if found
     db = get_db_adapter()
     async with db.get_async_session() as sess:
-        existing = (
-            await sess.execute(select(Data).filter(Data.id == data_id))
-        ).scalar_one_or_none()
+        existing = (await sess.execute(select(Data).filter(Data.id == data_id))).scalar_one_or_none()
 
         if existing is not None:
             # Update existing record within the same session to avoid detached object issues

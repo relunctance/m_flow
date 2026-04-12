@@ -79,9 +79,7 @@ class ActiveReconciler:
         versions_found = [r.get("version", 1) for r in rows]
 
         # Highest version as active
-        rows_sorted = sorted(
-            rows, key=lambda r: (r.get("version", 0), r.get("updated_at", 0)), reverse=True
-        )
+        rows_sorted = sorted(rows, key=lambda r: (r.get("version", 0), r.get("updated_at", 0)), reverse=True)
         active_row = rows_sorted[0]
         active_id = active_row.get("id")
 

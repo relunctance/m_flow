@@ -112,9 +112,7 @@ def _assemble_summary_mode(
                 n1_type = edge.node1.attributes.get("type", "")
                 if n1_type == "Episode" and str(edge.node1.id) == ep:
                     ep_node = edge.node1
-                elif (
-                    edge.node2.attributes.get("type", "") == "Episode" and str(edge.node2.id) == ep
-                ):
+                elif edge.node2.attributes.get("type", "") == "Episode" and str(edge.node2.id) == ep:
                     ep_node = edge.node2
                 if ep_node:
                     break
@@ -126,9 +124,7 @@ def _assemble_summary_mode(
                 if edge:
                     if edge.node1.attributes.get("type") == "Episode" and str(edge.node1.id) == ep:
                         ep_node = edge.node1
-                    elif (
-                        edge.node2.attributes.get("type") == "Episode" and str(edge.node2.id) == ep
-                    ):
+                    elif edge.node2.attributes.get("type") == "Episode" and str(edge.node2.id) == ep:
                         ep_node = edge.node2
                     if ep_node:
                         break
@@ -497,11 +493,7 @@ def _get_top_entities(
             if not eobj:
                 continue
             key = _get_edge_key_for_embedding(eobj)
-            ec = (
-                float(edge_hit_map.get(key, config.edge_miss_cost))
-                if key
-                else config.edge_miss_cost
-            )
+            ec = float(edge_hit_map.get(key, config.edge_miss_cost)) if key else config.edge_miss_cost
             # 2 hops: Entity → Facet → Episode
             c = ed + ec + config.hop_cost * 2
             candidates.append((c, en))
@@ -630,11 +622,7 @@ def _sort_output_edges_basic(
 
         # Edge vector cost
         emb_key = _get_edge_key_for_embedding(edge)
-        edge_vector_cost = (
-            float(edge_hit_map.get(emb_key, config.edge_miss_cost))
-            if emb_key
-            else config.edge_miss_cost
-        )
+        edge_vector_cost = float(edge_hit_map.get(emb_key, config.edge_miss_cost)) if emb_key else config.edge_miss_cost
 
         # Edge type priority
         rel = get_edge_relationship(edge)
@@ -685,16 +673,10 @@ def _sort_output_edges_adaptive(
 
         # Get edge vector score
         emb_key = _get_edge_key_for_embedding(edge)
-        edge_score = (
-            float(edge_hit_map.get(emb_key, config.edge_miss_cost))
-            if emb_key
-            else config.edge_miss_cost
-        )
+        edge_score = float(edge_hit_map.get(emb_key, config.edge_miss_cost)) if emb_key else config.edge_miss_cost
 
         # Compute semantic score
-        semantic = compute_semantic_score(
-            node_score, edge_score, adaptive_context.w_node, adaptive_context.w_edge
-        )
+        semantic = compute_semantic_score(node_score, edge_score, adaptive_context.w_node, adaptive_context.w_edge)
 
         # Get Episode rank
         ep_id = _get_edge_episode_id(edge, facet_to_episode)
@@ -734,9 +716,7 @@ def _sort_output_edges_adaptive(
         logger.info("[AdaptiveSort] Sorting edges with adaptive scoring...")
         for i, e in enumerate(out_edges[:5]):
             key = get_adaptive_sort_key(e)
-            logger.info(
-                f"  Edge {i}: final={key[0]:.4f}, priority={key[1]}, rel={get_edge_relationship(e)}"
-            )
+            logger.info(f"  Edge {i}: final={key[0]:.4f}, priority={key[1]}, rel={get_edge_relationship(e)}")
 
     out_edges.sort(key=get_adaptive_sort_key)
 

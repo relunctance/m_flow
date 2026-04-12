@@ -28,6 +28,7 @@ from m_flow.shared.logging_utils import get_logger
 
 _log = get_logger("m_flow.pipeline")
 
+
 @dataclass(frozen=True)
 class WorkflowConfig:
     """Optional knobs for a workflow run."""
@@ -38,7 +39,9 @@ class WorkflowConfig:
     incremental: bool = False
     batch_size: int = 20
 
+
 WorkflowConfig = WorkflowConfig
+
 
 async def execute_workflow(
     tasks: list[Stage],
@@ -71,9 +74,15 @@ async def execute_workflow(
 
     for ds in authorised:
         async for info in _execute_for_dataset(
-            ds, resolved_user, tasks, data, name, cfg,
+            ds,
+            resolved_user,
+            tasks,
+            data,
+            name,
+            cfg,
         ):
             yield info
+
 
 async def _prepare(
     tasks: list[Stage],
@@ -85,6 +94,7 @@ async def _prepare(
     ensure_valid_tasks(tasks)
     await prepare_backends(cfg.vector_db, cfg.graph_db)
     return await authorize_datasets(datasets, user)
+
 
 async def _execute_for_dataset(
     ds: Dataset,
@@ -123,5 +133,6 @@ async def _execute_for_dataset(
         incremental_loading=cfg.incremental,
     ):
         yield info
+
 
 execute_workflow = execute_workflow

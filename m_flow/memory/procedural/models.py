@@ -219,9 +219,7 @@ class ProcedureCandidate(BaseModel):
 
     procedure_id: str = Field(..., description="The unique ID of the candidate procedure.")
     procedure_name: str = Field(..., description="The name/title of the candidate procedure.")
-    procedure_summary: str = Field(
-        ..., description="The summary of the candidate procedure (may be truncated)."
-    )
+    procedure_summary: str = Field(..., description="The summary of the candidate procedure (may be truncated).")
     version: int = Field(default=1, description="Current version number.")
     match_signals: str = Field(
         default="",

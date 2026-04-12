@@ -67,12 +67,8 @@ class TestValidateSplits:
     def test_valid_splits(self):
         """Test valid split suggestions pass validation."""
         splits = [
-            SplitSuggestion(
-                new_episode_name="Episode A", facet_indices=[0, 1, 2], rationale="Group A"
-            ),
-            SplitSuggestion(
-                new_episode_name="Episode B", facet_indices=[3, 4], rationale="Group B"
-            ),
+            SplitSuggestion(new_episode_name="Episode A", facet_indices=[0, 1, 2], rationale="Group A"),
+            SplitSuggestion(new_episode_name="Episode B", facet_indices=[3, 4], rationale="Group B"),
         ]
 
         result = validate_splits(splits, total_facets=5)
@@ -94,9 +90,7 @@ class TestValidateSplits:
     def test_negative_index(self):
         """Test negative index raises ValueError."""
         splits = [
-            SplitSuggestion(
-                new_episode_name="Episode A", facet_indices=[-1, 0, 1], rationale="Group A"
-            ),
+            SplitSuggestion(new_episode_name="Episode A", facet_indices=[-1, 0, 1], rationale="Group A"),
         ]
 
         with pytest.raises(ValueError, match="Invalid facet index"):
@@ -105,9 +99,7 @@ class TestValidateSplits:
     def test_duplicate_indices(self):
         """Test duplicate indices raises ValueError."""
         splits = [
-            SplitSuggestion(
-                new_episode_name="Episode A", facet_indices=[0, 1, 2], rationale="Group A"
-            ),
+            SplitSuggestion(new_episode_name="Episode A", facet_indices=[0, 1, 2], rationale="Group A"),
             SplitSuggestion(
                 new_episode_name="Episode B",
                 facet_indices=[2, 3, 4],  # 2 is duplicate
@@ -121,9 +113,7 @@ class TestValidateSplits:
     def test_missing_facets(self):
         """Test not all facets assigned raises ValueError."""
         splits = [
-            SplitSuggestion(
-                new_episode_name="Episode A", facet_indices=[0, 1], rationale="Group A"
-            ),
+            SplitSuggestion(new_episode_name="Episode A", facet_indices=[0, 1], rationale="Group A"),
             # Missing indices 2, 3, 4
         ]
 
@@ -157,12 +147,8 @@ class TestAuditResultParsing:
             decision="SPLIT",
             reasoning="Two distinct topics found",
             splits=[
-                SplitSuggestion(
-                    new_episode_name="Topic A", facet_indices=[0, 1], rationale="Related to A"
-                ),
-                SplitSuggestion(
-                    new_episode_name="Topic B", facet_indices=[2, 3], rationale="Related to B"
-                ),
+                SplitSuggestion(new_episode_name="Topic A", facet_indices=[0, 1], rationale="Related to A"),
+                SplitSuggestion(new_episode_name="Topic B", facet_indices=[2, 3], rationale="Related to B"),
             ],
         )
 

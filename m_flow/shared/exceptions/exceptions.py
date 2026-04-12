@@ -12,6 +12,7 @@ from http import HTTPStatus
 
 from m_flow.exceptions import BadInputError
 
+
 class IngestionError(BadInputError):
     """Raised when a data-ingestion / loading step cannot complete.
 

@@ -204,9 +204,7 @@ def sleep_and_retry_sync(
                         raise
 
                     delay = _calc_backoff(attempt, initial_backoff, backoff_factor, jitter)
-                    _log.warning(
-                        f"Rate limit retry {attempt}/{max_retries}, waiting {delay:.1f}s: {e}"
-                    )
+                    _log.warning(f"Rate limit retry {attempt}/{max_retries}, waiting {delay:.1f}s: {e}")
                     time.sleep(delay)
 
         return wrapper  # type: ignore
@@ -239,9 +237,7 @@ def sleep_and_retry_async(
                         raise
 
                     delay = _calc_backoff(attempt, initial_backoff, backoff_factor, jitter)
-                    _log.warning(
-                        f"Rate limit retry {attempt}/{max_retries}, waiting {delay:.1f}s: {e}"
-                    )
+                    _log.warning(f"Rate limit retry {attempt}/{max_retries}, waiting {delay:.1f}s: {e}")
                     await asyncio.sleep(delay)
 
         return wrapper  # type: ignore

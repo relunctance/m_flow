@@ -101,9 +101,7 @@ class FastembedEmbeddingEngine(EmbeddingEngine):
                 self.model,
                 exc,
             )
-            raise EmbeddingException(
-                f"Unable to compute embeddings with {self.model}"
-            ) from exc
+            raise EmbeddingException(f"Unable to compute embeddings with {self.model}") from exc
 
     def get_vector_size(self) -> int:
         return self.dimensions

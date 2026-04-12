@@ -143,9 +143,7 @@ def get_delete_router() -> APIRouter:
 
         from m_flow.api.v1.delete.node_deletion import delete_node_by_id
 
-        return await delete_node_by_id(
-            node_id, dataset_id, cascade=cascade, user=user
-        )
+        return await delete_node_by_id(node_id, dataset_id, cascade=cascade, user=user)
 
     @router.delete("/episode/{episode_id}", response_model=None)
     async def delete_episode_node(

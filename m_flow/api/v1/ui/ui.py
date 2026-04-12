@@ -61,9 +61,7 @@ def _check_ports(ports: list[tuple[int, str]]) -> tuple[bool, list[str]]:
 # ===================== Process Output Streaming =====================
 
 
-def _stream_output(
-    proc: subprocess.Popen, stream: str, tag: str, color: str = ""
-) -> threading.Thread:
+def _stream_output(proc: subprocess.Popen, stream: str, tag: str, color: str = "") -> threading.Thread:
     """Stream subprocess output with a prefix."""
 
     def reader():

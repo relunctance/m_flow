@@ -46,37 +46,25 @@ async def check_file_deletion_behavior(text_data: str, referenced_path: str):
     async with engine.get_async_session() as session:
         content_digest = hashlib.md5(text_data.encode("utf-8")).hexdigest()
 
-        data_entry = (
-            await session.scalars(select(Data).where(Data.content_hash == content_digest))
-        ).one()
+        data_entry = (await session.scalars(select(Data).where(Data.content_hash == content_digest))).one()
 
         local_path = data_entry.processed_path.replace("file://", "")
-        assert os.path.isfile(local_path), (
-            f"File missing before deletion: {data_entry.processed_path}"
-        )
+        assert os.path.isfile(local_path), f"File missing before deletion: {data_entry.processed_path}"
 
         await engine.delete_data_entity(data_entry.id)
 
-        assert not os.path.exists(local_path), (
-            f"m_flow file should be removed: {data_entry.processed_path}"
-        )
+        assert not os.path.exists(local_path), f"m_flow file should be removed: {data_entry.processed_path}"
 
     # Test 2: External references should not be deleted
     async with engine.get_async_session() as session:
-        data_entry = (
-            await session.scalars(select(Data).where(Data.processed_path == referenced_path))
-        ).one()
+        data_entry = (await session.scalars(select(Data).where(Data.processed_path == referenced_path))).one()
 
         local_path = data_entry.processed_path.replace("file://", "")
-        assert os.path.isfile(local_path), (
-            f"File missing before deletion: {data_entry.processed_path}"
-        )
+        assert os.path.isfile(local_path), f"File missing before deletion: {data_entry.processed_path}"
 
         await engine.delete_data_entity(data_entry.id)
 
-        assert os.path.exists(local_path), (
-            f"External file should persist: {data_entry.processed_path}"
-        )
+        assert os.path.exists(local_path), f"External file should persist: {data_entry.processed_path}"
 
 
 async def check_document_access(dataset_name: str):
@@ -95,9 +83,7 @@ async def check_document_access(dataset_name: str):
 
     # Full access retrieval
     all_accessible_docs = await get_document_ids_for_user(user.id)
-    assert len(all_accessible_docs) == 2, (
-        f"User should access 2 documents, found {len(all_accessible_docs)}"
-    )
+    assert len(all_accessible_docs) == 2, f"User should access 2 documents, found {len(all_accessible_docs)}"
 
 
 async def check_unbounded_search():
@@ -131,9 +117,7 @@ async def check_unbounded_search():
     )
 
     # Common default limits are 5, 10, 15 - we should exceed all of these
-    assert len(search_results) > 15, (
-        f"Unbounded search should return >15 results, got {len(search_results)}"
-    )
+    assert len(search_results) > 15, f"Unbounded search should return >15 results, got {len(search_results)}"
 
 
 async def main():
@@ -216,16 +200,12 @@ async def main():
     # Cleanup validation
     await m_flow.prune.prune_data()
     storage_cfg = get_storage_config()
-    assert not os.path.isdir(storage_cfg["data_root_directory"]), (
-        "Data directory should be removed after prune"
-    )
+    assert not os.path.isdir(storage_cfg["data_root_directory"]), "Data directory should be removed after prune"
 
     await m_flow.prune.prune_system(metadata=True)
     db_connection = await vector_db.get_connection()
     remaining_tables = await db_connection.table_names()
-    assert len(remaining_tables) == 0, (
-        f"LanceDB should be empty after cleanup, found {len(remaining_tables)} tables"
-    )
+    assert len(remaining_tables) == 0, f"LanceDB should be empty after cleanup, found {len(remaining_tables)} tables"
 
     # Unbounded search test
     await check_unbounded_search()

@@ -67,11 +67,7 @@ class GraphRelationshipLedger(Base):
             "source_node_id": str(self.source_node_id),
             "destination_node_id": str(self.destination_node_id),
             "creator_function": self.creator_function,
-            "created_at": (
-                self.created_at.isoformat() if self.created_at else None
-            ),
-            "deleted_at": (
-                self.deleted_at.isoformat() if self.deleted_at else None
-            ),
+            "created_at": (self.created_at.isoformat() if self.created_at else None),
+            "deleted_at": (self.deleted_at.isoformat() if self.deleted_at else None),
             "user_id": str(self.user_id) if self.user_id else None,
         }

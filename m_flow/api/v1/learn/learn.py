@@ -72,41 +72,41 @@ def _create_virtual_chunk_for_episode(episode: Episode) -> ContentFragment:
 async def _filter_virtual_nodes(items: List[Any]) -> List[Any]:
     """
     Filter out virtual FragmentDigest nodes that should not be persisted to the database.
-    
+
     This is a pipeline task that filters FragmentDigest objects created from Episode data.
     These virtual nodes are only used to pass data between pipeline stages, not for storage.
-    
+
     Filter criteria:
     - Only filters FragmentDigest type objects
     - Checks made_from.metadata.source_type == "episode"
     - Preserves all other node types (Procedure, MemorySpace, Points, etc.)
-    
+
     Args:
         items: List of MemoryNode objects from write_procedural_memories
-        
+
     Returns:
         Filtered list without virtual FragmentDigest nodes
     """
     # FragmentDigest is already imported at module level (line 27)
     result = []
     filtered_count = 0
-    
+
     for item in items:
         if isinstance(item, FragmentDigest):
             # Safely access nested attributes
-            made_from = getattr(item, 'made_from', None)
+            made_from = getattr(item, "made_from", None)
             if made_from is not None:
-                metadata = getattr(made_from, 'metadata', None)
+                metadata = getattr(made_from, "metadata", None)
                 if metadata is not None and isinstance(metadata, dict):
-                    source_type = metadata.get('source_type')
-                    if source_type == 'episode':
+                    source_type = metadata.get("source_type")
+                    if source_type == "episode":
                         filtered_count += 1
                         continue  # Skip virtual node
         result.append(item)
-    
+
     if filtered_count > 0:
         logger.info(f"[learn] Filtered {filtered_count} virtual FragmentDigest nodes")
-    
+
     return result
 
 
@@ -148,12 +148,13 @@ async def fetch_episodes_from_graph(
                         props = node_data.get("properties", {})
                         if isinstance(props, str):
                             import json as _json
+
                             try:
                                 props = _json.loads(props)
                             except (ValueError, TypeError):
                                 props = {}
                         ds_id = node_data.get("dataset_id") or props.get("dataset_id")
-                        
+
                         episode = Episode(
                             id=UUID(node_data.get("id")),
                             name=node_data.get("name", ""),
@@ -211,10 +212,7 @@ async def fetch_episodes_from_graph(
                     # get_edges returns List[Tuple[Dict, str, Dict]]
                     try:
                         edges = await graph_engine.get_edges(str(node_id))
-                        has_derived = any(
-                            rel == "derived_procedure"
-                            for _src, rel, _dst in edges
-                        )
+                        has_derived = any(rel == "derived_procedure" for _src, rel, _dst in edges)
                     except Exception as e:
                         logger.debug("Failed to check edges for node %s: %s", node_id, e)
                         has_derived = False
@@ -222,7 +220,7 @@ async def fetch_episodes_from_graph(
                     if not has_derived:
                         # Extract dataset_id from properties for data consistency
                         ds_id = props.get("dataset_id")
-                        
+
                         episode = Episode(
                             id=UUID(str(node_id)),
                             name=name or "",
@@ -354,9 +352,7 @@ async def _create_derived_procedure_edges(
                         },
                     )
                     edges_created += 1
-                    logger.debug(
-                        f"[learn] Created derived_procedure edge: {episode.name} -> {proc.name}"
-                    )
+                    logger.debug(f"[learn] Created derived_procedure edge: {episode.name} -> {proc.name}")
                 except Exception as e:
                     logger.warning(f"[learn] Failed to create edge for {episode.name}: {e}")
 
@@ -436,8 +432,7 @@ async def learn(
     # This will be addressed in a future refactoring.
     if run_in_background:
         logger.warning(
-            "[learn] run_in_background=True is not yet supported for learn(). "
-            "The operation will run synchronously."
+            "[learn] run_in_background=True is not yet supported for learn(). The operation will run synchronously."
         )
 
     try:
@@ -450,9 +445,7 @@ async def learn(
             name="learn_pipeline",
         ):
             if hasattr(result, "payload"):
-                result_items.extend(
-                    result.payload if isinstance(result.payload, list) else [result.payload]
-                )
+                result_items.extend(result.payload if isinstance(result.payload, list) else [result.payload])
 
         # Step 5: Create derived_procedure edges
         graph_engine = await get_graph_provider()
@@ -468,8 +461,7 @@ async def learn(
         procedures_created = len([r for r in result_items if isinstance(r, Procedure)])
 
         logger.info(
-            f"[learn] Completed: {len(episodes)} episodes -> "
-            f"{procedures_created} procedures, {edges_created} edges"
+            f"[learn] Completed: {len(episodes)} episodes -> {procedures_created} procedures, {edges_created} edges"
         )
 
         return {

@@ -137,9 +137,7 @@ async def get_episode_quality_stats(dataset_id: Optional[str] = None) -> dict:
             "max_facet_count": max(facet_counts) if facet_counts else 0,
         },
         "problematic_episodes": [asdict(p) for p in problematic],
-        "all_episodes": [
-            asdict(a) for a in sorted(all_items, key=lambda x: (-x.facet_count, x.name))
-        ],
+        "all_episodes": [asdict(a) for a in sorted(all_items, key=lambda x: (-x.facet_count, x.name))],
     }
 
 
@@ -205,9 +203,7 @@ async def run_size_check_for_episodes(episode_ids: List[str]) -> dict:
 
             if audit_result.decision == "SPLIT" and audit_result.splits:
                 # Execute split
-                new_ep_ids = await execute_split(
-                    ep_id, audit_result.splits, audit_result.reasoning
-                )
+                new_ep_ids = await execute_split(ep_id, audit_result.splits, audit_result.reasoning)
 
                 results.append(
                     {

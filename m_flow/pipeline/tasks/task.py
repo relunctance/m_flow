@@ -12,6 +12,7 @@ import inspect
 from collections.abc import AsyncIterator
 from typing import Any, Dict, Optional
 
+
 class Stage:
     """
     Normalises arbitrary callables into a single async-iterable contract.
@@ -105,10 +106,7 @@ class Stage:
         next_batch_size
             Override the configured batch size for this single execution.
         """
-        effective_batch = (
-            next_batch_size if next_batch_size is not None
-            else self._cfg.get("batch_size", 1)
-        )
+        effective_batch = next_batch_size if next_batch_size is not None else self._cfg.get("batch_size", 1)
 
         match self._kind:
             case "async_gen":
@@ -125,7 +123,9 @@ class Stage:
     # -- private collectors ---------------------------------------------------
 
     async def _collect_async_gen(
-        self, inputs: Any, size: int,
+        self,
+        inputs: Any,
+        size: int,
     ) -> AsyncIterator[list]:
         buf: list = []
         async for item in self.run(*inputs):
@@ -137,7 +137,9 @@ class Stage:
             yield buf
 
     async def _collect_sync_gen(
-        self, inputs: Any, size: int,
+        self,
+        inputs: Any,
+        size: int,
     ) -> AsyncIterator[list]:
         buf: list = []
         for item in self.run(*inputs):
@@ -147,4 +149,3 @@ class Stage:
                 buf = []
         if buf:
             yield buf
-

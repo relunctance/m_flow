@@ -308,9 +308,7 @@ class NeptuneGraphDB(GraphProvider):
                 try:
                     await self.add_node(n)
                 except Exception as inner_exc:
-                    _log.error(
-                        f"Individual node failed [{n.id}]: {format_neptune_error(inner_exc)}"
-                    )
+                    _log.error(f"Individual node failed [{n.id}]: {format_neptune_error(inner_exc)}")
 
     async def delete_node(self, node_id: str) -> None:
         """Remove a node and its relationships by ID."""
@@ -593,10 +591,7 @@ class NeptuneGraphDB(GraphProvider):
             edge_results = await self.query(edge_cypher)
 
             nodes = [(r["node_id"], r["properties"]) for r in node_results]
-            edges = [
-                (r["source_id"], r["target_id"], r["relationship_name"], r["properties"])
-                for r in edge_results
-            ]
+            edges = [(r["source_id"], r["target_id"], r["relationship_name"], r["properties"]) for r in edge_results]
 
             _log.debug(f"Graph data: {len(nodes)} nodes, {len(edges)} edges")
             return (nodes, edges)
@@ -614,9 +609,7 @@ class NeptuneGraphDB(GraphProvider):
             "num_nodes": node_count,
             "num_edges": edge_count,
             "mean_degree": (2 * edge_count / node_count) if node_count else None,
-            "edge_density": (
-                edge_count / (node_count * (node_count - 1)) if node_count > 1 else None
-            ),
+            "edge_density": (edge_count / (node_count * (node_count - 1)) if node_count > 1 else None),
             "num_connected_components": component_count,
             "sizes_of_connected_components": component_sizes,
             "num_selfloops": -1,
@@ -742,18 +735,14 @@ class NeptuneGraphDB(GraphProvider):
         """
 
         try:
-            results = await self.query(
-                cypher, {"names": node_name, "type_name": node_type.__name__}
-            )
+            results = await self.query(cypher, {"names": node_name, "type_name": node_type.__name__})
 
             if not results:
                 return ([], [])
 
             raw = results[0]
             nodes = [(n["id"], n["properties"]) for n in raw["rawNodes"]]
-            edges = [
-                (r["source_id"], r["target_id"], r["type"], r["properties"]) for r in raw["rawRels"]
-            ]
+            edges = [(r["source_id"], r["target_id"], r["type"], r["properties"]) for r in raw["rawRels"]]
 
             _log.debug(f"Subgraph: {len(nodes)} nodes, {len(edges)} edges for {node_type.__name__}")
             return (nodes, edges)
@@ -797,9 +786,7 @@ class NeptuneGraphDB(GraphProvider):
         results = await self.query(cypher, {"doc_id": data_id})
         return results[0] if results else None
 
-    async def query_by_attributes(
-        self, attribute_filters: list[dict[str, list]]
-    ) -> Tuple[List[Tuple], List[Tuple]]:
+    async def query_by_attributes(self, attribute_filters: list[dict[str, list]]) -> Tuple[List[Tuple], List[Tuple]]:
         """Get nodes and edges filtered by attributes."""
         where_n = []
         where_m = []
@@ -852,9 +839,7 @@ class NeptuneGraphDB(GraphProvider):
     # Connection Management
     # -------------------------------------------------------------------------
 
-    async def remove_connection_to_predecessors_of(
-        self, node_ids: list[str], edge_label: str
-    ) -> None:
+    async def remove_connection_to_predecessors_of(self, node_ids: list[str], edge_label: str) -> None:
         """Remove outgoing edges of specified label from nodes."""
         cypher = f"""
         UNWIND $ids AS nid
@@ -863,9 +848,7 @@ class NeptuneGraphDB(GraphProvider):
         """
         await self.query(cypher, {"ids": node_ids})
 
-    async def remove_connection_to_successors_of(
-        self, node_ids: list[str], edge_label: str
-    ) -> None:
+    async def remove_connection_to_successors_of(self, node_ids: list[str], edge_label: str) -> None:
         """Remove incoming edges of specified label to nodes."""
         cypher = f"""
         UNWIND $ids AS nid
@@ -891,9 +874,7 @@ class NeptuneGraphDB(GraphProvider):
 
     async def get_relationship_labels_string(self) -> str:
         """Get all relationship types as a string."""
-        cypher = (
-            "CALL neptune.graph.pg_schema() YIELD schema RETURN schema.edgeLabels as relationships"
-        )
+        cypher = "CALL neptune.graph.pg_schema() YIELD schema RETURN schema.edgeLabels as relationships"
         results = await self.query(cypher)
         rels = results[0]["relationships"] if results else []
 

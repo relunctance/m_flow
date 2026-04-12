@@ -21,10 +21,6 @@ async def get_user_by_email(user_email: str) -> Optional[User]:
     engine = get_db_adapter()
 
     async with engine.get_async_session() as session:
-        query = (
-            select(User)
-            .options(joinedload(User.roles), joinedload(User.tenants))
-            .where(User.email == user_email)
-        )
+        query = select(User).options(joinedload(User.roles), joinedload(User.tenants)).where(User.email == user_email)
         result = await session.execute(query)
         return result.scalar()

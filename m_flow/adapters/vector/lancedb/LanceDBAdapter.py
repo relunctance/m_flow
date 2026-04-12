@@ -200,9 +200,7 @@ class LanceDBAdapter(VectorProvider):
         conn = await self.get_connection()
         return await conn.open_table(collection_name)
 
-    async def create_memory_nodes(
-        self, collection_name: str, memory_nodes: list[MemoryNode]
-    ) -> None:
+    async def create_memory_nodes(self, collection_name: str, memory_nodes: list[MemoryNode]) -> None:
         """创建或更新内存节点"""
         if not memory_nodes:
             return
@@ -270,15 +268,10 @@ class LanceDBAdapter(VectorProvider):
         # 执行upsert
         async with self._lock:
             await (
-                coll.merge_insert("id")
-                .when_matched_update_all()
-                .when_not_matched_insert_all()
-                .execute(unique_records)
+                coll.merge_insert("id").when_matched_update_all().when_not_matched_insert_all().execute(unique_records)
             )
 
-    async def retrieve(
-        self, collection_name: str, memory_node_ids: list[str]
-    ) -> list[VectorSearchHit]:
+    async def retrieve(self, collection_name: str, memory_node_ids: list[str]) -> list[VectorSearchHit]:
         """根据ID检索节点"""
         coll = await self.get_collection(collection_name)
 
@@ -409,7 +402,7 @@ class LanceDBAdapter(VectorProvider):
         memory_nodes: list[MemoryNode],
     ) -> None:
         """为内存节点建立索引
-        
+
         保留 dataset_id 和 memory_type 字段以支持：
         - Episode Routing 的 dataset 隔离过滤
         - Retrieval 的 memory_type 过滤

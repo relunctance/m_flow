@@ -187,9 +187,7 @@ async def resolve_edges_to_text(edges: list[Edge]) -> str:
 
     node_lines = []
     for info in nodes.values():
-        node_lines.append(
-            f"Node: {info['name']}\n__node_content_start__\n{info['content']}\n__node_content_end__"
-        )
+        node_lines.append(f"Node: {info['name']}\n__node_content_start__\n{info['content']}\n__node_content_end__")
     node_section = "\n".join(node_lines)
 
     conn_lines = []

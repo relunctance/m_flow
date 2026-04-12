@@ -205,8 +205,7 @@ async def compile_by_action(
     if action == MergeAction.patch:
         if not existing_procedure:
             logger.warning(
-                "[procedural.incremental.compile] patch action but no existing_procedure, "
-                "fallback to create_new"
+                "[procedural.incremental.compile] patch action but no existing_procedure, fallback to create_new"
             )
             return await _compile_create_new(candidate, content)
         return await _compile_patch(candidate, content, existing_procedure)
@@ -214,8 +213,7 @@ async def compile_by_action(
     if action == MergeAction.new_version:
         if not existing_procedure:
             logger.warning(
-                "[procedural.incremental.compile] new_version action but no existing_procedure, "
-                "fallback to create_new"
+                "[procedural.incremental.compile] new_version action but no existing_procedure, fallback to create_new"
             )
             return await _compile_create_new(candidate, content)
         return await _compile_new_version(candidate, content, existing_procedure)
@@ -310,7 +308,5 @@ async def _compile_new_version(
                 response_model=ProceduralWriteDraft,
             )
     except Exception as e:
-        logger.error(
-            f"[procedural.incremental.compile] new_version compile failed: {e}"
-        )
+        logger.error(f"[procedural.incremental.compile] new_version compile failed: {e}")
         return None

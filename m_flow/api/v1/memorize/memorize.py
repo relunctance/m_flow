@@ -78,8 +78,7 @@ async def _check_and_register_datasets(
         if conflicts:
             if conflict_mode == "error":
                 raise ConcurrentMemorizeError(
-                    f"Datasets {conflicts} are already being processed. "
-                    f"Use conflict_mode='ignore' to proceed anyway."
+                    f"Datasets {conflicts} are already being processed. Use conflict_mode='ignore' to proceed anyway."
                 )
             elif conflict_mode == "warn":
                 logger.warning(
@@ -300,6 +299,7 @@ async def memorize(
 
         # Run the execute_workflow in the background or blocking based on executor
         from m_flow.pipeline.operations.pipeline import WorkflowConfig
+
         result = await pipeline_executor_func(
             pipeline=execute_workflow,
             tasks=tasks,
@@ -317,9 +317,7 @@ async def memorize(
 
         # Episode Size Check: Post-memorize maintenance
         # Controlled by MFLOW_EPISODE_SIZE_CHECK_AUTO environment variable (default: true)
-        episode_size_check_auto = os.getenv(
-            "MFLOW_EPISODE_SIZE_CHECK_AUTO", "true"
-        ).lower() not in (
+        episode_size_check_auto = os.getenv("MFLOW_EPISODE_SIZE_CHECK_AUTO", "true").lower() not in (
             "0",
             "false",
             "no",
@@ -344,8 +342,9 @@ async def memorize(
         if not run_in_background:
             try:
                 from m_flow.adapters.graph.get_graph_adapter import get_graph_provider
+
                 graph_engine = await get_graph_provider()
-                if hasattr(graph_engine, 'checkpoint'):
+                if hasattr(graph_engine, "checkpoint"):
                     await graph_engine.checkpoint()
                     logger.info("[memorize] Graph database checkpoint completed")
             except Exception as e:
@@ -375,7 +374,7 @@ async def get_default_tasks(
     # ---------------------------------------------------------------------------
     # Feature Toggles (Priority: kwargs > environment variable > default)
     # ---------------------------------------------------------------------------
-    
+
     def _env_bool(env_var: str, default: bool) -> bool:
         """Parse environment variable as boolean."""
         val = os.getenv(env_var, str(default).lower()).lower()
@@ -385,7 +384,7 @@ async def get_default_tasks(
     enable_episodic_override = kwargs.pop("enable_episodic", None)
     enable_procedural_override = kwargs.pop("enable_procedural", None)
     enable_content_routing_override = kwargs.pop("enable_content_routing", None)
-    
+
     # Extract content_type for sentence splitting strategy
     content_type = kwargs.pop("content_type", ContentType.TEXT)
 
@@ -433,16 +432,16 @@ async def get_default_tasks(
             - This reduces LLM calls by combining episodic summary + procedural routing
             """
             if procedural_enabled:
-                logger.info(
-                    "[memorize] Sentence routing + Procedural: unified routing in episodic summarization"
-                )
+                logger.info("[memorize] Sentence routing + Procedural: unified routing in episodic summarization")
                 # Use unified episodic+procedural task
                 return Stage(
                     _unified_episodic_procedural_write,
                     task_config={"batch_size": chunks_per_batch},
                 )
             else:
-                return Stage(write_episodic_memories, precise_mode=precise_mode, task_config={"batch_size": chunks_per_batch})
+                return Stage(
+                    write_episodic_memories, precise_mode=precise_mode, task_config={"batch_size": chunks_per_batch}
+                )
 
         memory_task = _build_memory_task()
 
@@ -493,16 +492,20 @@ async def get_default_tasks(
                 logger.info("[memorize] Parallel execution: Episodic + Procedural")
                 return execute_parallel(
                     [
-                        Stage(write_episodic_memories, precise_mode=precise_mode, task_config={"batch_size": chunks_per_batch}),
                         Stage(
-                            write_procedural_memories, task_config={"batch_size": chunks_per_batch}
+                            write_episodic_memories,
+                            precise_mode=precise_mode,
+                            task_config={"batch_size": chunks_per_batch},
                         ),
+                        Stage(write_procedural_memories, task_config={"batch_size": chunks_per_batch}),
                     ],
                     merge_results=True,
                     deduplicate=True,
                 )
             elif episodic_enabled:
-                return Stage(write_episodic_memories, precise_mode=precise_mode, task_config={"batch_size": chunks_per_batch})
+                return Stage(
+                    write_episodic_memories, precise_mode=precise_mode, task_config={"batch_size": chunks_per_batch}
+                )
             elif procedural_enabled:
                 return Stage(write_procedural_memories, task_config={"batch_size": chunks_per_batch})
             else:

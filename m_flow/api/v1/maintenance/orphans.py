@@ -295,10 +295,7 @@ async def check_orphans(
     report.orphan_ids = orphan_ids[:100]  # Limit IDs in report
     report.orphan_locations = orphan_locations
 
-    _logger.info(
-        f"[check_orphans] Scan complete: "
-        f"{report.orphan_count}/{report.total_checked} orphan records found"
-    )
+    _logger.info(f"[check_orphans] Scan complete: {report.orphan_count}/{report.total_checked} orphan records found")
 
     if report.orphan_count > 0:
         _logger.warning(
@@ -372,8 +369,7 @@ async def fix_orphans(
 
     if dry_run:
         _logger.info(
-            f"[fix_orphans] [DRY RUN] Would delete {report.orphan_count} "
-            f"orphan records: {report.orphan_ids[:5]}..."
+            f"[fix_orphans] [DRY RUN] Would delete {report.orphan_count} orphan records: {report.orphan_ids[:5]}..."
         )
         result.fixed_ids = report.orphan_ids
         return result
@@ -387,9 +383,6 @@ async def fix_orphans(
     result.fixed_count = deleted_count
     result.fixed_ids = report.orphan_ids[:deleted_count]
 
-    _logger.info(
-        f"[fix_orphans] Cleanup complete: "
-        f"deleted {deleted_count}/{report.orphan_count} orphan records"
-    )
+    _logger.info(f"[fix_orphans] Cleanup complete: deleted {deleted_count}/{report.orphan_count} orphan records")
 
     return result

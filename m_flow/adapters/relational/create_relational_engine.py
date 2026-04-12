@@ -9,8 +9,7 @@ from functools import lru_cache
 from .sqlalchemy.SqlAlchemyAdapter import SQLAlchemyAdapter
 
 _POSTGRES_EXTRAS = (
-    "PostgreSQL dependencies are not installed. "
-    "Run: pip install 'm_flow[postgres]' or 'm_flow[postgres-binary]'"
+    "PostgreSQL dependencies are not installed. Run: pip install 'm_flow[postgres]' or 'm_flow[postgres-binary]'"
 )
 
 

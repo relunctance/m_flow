@@ -97,14 +97,9 @@ def _exact_bonus(query: str, node_text: str) -> float:
         bonus -= min(0.10 * hit, 0.20)
     # English term match
     if bool(re.search(r"[\u4e00-\u9fff]", query)):
-        q_en = {
-            m.lower() for m in re.findall(r"[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9]|[A-Za-z]{2,}", query)
-        }
+        q_en = {m.lower() for m in re.findall(r"[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9]|[A-Za-z]{2,}", query)}
         if q_en:
-            n_en = {
-                m.lower()
-                for m in re.findall(r"[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9]|[A-Za-z]{2,}", node_text)
-            }
+            n_en = {m.lower() for m in re.findall(r"[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9]|[A-Za-z]{2,}", node_text)}
             bonus -= min(0.08 * len(q_en & n_en), 0.16)
     return bonus
 
@@ -456,9 +451,7 @@ async def procedural_bundle_search(
                         props = json.loads(props)
                     except Exception:
                         props = {}
-                proc_status[str(nid)] = (
-                    props.get("status") or node.attributes.get("status") or "active"
-                )
+                proc_status[str(nid)] = props.get("status") or node.attributes.get("status") or "active"
 
         # ── Bundle scoring (1-hop, like Episodic) ──
         bundles: List[ProcedureBundle] = []
@@ -594,9 +587,7 @@ async def procedural_bundle_search(
                     "best_steps_pack_id": None,
                     "best_step_point_id": b.best_point_id if b.best_path == "key_point" else None,
                     "best_context_pack_id": None,
-                    "best_context_point_id": b.best_point_id
-                    if b.best_path == "context_point"
-                    else None,
+                    "best_context_point_id": b.best_point_id if b.best_path == "context_point" else None,
                 }
                 for b in bundles
             ]

@@ -151,10 +151,7 @@ def _register_list_datasets(router: APIRouter) -> None:
 
     @router.get("", response_model=list[DatasetDTO] | list[DatasetWithCountsDTO])
     async def list_datasets(
-        with_counts: bool = Query(
-            default=False,
-            description="Include data item counts for each dataset"
-        ),
+        with_counts: bool = Query(default=False, description="Include data item counts for each dataset"),
         user: "User" = Depends(_get_auth_user()),
     ):
         """
@@ -162,7 +159,7 @@ def _register_list_datasets(router: APIRouter) -> None:
 
         Returns datasets where user has read permission, including
         metadata like ID, name, timestamps, and owner information.
-        
+
         If with_counts=true, also includes the number of data items in each dataset.
         """
         _emit_telemetry("GET /v1/datasets", user.id, with_counts=with_counts)
@@ -171,27 +168,29 @@ def _register_list_datasets(router: APIRouter) -> None:
 
         try:
             datasets = await get_all_user_permission_datasets(user, "read")
-            
+
             if not with_counts:
                 return datasets
-            
+
             # Add counts for each dataset
             from m_flow.data.methods import fetch_dataset_items
-            
+
             result = []
             for ds in datasets:
                 items = await fetch_dataset_items(dataset_id=ds.id)
                 count = len(items) if items else 0
-                result.append(DatasetWithCountsDTO(
-                    id=ds.id,
-                    name=ds.name,
-                    created_at=ds.created_at,
-                    updated_at=ds.updated_at,
-                    owner_id=ds.owner_id,
-                    data_count=count,
-                ))
+                result.append(
+                    DatasetWithCountsDTO(
+                        id=ds.id,
+                        name=ds.name,
+                        created_at=ds.created_at,
+                        updated_at=ds.updated_at,
+                        owner_id=ds.owner_id,
+                        data_count=count,
+                    )
+                )
             return result
-            
+
         except Exception as err:
             _logger.error("Error listing datasets: %s", err)
             raise HTTPException(
@@ -274,11 +273,11 @@ def _register_get_dataset(router: APIRouter) -> None:
 
         datasets = await _require_dataset_access([dataset_id], "read", user)
         ds = datasets[0]
-        
+
         # Get data count
         items = await fetch_dataset_items(dataset_id=ds.id)
         count = len(items) if items else 0
-        
+
         return DatasetWithCountsDTO(
             id=ds.id,
             name=ds.name,
@@ -494,20 +493,16 @@ def _register_get_raw_file(router: APIRouter) -> None:
         # Find matching data item
         matches = [item for item in items if item.id == data_id]
         if not matches:
-            raise DataNotFoundError(
-                message=f"Data ({data_id}) not found in dataset ({dataset_id})."
-            )
+            raise DataNotFoundError(message=f"Data ({data_id}) not found in dataset ({dataset_id}).")
 
         # Fetch and return raw location
         data_obj = await get_data(user.id, data_id)
         if data_obj is None:
-            raise DataNotFoundError(
-                message=f"Data ({data_id}) not found in dataset ({dataset_id})."
-            )
+            raise DataNotFoundError(message=f"Data ({data_id}) not found in dataset ({dataset_id}).")
 
         raw_loc = data_obj.processed_path or ""
         if raw_loc.startswith("file://"):
-            raw_loc = raw_loc[len("file://"):]
+            raw_loc = raw_loc[len("file://") :]
         if not raw_loc or not os.path.exists(raw_loc):
             return JSONResponse(
                 status_code=404,

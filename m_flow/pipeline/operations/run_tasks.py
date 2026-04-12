@@ -44,12 +44,14 @@ _log = get_logger("m_flow.pipeline.run_tasks")
 @runtime_checkable
 class RemoteSyncable(Protocol):
     """Adapters that can push local data to a remote object store."""
+
     async def sync_to_remote(self) -> None: ...
 
 
 @dataclass
 class _RunContext:
     """Holds identifiers created during pipeline initialisation."""
+
     run_id: UUID
     pipe_id: str
     dataset: Dataset
@@ -145,8 +147,15 @@ async def _process_batches(
 
         coros = [
             process_data_items(
-                item, ctx.dataset, tasks, ctx.workflow_name,
-                ctx.pipe_id, ctx.run_id, merged_ctx, ctx.user, incremental_loading,
+                item,
+                ctx.dataset,
+                tasks,
+                ctx.workflow_name,
+                ctx.pipe_id,
+                ctx.run_id,
+                merged_ctx,
+                ctx.user,
+                incremental_loading,
             )
             for item in batch
         ]
@@ -176,6 +185,7 @@ async def _flush_remote_storage() -> None:
 # Public entry point
 # ---------------------------------------------------------------------------
 
+
 async def run_tasks(
     tasks: list[Stage],
     dataset_id: UUID,
@@ -196,10 +206,16 @@ async def run_tasks(
     """
     if _want_distributed(distributed):
         from m_flow.pipeline.operations.dispatch_remote import dispatch_remote
+
         async for evt in dispatch_remote(
-            tasks=tasks, dataset_id=dataset_id, user=user,
-            workflow_name=workflow_name, data=data, context=context,
-            items_per_batch=items_per_batch, incremental_loading=incremental_loading,
+            tasks=tasks,
+            dataset_id=dataset_id,
+            user=user,
+            workflow_name=workflow_name,
+            data=data,
+            context=context,
+            items_per_batch=items_per_batch,
+            incremental_loading=incremental_loading,
         ):
             yield evt
         return

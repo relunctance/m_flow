@@ -393,10 +393,7 @@ async def merge_procedure_content(
         state = await fetch_procedure_state(graph_engine, target_procedure_id)
 
         if not state.exists:
-            logger.warning(
-                f"[procedural.router] Procedure not found for merge: "
-                f"{target_procedure_id}"
-            )
+            logger.warning(f"[procedural.router] Procedure not found for merge: {target_procedure_id}")
             return False
 
         # Merge content
@@ -465,9 +462,7 @@ async def merge_procedure_content(
             summary_parts.append(f"{search_text}: context - {merged_context_text}")
         if merged_points:
             summary_parts.append(f"{search_text}: points - {merged_points}")
-        props["summary"] = (
-            "\n".join(summary_parts) if summary_parts else search_text
-        )
+        props["summary"] = "\n".join(summary_parts) if summary_parts else search_text
 
         # Write back
         update_cypher = """
@@ -483,8 +478,7 @@ async def merge_procedure_content(
         )
 
         logger.info(
-            f"[procedural.router] Merged content into {target_procedure_id}: "
-            f"version {state.version} -> {new_version}"
+            f"[procedural.router] Merged content into {target_procedure_id}: version {state.version} -> {new_version}"
         )
         return True
 

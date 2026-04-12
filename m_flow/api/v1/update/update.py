@@ -102,7 +102,7 @@ async def update(
     else:
         # If content_type not provided, disable content_routing to avoid validation error
         memorize_kwargs["enable_content_routing"] = False
-    
+
     result = await memorize(
         datasets=[dataset_id],
         user=user,

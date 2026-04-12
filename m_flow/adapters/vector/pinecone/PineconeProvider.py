@@ -44,9 +44,7 @@ class PineconeProvider:
         try:
             from pinecone import Pinecone
         except ImportError as exc:
-            raise ImportError(
-                "pinecone is required. Install with: pip install m_flow[pinecone]"
-            ) from exc
+            raise ImportError("pinecone is required. Install with: pip install m_flow[pinecone]") from exc
 
         self._api_key = api_key or os.getenv("PINECONE_API_KEY", "")
         self._index_name = index_name or os.getenv("PINECONE_INDEX_NAME", "m_flow")
@@ -84,11 +82,13 @@ class PineconeProvider:
         for node in memory_nodes:
             text = node.extract_index_text() if hasattr(node, "extract_index_text") else str(node)
             embedding = await self.embedding_engine.embed_data([text])
-            vectors.append({
-                "id": str(node.id),
-                "values": embedding[0] if embedding else [],
-                "metadata": {"text": text, "type": getattr(node, "type", "")},
-            })
+            vectors.append(
+                {
+                    "id": str(node.id),
+                    "values": embedding[0] if embedding else [],
+                    "metadata": {"text": text, "type": getattr(node, "type", "")},
+                }
+            )
 
         if vectors:
             self._index.upsert(vectors=vectors, namespace=collection_name)
@@ -96,10 +96,7 @@ class PineconeProvider:
 
     async def retrieve(self, collection_name: str, memory_node_ids: List[str]) -> List[Dict]:
         results = self._index.fetch(ids=memory_node_ids, namespace=collection_name)
-        return [
-            {"id": vid, **vec.get("metadata", {})}
-            for vid, vec in (results.get("vectors") or {}).items()
-        ]
+        return [{"id": vid, **vec.get("metadata", {})} for vid, vec in (results.get("vectors") or {}).items()]
 
     async def search(
         self,

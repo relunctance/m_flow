@@ -19,6 +19,7 @@ from m_flow.tests.integration.documents.async_gen_zip import async_gen_zip
 _TEST_DATA = pathlib.Path(__file__).parent.parent.parent / "test_data"
 _chunk_mod = sys.modules.get("m_flow.ingestion.chunks.split_sentences")
 
+
 @patch.object(_chunk_mod, "get_embedding_engine", side_effect=mock_get_embedding_engine)
 @pytest.mark.asyncio
 async def test_pdf_chunking(mock_eng):

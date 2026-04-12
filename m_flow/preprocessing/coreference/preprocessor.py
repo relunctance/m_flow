@@ -114,7 +114,7 @@ def _detect_language(text: str) -> str:
     Returns:
         "zh" for Chinese, "en" for English.
     """
-    chinese_chars = sum(1 for c in text if '\u4e00' <= c <= '\u9fff')
+    chinese_chars = sum(1 for c in text if "\u4e00" <= c <= "\u9fff")
     total_alpha = sum(1 for c in text if c.isalpha())
 
     if total_alpha == 0:

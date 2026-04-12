@@ -15,9 +15,7 @@ class MFlowPipelineExecutionSuite(unittest.TestCase):
     REQUIRED_ENV = ("LLM_API_KEY", "EMBEDDING_API_KEY")
 
     def setUp(self):
-        self._project_root = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "../..")
-        )
+        self._project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
         self._pipeline_dir = os.path.join(self._project_root, "src", "pipelines")
 
         absent = [k for k in self.REQUIRED_ENV if not os.environ.get(k)]

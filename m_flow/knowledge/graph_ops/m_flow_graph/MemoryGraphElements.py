@@ -76,9 +76,7 @@ class Node:
         except ValueError:
             return
         other = edge.node2 if edge.node1 is self else edge.node1
-        still_connected = any(
-            (e.node1 is other or e.node2 is other) for e in self._edges
-        )
+        still_connected = any((e.node1 is other or e.node2 is other) for e in self._edges)
         if not still_connected and other in self._neighbours:
             self._neighbours.remove(other)
 

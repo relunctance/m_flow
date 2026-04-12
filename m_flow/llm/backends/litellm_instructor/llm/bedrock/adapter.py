@@ -68,9 +68,7 @@ class BedrockAdapter(LLMBackend):
         active_mode = instructor_mode or self.default_instructor_mode
         self.instructor_mode = active_mode
 
-        self.aclient = instructor.from_litellm(
-            litellm.acompletion, mode=instructor.Mode(active_mode)
-        )
+        self.aclient = instructor.from_litellm(litellm.acompletion, mode=instructor.Mode(active_mode))
         self.client = instructor.from_litellm(litellm.completion)
 
     # ------------------------------------------------------------------
@@ -114,9 +112,7 @@ class BedrockAdapter(LLMBackend):
             request_payload["aws_region_name"] = aws_cfg.aws_region
 
         if aws_cfg.aws_bedrock_runtime_endpoint:
-            request_payload["aws_bedrock_runtime_endpoint"] = (
-                aws_cfg.aws_bedrock_runtime_endpoint
-            )
+            request_payload["aws_bedrock_runtime_endpoint"] = aws_cfg.aws_bedrock_runtime_endpoint
 
         return request_payload
 
@@ -150,9 +146,7 @@ class BedrockAdapter(LLMBackend):
             if not self._is_content_policy_error(exc):
                 raise
             snippet = text_input[:_INPUT_PREVIEW_LEN]
-            raise ContentPolicyFilterError(
-                f"Content blocked: {snippet}..."
-            ) from exc
+            raise ContentPolicyFilterError(f"Content blocked: {snippet}...") from exc
 
     @_trace
     @sleep_and_retry_sync()

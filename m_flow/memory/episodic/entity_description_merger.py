@@ -216,9 +216,7 @@ async def merge_entity_description(
 
     # If new description has no context role, nothing to append
     if not new_role:
-        logger.debug(
-            f"[merger] Entity '{entity_name}': no context role in new description, keeping existing"
-        )
+        logger.debug(f"[merger] Entity '{entity_name}': no context role in new description, keeping existing")
         return (existing_desc, False)
 
     # Extract all existing context roles (including appended ones)
@@ -226,17 +224,14 @@ async def merge_entity_description(
 
     # Check if we've reached max context roles
     if len(existing_roles) >= max_context_roles:
-        logger.debug(
-            f"[merger] Entity '{entity_name}': max context roles ({max_context_roles}) reached, skipping"
-        )
+        logger.debug(f"[merger] Entity '{entity_name}': max context roles ({max_context_roles}) reached, skipping")
         return (existing_desc, False)
 
     # Check similarity with ALL existing context roles (batch optimized)
     max_similarity = await compute_max_similarity_batch(existing_roles, new_role)
     if max_similarity >= similarity_threshold:
         logger.debug(
-            f"[merger] Entity '{entity_name}': new role similar to existing "
-            f"(max_sim={max_similarity:.3f}), skipping"
+            f"[merger] Entity '{entity_name}': new role similar to existing (max_sim={max_similarity:.3f}), skipping"
         )
         return (existing_desc, False)
 
@@ -253,10 +248,7 @@ async def merge_entity_description(
             return (existing_desc, False)
         merged = f"{existing_desc}【+】{new_role[:available_len]}..."
 
-    logger.info(
-        f"[merger] Entity '{entity_name}': appended new context role "
-        f"(now {len(existing_roles) + 1} roles)"
-    )
+    logger.info(f"[merger] Entity '{entity_name}': appended new context role (now {len(existing_roles) + 1} roles)")
 
     return (merged, True)
 

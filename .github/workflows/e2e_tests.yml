@@ -21,8 +21,8 @@ on:
       EMBEDDING_API_KEY: {required: true}
       EMBEDDING_API_VERSION: {required: true}
       OPENAI_API_KEY: {required: true}
-      AWS_ACCESS_KEY_ID: {required: true}
-      AWS_SECRET_ACCESS_KEY: {required: true}
+      AWS_ACCESS_KEY_ID: {required: false}
+      AWS_SECRET_ACCESS_KEY: {required: false}
 
 jobs:
 

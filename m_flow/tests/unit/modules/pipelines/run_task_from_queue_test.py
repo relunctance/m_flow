@@ -50,9 +50,7 @@ async def _build_and_verify_chain(sq: ShutdownableQueue):
     reference = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
     pos = 0
     async for item in pipeline_output:
-        assert item[0] == reference[pos], (
-            f"索引 {pos}: 实际值 {item[0]} \u2260 预期值 {reference[pos]}"
-        )
+        assert item[0] == reference[pos], f"索引 {pos}: 实际值 {item[0]} \u2260 预期值 {reference[pos]}"
         pos += 1
 
 

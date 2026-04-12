@@ -91,10 +91,7 @@ async def index_relations(
         except Exception as exc:
             _log.error("Graph engine unavailable: %s", exc)
             raise RuntimeError("Initialization error") from exc
-        _log.warning(
-            "Fetching all edges at index time is deprecated — "
-            "pass edges to index_relations directly."
-        )
+        _log.warning("Fetching all edges at index time is deprecated — pass edges to index_relations directly.")
 
     relation_nodes = create_edge_type_datapoints(edges_data)
     await index_memory_nodes(relation_nodes)

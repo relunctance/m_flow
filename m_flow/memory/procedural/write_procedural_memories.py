@@ -210,9 +210,7 @@ NOTE: Do NOT generate 'summary' field - it will be constructed automatically."""
 
 
 async def write_procedural_memories(
-    memory_nodes: List[
-        Any
-    ],  # Changed: Accept mixed types for Content Routing Pipeline compatibility
+    memory_nodes: List[Any],  # Changed: Accept mixed types for Content Routing Pipeline compatibility
     *,
     procedural_nodeset_name: str = "Procedural",
     enable_routing: bool = True,  # Incremental update routing
@@ -321,7 +319,7 @@ async def write_procedural_memories(
             )
             for ci, c in enumerate(candidates_to_compile):
                 logger.info(
-                    f"  [procedural.router] Candidate {ci+1}: "
+                    f"  [procedural.router] Candidate {ci + 1}: "
                     f"search_text='{c.search_text[:50]}', "
                     f"confidence={c.confidence:.2f}, "
                     f"type={c.procedural_type}, "
@@ -334,9 +332,7 @@ async def write_procedural_memories(
                 {
                     "total_candidates": len(candidates),
                     "to_compile": len(candidates_to_compile),
-                    "candidate_search_texts": [
-                        c.search_text[:50] for c in candidates_to_compile[:5]
-                    ],
+                    "candidate_search_texts": [c.search_text[:50] for c in candidates_to_compile[:5]],
                 },
             )
 
@@ -463,9 +459,7 @@ async def _compile_and_build_procedure(
                 enable_incremental=True,
             )
         except Exception as e:
-            logger.error(
-                f"[procedural.incremental] Incremental update failed: {e}, falling back to create_new"
-            )
+            logger.error(f"[procedural.incremental] Incremental update failed: {e}, falling back to create_new")
             # Fall through to create_new path
 
     # Fallback path: always create new (no incremental update)
@@ -487,9 +481,7 @@ async def _compile_and_build_procedure(
             # Security checks
             if draft.key_points and draft.key_points.points_text:
                 if contains_dangerous_content(draft.key_points.points_text):
-                    logger.warning(
-                        f"[procedural] Dangerous content in '{candidate.search_text[:40]}', skipping"
-                    )
+                    logger.warning(f"[procedural] Dangerous content in '{candidate.search_text[:40]}', skipping")
                     return None
 
             # Derive write_decision from confidence

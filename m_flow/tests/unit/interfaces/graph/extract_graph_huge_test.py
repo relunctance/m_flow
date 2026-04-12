@@ -82,10 +82,7 @@ async def test_circular_reference_extraction():
     for pos, mod in enumerate(modules):
         mod.imports.append(modules[_pick_other(NUM_MODULES, pos)])
         mod.imports.append(modules[_pick_other(NUM_MODULES, pos)])
-        mod.fragments.extend(
-            Fragment(part_of=mod, content=f"Part {k}")
-            for k in range(FRAGMENTS_PER_MODULE)
-        )
+        mod.fragments.extend(Fragment(part_of=mod, content=f"Part {k}") for k in range(FRAGMENTS_PER_MODULE))
 
     shared_nodes: dict = {}
     shared_edges: dict = {}

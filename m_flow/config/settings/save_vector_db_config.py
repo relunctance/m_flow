@@ -26,9 +26,7 @@ class VectorDBConfigDTO(BaseModel):
 
     url: str = Field(default="", description="Connection URL for the vector store")
     api_key: str = Field(default="", description="API key (or masked placeholder)")
-    provider: Literal["lancedb", "pgvector", "chromadb"] = Field(
-        ..., description="Backend provider slug"
-    )
+    provider: Literal["lancedb", "pgvector", "chromadb"] = Field(..., description="Backend provider slug")
 
 
 async def save_vector_db_config(dto: VectorDBConfigDTO, persist: bool = True) -> None:
@@ -38,7 +36,7 @@ async def save_vector_db_config(dto: VectorDBConfigDTO, persist: bool = True) ->
     * ``url`` and ``provider`` are always overwritten.
     * ``api_key`` is written **only** when the caller supplies a
       non-empty, non-masked value.
-    
+
     Args:
         dto: Configuration update data.
         persist: If True, also write changes to .env file for persistence.
@@ -55,7 +53,7 @@ async def save_vector_db_config(dto: VectorDBConfigDTO, persist: bool = True) ->
     if persist:
         try:
             from m_flow.config.settings.persist_env import persist_vector_db_config as _persist
-            
+
             await _persist(
                 provider=dto.provider,
                 url=dto.url if dto.url else None,

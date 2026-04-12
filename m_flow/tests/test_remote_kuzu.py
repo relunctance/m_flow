@@ -95,9 +95,7 @@ async def main():
         # Cleanup validation
         await m_flow.prune.prune_data()
         storage_cfg = get_storage_config()
-        assert not os.path.isdir(storage_cfg["data_root_directory"]), (
-            "Local data directory persists"
-        )
+        assert not os.path.isdir(storage_cfg["data_root_directory"]), "Local data directory persists"
 
         await m_flow.prune.prune_system(metadata=True)
 
@@ -106,9 +104,7 @@ async def main():
 
         graph = await get_graph_provider()
         nodes, edges = await graph.get_graph_data()
-        assert len(nodes) == 0 and len(edges) == 0, (
-            f"Remote Kuzu not empty: {len(nodes)} nodes, {len(edges)} edges"
-        )
+        assert len(nodes) == 0 and len(edges) == 0, f"Remote Kuzu not empty: {len(nodes)} nodes, {len(edges)} edges"
 
         _logger.info("Remote Kuzu integration test completed")
 

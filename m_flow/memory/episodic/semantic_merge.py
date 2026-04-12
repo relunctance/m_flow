@@ -147,9 +147,7 @@ class SemanticFacetMatcher:
                 best_id = fid
 
         if best_id and best_sim >= self.threshold:
-            logger.debug(
-                f"Semantic match: '{candidate_text}' -> existing facet {best_id} (sim={best_sim:.3f})"
-            )
+            logger.debug(f"Semantic match: '{candidate_text}' -> existing facet {best_id} (sim={best_sim:.3f})")
             return str(best_id)
 
         return None

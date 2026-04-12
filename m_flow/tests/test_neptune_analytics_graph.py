@@ -17,15 +17,15 @@ load_dotenv()
 _graph_id = os.getenv("GRAPH_ID", "")
 
 # 跳过测试，除非 GRAPH_ID 已配置
-pytestmark = pytest.mark.skipif(
-    not _graph_id,
-    reason="需要设置 GRAPH_ID 环境变量来运行 Neptune Analytics 测试"
-)
+pytestmark = pytest.mark.skipif(not _graph_id, reason="需要设置 GRAPH_ID 环境变量来运行 Neptune Analytics 测试")
+
 
 # 延迟导入，避免在收集时实例化
 def _get_adapter():
     from m_flow.adapters.graph.neptune_driver import NeptuneGraphDB
+
     return NeptuneGraphDB(_graph_id)
+
 
 from m_flow.core.domain.models import Entity, EntityType
 from m_flow.data.processing.document_types import TextDocument

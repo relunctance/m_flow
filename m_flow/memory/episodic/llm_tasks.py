@@ -134,9 +134,7 @@ async def llm_select_entities(
         if result.facet_entities:
             for mapping in result.facet_entities:
                 entity_names = [e.name for e in (mapping.entities or [])]
-                logger.info(
-                    f"[episodic] Facet '{mapping.facet_search_text}' -> entities: {entity_names}"
-                )
+                logger.info(f"[episodic] Facet '{mapping.facet_search_text}' -> entities: {entity_names}")
                 for e in mapping.entities or []:
                     logger.info(
                         f"  - {e.name}: {e.context_description[:100] if e.context_description else '(empty)'}..."
@@ -180,12 +178,8 @@ async def llm_extract_entity_names(
         logger.warning("Missing extract_entity_names.txt prompt file, skipping")
         return ConceptNamesResult(names=[])
 
-    logger.info(
-        f"[episodic] ========== Entity Name Extraction LLM (batch {batch_index}) =========="
-    )
-    logger.info(
-        f"[episodic] Entity Name Extraction Input: batch={batch_index}, text_len={len(text)}"
-    )
+    logger.info(f"[episodic] ========== Entity Name Extraction LLM (batch {batch_index}) ==========")
+    logger.info(f"[episodic] Entity Name Extraction Input: batch={batch_index}, text_len={len(text)}")
 
     try:
         tracker = _get_tracker()
@@ -345,8 +339,7 @@ async def llm_extract_facet_points(
         tracker.record_attempt(1)
 
     logger.info(
-        f"[episodic] FacetPoint Output: facet={facet_search_text}, "
-        f"points={len(result.points) if result.points else 0}"
+        f"[episodic] FacetPoint Output: facet={facet_search_text}, points={len(result.points) if result.points else 0}"
     )
     return result
 

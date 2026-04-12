@@ -55,15 +55,13 @@ class GeminiTokenizer(TokenizerInterface):
     def extract_tokens(self, text: str) -> List[Any]:  # noqa: D401
         """Not available — Gemini SDK lacks offline tokenisation."""
         raise NotImplementedError(
-            "GeminiTokenizer cannot extract individual tokens; "
-            "the Gemini SDK only supports remote token counting."
+            "GeminiTokenizer cannot extract individual tokens; the Gemini SDK only supports remote token counting."
         )
 
     def decode_single_token(self, encoding: int) -> str:  # noqa: D401
         """Not available — Gemini SDK cannot reverse-map token ids."""
         raise NotImplementedError(
-            "GeminiTokenizer cannot decode token ids; "
-            "the Gemini SDK does not expose a vocabulary mapping."
+            "GeminiTokenizer cannot decode token ids; the Gemini SDK does not expose a vocabulary mapping."
         )
 
     # ------------------------------------------------------------------

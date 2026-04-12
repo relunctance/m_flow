@@ -9,8 +9,7 @@ from m_flow.api.v1.search import RecallMode
 
 DATASET_TAG = "second_memorize_dataset"
 RECALL_PROMPT = (
-    "Describe what you find in the context. "
-    "Prepend the token 'SECOND_MEMORIZE' to the beginning of your response."
+    "Describe what you find in the context. Prepend the token 'SECOND_MEMORIZE' to the beginning of your response."
 )
 
 

@@ -36,6 +36,7 @@ from m_flow.retrieval.episodic.config import EpisodicConfig
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _default_config(**kwargs) -> EpisodicConfig:
     cfg = EpisodicConfig()
     for k, v in kwargs.items():
@@ -46,6 +47,7 @@ def _default_config(**kwargs) -> EpisodicConfig:
 # ===========================================================================
 # 1. has_chinese
 # ===========================================================================
+
 
 class TestHasChinese:
     """Tests for has_chinese utility."""
@@ -85,6 +87,7 @@ class TestHasChinese:
 # 2. _strip_question_words_for_vector
 # ===========================================================================
 
+
 class TestStripQuestionWordsForVector:
     """Tests for _strip_question_words_for_vector."""
 
@@ -118,6 +121,7 @@ class TestStripQuestionWordsForVector:
 # ===========================================================================
 # 3. _get_hybrid_search_reason
 # ===========================================================================
+
 
 class TestGetHybridSearchReason:
     """Tests for _get_hybrid_search_reason."""
@@ -192,6 +196,7 @@ class TestGetHybridSearchReason:
 # 4. _extract_keyword_by_reason
 # ===========================================================================
 
+
 class TestExtractKeywordByReason:
     """Tests for _extract_keyword_by_reason."""
 
@@ -211,7 +216,7 @@ class TestExtractKeywordByReason:
         keyword = _extract_keyword_by_reason("Alice 去了哪里", "mixed_lang")
         assert "Alice" in keyword or "alice" in keyword.lower()
         # Chinese characters should not appear
-        assert not any('\u4e00' <= c <= '\u9fff' for c in keyword)
+        assert not any("\u4e00" <= c <= "\u9fff" for c in keyword)
 
     def test_short_query_reason_returns_full_keyword(self):
         """'short_query' reason → return full stripped keyword."""
@@ -237,6 +242,7 @@ class TestExtractKeywordByReason:
 # ===========================================================================
 # 5. extract_english_words
 # ===========================================================================
+
 
 class TestExtractEnglishWords:
     """Tests for extract_english_words."""
@@ -273,7 +279,7 @@ class TestExtractEnglishWords:
         assert "Beijing" in words or "beijing" in words
         # No Chinese characters in results
         for w in words:
-            assert not any('\u4e00' <= c <= '\u9fff' for c in w)
+            assert not any("\u4e00" <= c <= "\u9fff" for c in w)
 
     def test_numbers_not_extracted_as_words(self):
         """Pure numeric strings should not appear as English words."""
@@ -291,6 +297,7 @@ class TestExtractEnglishWords:
 # ===========================================================================
 # 6. preprocess_query (integration)
 # ===========================================================================
+
 
 class TestPreprocessQuery:
     """Integration tests for preprocess_query."""
@@ -375,6 +382,7 @@ class TestPreprocessQuery:
 # ===========================================================================
 # 7. PreprocessedQuery dataclass
 # ===========================================================================
+
 
 class TestPreprocessedQueryDataclass:
     """Sanity checks for PreprocessedQuery."""

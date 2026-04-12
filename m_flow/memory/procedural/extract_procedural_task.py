@@ -44,9 +44,7 @@ async def extract_procedural_task(
     Returns:
         List of created MemoryNode objects (Procedure, StepPoint, etc.)
     """
-    logger.info(
-        f"[extract_procedural_task] Starting, force={force_reprocess}, limit={limit}"
-    )
+    logger.info(f"[extract_procedural_task] Starting, force={force_reprocess}, limit={limit}")
 
     result = await extract_procedural_from_episodic(
         limit=limit,

@@ -135,17 +135,11 @@ async def _task_extract_entity_names(
         if max_entities_per_episode > 0:
             _top_names = _top_names[:max_entities_per_episode]
 
-        logger.info(
-            f"[episodic] Entity extraction complete: "
-            f"{len(entity_freq)} unique, top {len(_top_names)} selected"
-        )
+        logger.info(f"[episodic] Entity extraction complete: {len(entity_freq)} unique, top {len(_top_names)} selected")
         return _top_names
     else:
         # No cache available — fallback to LLM extraction
-        logger.info(
-            "[episodic] Entity cache empty (routing skipped), "
-            "extracting entities via LLM in Phase 0A"
-        )
+        logger.info("[episodic] Entity cache empty (routing skipped), extracting entities via LLM in Phase 0A")
 
         # Prepare text segments
         text_segments: List[str] = []
@@ -290,8 +284,7 @@ async def _task_generate_facets(
                 event_sentences.append(chunk_text)
 
         logger.debug(
-            f"[episodic] No event_ids for episode={episode_id_str[:20]}..., "
-            f"using {len(event_sentences)} chunk texts"
+            f"[episodic] No event_ids for episode={episode_id_str[:20]}..., using {len(event_sentences)} chunk texts"
         )
 
     # Generate sections via summarize_by_event
@@ -329,6 +322,7 @@ async def _task_generate_facets(
                     _date_hdr = ""
                     if _precise and reference_date is not None:
                         from m_flow.knowledge.summarization.summarize_by_event import _format_reference_date
+
                         _fmt = _format_reference_date(reference_date)
                         if _fmt:
                             _date_hdr = f"[Session Date: {_fmt}]"
@@ -342,6 +336,7 @@ async def _task_generate_facets(
                         session_date_header=_date_hdr,
                     )
                     from m_flow.knowledge.summarization.summarize_by_event import SummarizeResult
+
                     if content_routing_disabled and isinstance(result, SummarizeResult):
                         event_sections = result.sections
                         generated_episode_name = result.episode_name or ""
@@ -363,8 +358,7 @@ async def _task_generate_facets(
     # Fallback: Create simple facet from chunk text
     if not section_facets:
         logger.warning(
-            f"[episodic] No sections generated for episode={episode_id_str[:20]}..., "
-            f"creating fallback facet"
+            f"[episodic] No sections generated for episode={episode_id_str[:20]}..., creating fallback facet"
         )
         for ts in doc_summaries:
             chunk_text = (ts.made_from.text or "")[:500] if ts.made_from else ""
@@ -384,9 +378,7 @@ async def _task_generate_facets(
     # Fallback chain for combined_summary
     if not combined_summary:
         overall_topics = [
-            getattr(ts, "overall_topic", None) or ""
-            for ts in doc_summaries
-            if getattr(ts, "overall_topic", None)
+            getattr(ts, "overall_topic", None) or "" for ts in doc_summaries if getattr(ts, "overall_topic", None)
         ]
         if overall_topics:
             combined_summary = "; ".join(overall_topics)
@@ -454,9 +446,7 @@ async def _task_prepare_matcher(
         for f in state_facets
     ]
     await _matcher.prepare(existing_facet_infos)
-    logger.info(
-        f"[episodic] semantic_matcher prepared with {len(existing_facet_infos)} existing facets"
-    )
+    logger.info(f"[episodic] semantic_matcher prepared with {len(existing_facet_infos)} existing facets")
     return _matcher
 
 

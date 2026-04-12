@@ -47,10 +47,12 @@ from m_flow.auth.methods import get_authenticated_user as _gau_func
 # Get module reference for patching REQUIRE_AUTHENTICATION using sys.modules
 # This avoids polluting the import system
 import sys
+
 _gau_mod = sys.modules.get("m_flow.auth.methods.get_authenticated_user")
 if _gau_mod is None:
     # Fallback: import module directly if not in sys.modules
     from m_flow.auth.methods import get_authenticated_user as _temp
+
     _gau_mod = sys.modules["m_flow.auth.methods.get_authenticated_user"]
 
 
@@ -173,10 +175,7 @@ class TestErrorHandling:
         from fastapi import HTTPException
 
         async def mock_auth_error():
-            raise HTTPException(
-                status_code=500,
-                detail="Failed to create default user: DB error"
-            )
+            raise HTTPException(status_code=500, detail="Failed to create default user: DB error")
 
         app.dependency_overrides[get_authenticated_user] = mock_auth_error
         client = TestClient(app, raise_server_exceptions=False)

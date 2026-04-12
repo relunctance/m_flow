@@ -128,9 +128,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         if m:
             token = m.group(2)
             response.status_code = 200
-            response.body = json.dumps({"access_token": token, "token_type": "bearer"}).encode(
-                "utf-8"
-            )
+            response.body = json.dumps({"access_token": token, "token_type": "bearer"}).encode("utf-8")
             response.headers["Content-Type"] = "application/json"
 
     async def on_after_register(

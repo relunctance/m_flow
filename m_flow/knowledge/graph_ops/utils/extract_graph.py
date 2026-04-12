@@ -56,11 +56,7 @@ def _parse_field_content(value: Any) -> list[EdgeWithNodes]:
         if _is_edge_instance(edge_candidate):
             if _is_memory_node(data_candidate):
                 return [(edge_candidate, [data_candidate])]
-            if (
-                isinstance(data_candidate, list)
-                and data_candidate
-                and _is_memory_node(data_candidate[0])
-            ):
+            if isinstance(data_candidate, list) and data_candidate and _is_memory_node(data_candidate[0]):
                 return [(edge_candidate, data_candidate)]
 
     # List format: may contain nodes, tuples, or mixed

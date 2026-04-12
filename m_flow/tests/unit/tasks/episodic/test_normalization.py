@@ -5,7 +5,6 @@
 测试 normalize_for_compare, normalize_for_id 等函数。
 """
 
-
 from m_flow.memory.episodic.normalization import (
     normalize_for_compare,
     normalize_for_id,

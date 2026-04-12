@@ -51,9 +51,7 @@ class TestPruneAllMethod:
         content = prune_file.read_text()
 
         # Check for try/except
-        assert "try:" in content and "except Exception" in content, (
-            "prune.all() should have exception handling"
-        )
+        assert "try:" in content and "except Exception" in content, "prune.all() should have exception handling"
 
     def test_prune_all_has_logging(self):
         """Verify prune.all() has logging."""

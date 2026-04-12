@@ -18,7 +18,7 @@ from .db_concurrency import (
     is_sqlite_mode,
     clear_concurrency_cache,
 )
-from .execute_pipeline_tasks import execute_pipeline_tasks, execute_pipeline_tasks
+from .execute_pipeline_tasks import execute_pipeline_tasks
 from .execute_with_telemetry import execute_with_telemetry, run_tasks_with_telemetry
 from .process_data_items import (
     process_data_items,

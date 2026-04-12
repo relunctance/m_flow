@@ -45,16 +45,8 @@ async def get_episodic_memory_fragment(
     # Use config default values
     nodeset_name = episodic_nodeset_name or config.episodic_nodeset_name
     props = properties_to_project or config.properties_to_project
-    penalty = (
-        triplet_distance_penalty
-        if triplet_distance_penalty is not None
-        else config.triplet_distance_penalty
-    )
-    strict = (
-        strict_nodeset_filtering
-        if strict_nodeset_filtering is not None
-        else config.strict_nodeset_filtering
-    )
+    penalty = triplet_distance_penalty if triplet_distance_penalty is not None else config.triplet_distance_penalty
+    strict = strict_nodeset_filtering if strict_nodeset_filtering is not None else config.strict_nodeset_filtering
 
     memory_fragment = MemoryGraph()
 

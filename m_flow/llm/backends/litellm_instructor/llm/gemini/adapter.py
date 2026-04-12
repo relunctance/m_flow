@@ -178,18 +178,12 @@ class GeminiAdapter(LLMBackend):
 
             # Try fallback if configured
             if not all([self.fallback_model, self.fallback_api_key, self.fallback_endpoint]):
-                raise ContentPolicyFilterError(
-                    f"Content blocked by policy: {text_input[:100]}..."
-                ) from err
+                raise ContentPolicyFilterError(f"Content blocked by policy: {text_input[:100]}...") from err
 
             try:
                 async with llm_rate_limiter_context_manager():
-                    return await self._call_model(
-                        text_input, system_prompt, response_model, use_fallback=True
-                    )
+                    return await self._call_model(text_input, system_prompt, response_model, use_fallback=True)
             except _POLICY_ERRORS as fallback_err:
                 if not self._is_policy_error(fallback_err):
                     raise
-                raise ContentPolicyFilterError(
-                    f"Content blocked by policy: {text_input[:100]}..."
-                ) from fallback_err
+                raise ContentPolicyFilterError(f"Content blocked by policy: {text_input[:100]}...") from fallback_err

@@ -50,13 +50,9 @@ class TextChunkerWithOverlap(Chunker):
             self.split_paragraphs = get_chunk_data
         elif chunk_overlap_ratio > 0:
             para_size = int(0.5 * chunk_overlap_ratio * max_chunk_size)
-            self.split_paragraphs = lambda txt: split_paragraphs(
-                txt, para_size, batch_paragraphs=True
-            )
+            self.split_paragraphs = lambda txt: split_paragraphs(txt, para_size, batch_paragraphs=True)
         else:
-            self.split_paragraphs = lambda txt: split_paragraphs(
-                txt, self.max_chunk_size, batch_paragraphs=True
-            )
+            self.split_paragraphs = lambda txt: split_paragraphs(txt, self.max_chunk_size, batch_paragraphs=True)
 
     def _would_overflow(self, para: dict) -> bool:
         """Check if adding paragraph exceeds limit."""

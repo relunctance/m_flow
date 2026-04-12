@@ -80,8 +80,7 @@ async def write_by_action(
     if action == MergeAction.patch:
         if not existing_procedure:
             logger.warning(
-                "[procedural.incremental.write] patch write but no existing_procedure, "
-                "fallback to create_new"
+                "[procedural.incremental.write] patch write but no existing_procedure, fallback to create_new"
             )
             return await _write_create_new(draft, nodeset, source_refs)
         return await _write_patch(draft, existing_procedure, nodeset, source_refs)
@@ -89,13 +88,10 @@ async def write_by_action(
     if action == MergeAction.new_version:
         if not existing_procedure:
             logger.warning(
-                "[procedural.incremental.write] new_version write but no existing_procedure, "
-                "fallback to create_new"
+                "[procedural.incremental.write] new_version write but no existing_procedure, fallback to create_new"
             )
             return await _write_create_new(draft, nodeset, source_refs)
-        return await _write_new_version(
-            draft, existing_procedure, nodeset, source_refs
-        )
+        return await _write_new_version(draft, existing_procedure, nodeset, source_refs)
 
     return None
 
@@ -189,14 +185,9 @@ async def _write_new_version(
     # Deprecate old Procedure (updates status in graph via raw Cypher)
     try:
         await deprecate_procedure(existing.procedure_id)
-        logger.info(
-            f"[procedural.incremental.write] Deprecated old procedure: "
-            f"{existing.procedure_id}"
-        )
+        logger.info(f"[procedural.incremental.write] Deprecated old procedure: {existing.procedure_id}")
     except Exception as e:
-        logger.warning(
-            f"[procedural.incremental.write] Failed to deprecate old procedure: {e}"
-        )
+        logger.warning(f"[procedural.incremental.write] Failed to deprecate old procedure: {e}")
 
     # Attach supersedes edge to the Procedure MODEL (not directly to graph!)
     # This ensures extract_graph creates the edge when persist_memory_nodes writes the node.
@@ -221,9 +212,7 @@ async def _write_new_version(
 
         supersedes_edge = Edge(
             relationship_type="supersedes",
-            edge_text=(
-                f"version: v{new_version} supersedes v{existing.version}"
-            ),
+            edge_text=(f"version: v{new_version} supersedes v{existing.version}"),
         )
 
         if new_proc.supersedes is None:
@@ -231,13 +220,10 @@ async def _write_new_version(
         new_proc.supersedes.append((supersedes_edge, old_proc_ref))
 
         logger.info(
-            f"[procedural.incremental.write] Attached supersedes edge on model: "
-            f"v{new_version} → v{existing.version}"
+            f"[procedural.incremental.write] Attached supersedes edge on model: v{new_version} → v{existing.version}"
         )
     except Exception as e:
-        logger.warning(
-            f"[procedural.incremental.write] Failed to attach supersedes edge: {e}"
-        )
+        logger.warning(f"[procedural.incremental.write] Failed to attach supersedes edge: {e}")
 
     return new_proc
 
@@ -272,10 +258,7 @@ async def deprecate_procedure(procedure_id: str) -> bool:
         """
         result = await graph_engine.query(read_cypher, {"id": procedure_id})
         if not result:
-            logger.warning(
-                f"[procedural.incremental.write] Procedure not found for deprecation: "
-                f"{procedure_id}"
-            )
+            logger.warning(f"[procedural.incremental.write] Procedure not found for deprecation: {procedure_id}")
             return False
 
         # Step 2: Parse and update
@@ -307,9 +290,7 @@ async def deprecate_procedure(procedure_id: str) -> bool:
             },
         )
 
-        logger.debug(
-            f"[procedural.incremental.write] Procedure {procedure_id} marked as deprecated"
-        )
+        logger.debug(f"[procedural.incremental.write] Procedure {procedure_id} marked as deprecated")
         return True
 
     except Exception as e:
@@ -349,9 +330,7 @@ async def create_supersedes_edge(
         return True
 
     except Exception as e:
-        logger.warning(
-            f"[procedural.incremental.write] Failed to create supersedes edge: {e}"
-        )
+        logger.warning(f"[procedural.incremental.write] Failed to create supersedes edge: {e}")
         return False
 
 
@@ -410,9 +389,7 @@ async def build_procedure_node(
         summary_parts.append(f"{draft.search_text}: context - {context_text}")
     if points_text:
         summary_parts.append(f"{draft.search_text}: points - {points_text}")
-    constructed_summary = (
-        "\n".join(summary_parts) if summary_parts else draft.search_text
-    )
+    constructed_summary = "\n".join(summary_parts) if summary_parts else draft.search_text
 
     # Time extraction (from constructed summary)
     time_result = extract_mentioned_time(
@@ -422,18 +399,10 @@ async def build_procedure_node(
     )
 
     procedure_time_fields = {
-        "mentioned_time_start_ms": time_result.start_ms
-        if time_result.has_time
-        else None,
-        "mentioned_time_end_ms": time_result.end_ms
-        if time_result.has_time
-        else None,
-        "mentioned_time_confidence": time_result.confidence
-        if time_result.has_time
-        else None,
-        "mentioned_time_text": time_result.evidence_text
-        if time_result.has_time
-        else None,
+        "mentioned_time_start_ms": time_result.start_ms if time_result.has_time else None,
+        "mentioned_time_end_ms": time_result.end_ms if time_result.has_time else None,
+        "mentioned_time_confidence": time_result.confidence if time_result.has_time else None,
+        "mentioned_time_text": time_result.evidence_text if time_result.has_time else None,
     }
 
     # Build ContextPoints

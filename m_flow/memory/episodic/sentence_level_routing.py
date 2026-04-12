@@ -42,13 +42,13 @@ import re
 logger = get_logger("sentence_level_routing")
 
 _SPEAKER_LINE_RE = re.compile(
-    r"^(?:\[.*?\]\s*)?"              # optional [timestamp]
+    r"^(?:\[.*?\]\s*)?"  # optional [timestamp]
     r"(?P<speaker>"
-    r"[A-Za-z\u4e00-\u9fff]"        # first char of speaker name
-    r"[^:\n()\[\]{}=.]{0,20}"       # rest of name (no code punctuation)
+    r"[A-Za-z\u4e00-\u9fff]"  # first char of speaker name
+    r"[^:\n()\[\]{}=.]{0,20}"  # rest of name (no code punctuation)
     r")"
-    r"\s*[:：]\s*"                    # colon separator (ascii or fullwidth)
-    r"(?P<body>.{4,})$",            # message body: at least 4 chars (CJK-safe)
+    r"\s*[:：]\s*"  # colon separator (ascii or fullwidth)
+    r"(?P<body>.{4,})$",  # message body: at least 4 chars (CJK-safe)
     re.MULTILINE,
 )
 
@@ -75,6 +75,7 @@ def _detect_dialog(sample_text: str, threshold: float = 0.35) -> bool:
         return False
 
     from collections import Counter
+
     counts = Counter(speakers)
     distinct_speakers = len(counts)
     repeated_speakers = sum(1 for c in counts.values() if c >= 2)
@@ -111,18 +112,16 @@ async def route_content_v2(
     if not chunks:
         return chunks
 
-    if (
-        content_type == ContentType.TEXT
-        and os.getenv("MFLOW_AUTO_DETECT_DIALOG", "true").lower()
-        not in ("0", "false", "no", "off")
+    if content_type == ContentType.TEXT and os.getenv("MFLOW_AUTO_DETECT_DIALOG", "true").lower() not in (
+        "0",
+        "false",
+        "no",
+        "off",
     ):
         sample = "\n".join(ch.text for ch in chunks[:3] if ch.text)
         if _detect_dialog(sample):
             content_type = ContentType.DIALOG
-            logger.info(
-                "[sentence_routing] Auto-detected DIALOG content type "
-                f"(sampled {len(chunks[:3])} chunks)"
-            )
+            logger.info(f"[sentence_routing] Auto-detected DIALOG content type (sampled {len(chunks[:3])} chunks)")
 
     logger.info(
         f"[sentence_grouping] Processing {len(chunks)} chunks with sentence-level LLM classification "
@@ -165,6 +164,7 @@ async def _route_single_chunk(
     if len(sentences) == 1:
         text = sentences[0]
         from m_flow.memory.episodic.sentence_splitter import _chinese_char_ratio
+
         is_chinese = _chinese_char_ratio(text) > 0.3
         is_short = (is_chinese and len(text) <= 50) or (not is_chinese and len(text) <= 150)
 
@@ -212,16 +212,13 @@ async def _route_single_chunk(
         if indices_valid and is_complete:
             # Success
             if attempt > 0:
-                logger.info(
-                    f"[sentence_routing] Retry succeeded for chunk {chunk_idx} on attempt {attempt + 1}"
-                )
+                logger.info(f"[sentence_routing] Retry succeeded for chunk {chunk_idx} on attempt {attempt + 1}")
             break
 
         # Diagnose the failure
         if not indices_valid:
             logger.warning(
-                f"[sentence_routing] Invalid indices for chunk {chunk_idx} "
-                f"(attempt {attempt + 1}/{max_retries + 1})"
+                f"[sentence_routing] Invalid indices for chunk {chunk_idx} (attempt {attempt + 1}/{max_retries + 1})"
             )
         elif not is_complete:
             # Calculate coverage details
@@ -271,11 +268,7 @@ async def _route_single_chunk(
         atomic_event_id = f"atomic_{chunk.id}_{sent_idx}_{uuid4().hex[:6]}"
         atomic_text = sentences[sent_idx]
         # Create a brief topic from the sentence (first 50 chars)
-        atomic_topic = (
-            f"[Atomic] {atomic_text[:50]}..."
-            if len(atomic_text) > 50
-            else f"[Atomic] {atomic_text}"
-        )
+        atomic_topic = f"[Atomic] {atomic_text[:50]}..." if len(atomic_text) > 50 else f"[Atomic] {atomic_text}"
 
         classifications.append(
             SentenceClassification(

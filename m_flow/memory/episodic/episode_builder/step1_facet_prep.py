@@ -271,8 +271,7 @@ async def _process_facets(
         # CRITICAL: Discard invalid text
         if st_eval.quality == SearchTextQuality.CRITICAL:
             logger.debug(
-                f"[episodic] Facet skipped (CRITICAL): search_text='{_truncate(st, 30)}', "
-                f"reason={st_eval.reason}"
+                f"[episodic] Facet skipped (CRITICAL): search_text='{_truncate(st, 30)}', reason={st_eval.reason}"
             )
             continue
 
@@ -308,9 +307,7 @@ async def _process_facets(
             continue
 
         # new facet
-        facet_id = str(
-            generate_node_id(f"Facet:{episode_id_str}:{facet_type}:{normalize_for_id(st)}")
-        )
+        facet_id = str(generate_node_id(f"Facet:{episode_id_str}:{facet_type}:{normalize_for_id(st)}"))
 
         facet_desc = (f.description or "").strip() or None
 

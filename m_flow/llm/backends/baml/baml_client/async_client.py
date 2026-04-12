@@ -93,9 +93,7 @@ class BamlAsyncClient:
                     "system_prompt": system_prompt,
                 },
             )
-            return typing.cast(
-                types.ResponseModel, result.cast_to(types, types, stream_types, False, __runtime__)
-            )
+            return typing.cast(types.ResponseModel, result.cast_to(types, types, stream_types, False, __runtime__))
 
 
 class BamlStreamClient:
@@ -119,12 +117,8 @@ class BamlStreamClient:
         )
         return baml_py.BamlStream[stream_types.ResponseModel, types.ResponseModel](
             result,
-            lambda x: typing.cast(
-                stream_types.ResponseModel, x.cast_to(types, types, stream_types, True, __runtime__)
-            ),
-            lambda x: typing.cast(
-                types.ResponseModel, x.cast_to(types, types, stream_types, False, __runtime__)
-            ),
+            lambda x: typing.cast(stream_types.ResponseModel, x.cast_to(types, types, stream_types, True, __runtime__)),
+            lambda x: typing.cast(types.ResponseModel, x.cast_to(types, types, stream_types, False, __runtime__)),
             ctx,
         )
 

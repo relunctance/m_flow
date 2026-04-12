@@ -438,10 +438,7 @@ async def generate_missing_points(
         return []
 
     if _as_bool_env("MOCK_EPISODIC", False):
-        return [
-            FacetPointDraft(search_text=a, aliases=[], description=None)
-            for a in list(missing_anchors)[:3]
-        ]
+        return [FacetPointDraft(search_text=a, aliases=[], description=None) for a in list(missing_anchors)[:3]]
 
     system_prompt = read_query_prompt(prompt_file)
     if not system_prompt:
@@ -648,9 +645,7 @@ async def refine_facet_points(
     if enable_coverage_guard is None:
         enable_coverage_guard = _as_bool_env("MFLOW_EPISODIC_POINT_COVERAGE_GUARD", True)
     if enable_evidence_link is None:
-        enable_evidence_link = _as_bool_env(
-            "MFLOW_EPISODIC_POINT_EVIDENCE_LINK", False
-        )  # disabled by default
+        enable_evidence_link = _as_bool_env("MFLOW_EPISODIC_POINT_EVIDENCE_LINK", False)  # disabled by default
     if dedup_similarity_threshold is None:
         dedup_similarity_threshold = _as_float_env("MFLOW_EPISODIC_POINT_DEDUP_SIM", 0.92)
 
@@ -685,9 +680,7 @@ async def refine_facet_points(
     # Concurrently rewrite all bad points
     if bad_points_to_rewrite:
 
-        async def _do_rewrite(
-            idx: int, p: FacetPointDraft
-        ) -> Tuple[int, Optional[FacetPointDraft]]:
+        async def _do_rewrite(idx: int, p: FacetPointDraft) -> Tuple[int, Optional[FacetPointDraft]]:
             st = (p.search_text or "").strip()
             rewritten = await rewrite_point_handle(st)
             if rewritten and not is_bad_point_handle(rewritten):
@@ -698,9 +691,7 @@ async def refine_facet_points(
                 )
             return idx, None
 
-        rewrite_results = await asyncio.gather(
-            *[_do_rewrite(idx, p) for idx, p in bad_points_to_rewrite]
-        )
+        rewrite_results = await asyncio.gather(*[_do_rewrite(idx, p) for idx, p in bad_points_to_rewrite])
 
         for _idx, result in rewrite_results:  # _idx unused but required for unpacking
             if result is not None:

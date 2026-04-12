@@ -56,11 +56,7 @@ async def preload_processing_status(
     for offset in range(0, len(data_ids), _SQL_IN_LIMIT):
         chunk = data_ids[offset : offset + _SQL_IN_LIMIT]
         async with engine.get_async_session() as session:
-            rows = (
-                await session.execute(
-                    select(Data.id, Data.workflow_state).where(Data.id.in_(chunk))
-                )
-            ).all()
+            rows = (await session.execute(select(Data.id, Data.workflow_state).where(Data.id.in_(chunk)))).all()
             for row in rows:
                 ws = row.workflow_state or {}
                 if ws.get(workflow_name, {}).get(str(dataset_id)) == DataItemStatus.DATA_ITEM_PROCESSING_COMPLETED:
@@ -91,9 +87,7 @@ async def _is_already_processed(data_id, workflow_name: str, dataset_id) -> bool
 
     engine = get_db_adapter()
     async with engine.get_async_session() as session:
-        record = (
-            await session.execute(select(Data).where(Data.id == data_id))
-        ).scalar_one_or_none()
+        record = (await session.execute(select(Data).where(Data.id == data_id))).scalar_one_or_none()
 
         if not record:
             return False
@@ -106,9 +100,7 @@ async def _mark_completed(data_id, workflow_name: str, dataset_id) -> None:
     """Mark item as processed."""
     engine = get_db_adapter()
     async with engine.get_async_session() as session:
-        record = (
-            await session.execute(select(Data).where(Data.id == data_id))
-        ).scalar_one_or_none()
+        record = (await session.execute(select(Data).where(Data.id == data_id))).scalar_one_or_none()
 
         if record is None:
             _log.warning(f"Cannot mark completed: data record {data_id} not found")
@@ -172,8 +164,7 @@ async def process_items_incremental(
 
     except Exception as e:
         _log.error(
-            f"Stage failed for data_id={data_id}, dataset={dataset.name}, "
-            f"pipeline={workflow_name}: {e}",
+            f"Stage failed for data_id={data_id}, dataset={dataset.name}, pipeline={workflow_name}: {e}",
             exc_info=True,
         )
         yield {

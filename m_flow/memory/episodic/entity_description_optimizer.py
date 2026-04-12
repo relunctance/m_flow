@@ -151,9 +151,7 @@ async def optimize_merged_descriptions(
     """
     stats = OptimizationStats()
 
-    logger.info(
-        f"[optimizer] Starting description optimization (min_roles={min_context_roles}, dry_run={dry_run})"
-    )
+    logger.info(f"[optimizer] Starting description optimization (min_roles={min_context_roles}, dry_run={dry_run})")
 
     graph = await get_graph_provider()
 
@@ -208,9 +206,7 @@ async def optimize_merged_descriptions(
             )
 
     stats.entities_needing_optimization = len(entities_to_optimize)
-    logger.info(
-        f"[optimizer] Found {stats.entities_needing_optimization} entities needing optimization"
-    )
+    logger.info(f"[optimizer] Found {stats.entities_needing_optimization} entities needing optimization")
 
     if dry_run:
         logger.info("[optimizer] Dry run - no changes will be written")
@@ -403,8 +399,7 @@ async def _reindex_updated_edges(edges_to_reindex: List[Dict[str, Any]]) -> None
     await index_memory_nodes(relation_nodes)
 
     logger.info(
-        f"[optimizer] Re-indexed {len(relation_nodes)} unique edge_text vectors "
-        f"from {len(edges_to_reindex)} edges"
+        f"[optimizer] Re-indexed {len(relation_nodes)} unique edge_text vectors from {len(edges_to_reindex)} edges"
     )
 
 

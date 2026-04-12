@@ -125,9 +125,7 @@ class EvalMetrics:
         # Check card count
         if constraints.max_procedural_cards is not None:
             if result.procedural.cards_count > constraints.max_procedural_cards:
-                reasons.append(
-                    f"cards={result.procedural.cards_count} > max={constraints.max_procedural_cards}"
-                )
+                reasons.append(f"cards={result.procedural.cards_count} > max={constraints.max_procedural_cards}")
 
         # Check context fields
         for rf in constraints.require_context_fields:
@@ -274,12 +272,8 @@ class EvalMetrics:
                 fp_inject_rate=stats["fp_inject"] / fp_total if stats.get("fp_total") else 0.0,
                 ctx_completeness=stats["ctx_complete"] / n,
                 has_steps_rate=stats["has_steps"] / n,
-                trigger_accuracy=stats["trigger_correct"] / trigger_total
-                if stats.get("trigger_total")
-                else 1.0,
-                overshadow_rate=stats.get("overshadow", 0) / overshadow_total
-                if stats.get("overshadow_total")
-                else 0.0,
+                trigger_accuracy=stats["trigger_correct"] / trigger_total if stats.get("trigger_total") else 1.0,
+                overshadow_rate=stats.get("overshadow", 0) / overshadow_total if stats.get("overshadow_total") else 0.0,
             )
 
         metrics.overall = to_rate(overall)

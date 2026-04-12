@@ -22,6 +22,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 
 class Individual(MemoryNode):
     """A person entity used in graph integration tests."""
+
     label: str
     years: int
     metadata: dict = {"index_fields": ["label"]}
@@ -29,6 +30,7 @@ class Individual(MemoryNode):
 
 class Organisation(MemoryNode):
     """A corporate entity with sector information."""
+
     label: str
     sector: str
     metadata: dict = {"index_fields": ["label", "sector"]}
@@ -114,9 +116,7 @@ async def test_memory_node_lifecycle(prepared_env):
         {"edge_text": "is married to"},
     )
 
-    triplet_out = await persist_memory_nodes(
-        [ind_eps, ind_zeta], custom_edges=[triplet_link], embed_triplets=True
-    )
+    triplet_out = await persist_memory_nodes([ind_eps, ind_zeta], custom_edges=[triplet_link], embed_triplets=True)
     assert len(triplet_out) == 2
 
     g_nodes, g_edges = await gengine.get_graph_data()

@@ -24,14 +24,14 @@ _chunk_mod = sys.modules.get("m_flow.ingestion.chunks.split_rows")
 # 注意: mock 使 chunk_size 使用简单的词计数，而非 tokenizer
 _EXPECTED = {
     10: [
-        {"tokens": 9, "text_len": 31, "cut": "row_cut", "idx": 0},    # 'id: 1, name: alpha, category: A'
-        {"tokens": 3, "text_len": 10, "cut": "row_end", "idx": 1},    # 'value: 100'
-        {"tokens": 9, "text_len": 30, "cut": "row_cut", "idx": 2},    # 'id: 2, name: beta, category: B'
-        {"tokens": 3, "text_len": 10, "cut": "row_end", "idx": 3},    # 'value: 200'
+        {"tokens": 9, "text_len": 31, "cut": "row_cut", "idx": 0},  # 'id: 1, name: alpha, category: A'
+        {"tokens": 3, "text_len": 10, "cut": "row_end", "idx": 1},  # 'value: 100'
+        {"tokens": 9, "text_len": 30, "cut": "row_cut", "idx": 2},  # 'id: 2, name: beta, category: B'
+        {"tokens": 3, "text_len": 10, "cut": "row_end", "idx": 3},  # 'value: 200'
     ],
     128: [
-        {"tokens": 12, "text_len": 43, "cut": "row_end", "idx": 0},   # 'id: 1, name: alpha, category: A, value: 100'
-        {"tokens": 12, "text_len": 42, "cut": "row_end", "idx": 1},   # 'id: 2, name: beta, category: B, value: 200'
+        {"tokens": 12, "text_len": 43, "cut": "row_end", "idx": 0},  # 'id: 1, name: alpha, category: A, value: 100'
+        {"tokens": 12, "text_len": 42, "cut": "row_end", "idx": 1},  # 'id: 2, name: beta, category: B, value: 200'
     ],
 }
 
@@ -60,12 +60,8 @@ async def test_csv_chunking(mock_eng, filename, size):
     doc = _create_csv_doc(filename)
     expected = _EXPECTED[size]
 
-    async for exp, chunk in async_gen_zip(
-        expected, doc.read(chunker_cls=CsvChunker, max_chunk_size=size)
-    ):
+    async for exp, chunk in async_gen_zip(expected, doc.read(chunker_cls=CsvChunker, max_chunk_size=size)):
         assert exp["tokens"] == chunk.chunk_size, f"token数: {exp['tokens']} != {chunk.chunk_size}"
-        assert exp["text_len"] == len(chunk.text), (
-            f"文本长度: {exp['text_len']} != {len(chunk.text)}"
-        )
+        assert exp["text_len"] == len(chunk.text), f"文本长度: {exp['text_len']} != {len(chunk.text)}"
         assert exp["cut"] == chunk.cut_type, f"切割类型: {exp['cut']} != {chunk.cut_type}"
         assert exp["idx"] == chunk.chunk_index, f"索引: {exp['idx']} != {chunk.chunk_index}"

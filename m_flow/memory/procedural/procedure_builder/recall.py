@@ -64,8 +64,7 @@ async def recall_similar_procedures(
 
         if not relevant_bundles:
             logger.debug(
-                f"[procedural.incremental.recall] All recalled bundles filtered out "
-                f"by threshold ({score_threshold})"
+                f"[procedural.incremental.recall] All recalled bundles filtered out by threshold ({score_threshold})"
             )
             return []
 
@@ -109,25 +108,17 @@ def _extract_procedure_info_from_edges(
                         props = {}
 
                 # Find bundle info for this procedure
-                bundle_info = next(
-                    (b for b in bundles if b["procedure_id"] == pid), {}
-                )
+                bundle_info = next((b for b in bundles if b["procedure_id"] == pid), {})
 
                 procs[pid] = ExistingProcedureInfo(
                     procedure_id=pid,
                     title=n.attributes.get("name", ""),
-                    signature=props.get("signature")
-                    or n.attributes.get("signature", ""),
-                    search_text=props.get("search_text")
-                    or n.attributes.get("search_text", ""),
-                    version=props.get("version", 1)
-                    or n.attributes.get("version", 1),
-                    points_text=props.get("points_text")
-                    or n.attributes.get("points_text", ""),
-                    context_text=props.get("context_text")
-                    or n.attributes.get("context_text", ""),
-                    summary=props.get("summary")
-                    or n.attributes.get("summary", ""),
+                    signature=props.get("signature") or n.attributes.get("signature", ""),
+                    search_text=props.get("search_text") or n.attributes.get("search_text", ""),
+                    version=props.get("version", 1) or n.attributes.get("version", 1),
+                    points_text=props.get("points_text") or n.attributes.get("points_text", ""),
+                    context_text=props.get("context_text") or n.attributes.get("context_text", ""),
+                    summary=props.get("summary") or n.attributes.get("summary", ""),
                     relevance_score=bundle_info.get("score", 1.0),
                 )
 

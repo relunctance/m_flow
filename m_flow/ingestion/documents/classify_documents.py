@@ -33,10 +33,7 @@ _TEXT_EXTS = {
 }
 
 # Office document formats
-_OFFICE_EXTS = {
-    ext: UnstructuredDocument
-    for ext in ["docx", "doc", "odt", "xls", "xlsx", "ppt", "pptx", "odp", "ods"]
-}
+_OFFICE_EXTS = {ext: UnstructuredDocument for ext in ["docx", "doc", "odt", "xls", "xlsx", "ppt", "pptx", "odp", "ods"]}
 
 # Image formats
 _IMAGE_EXTS = {
@@ -62,12 +59,11 @@ _IMAGE_EXTS = {
 }
 
 # Audio formats
-_AUDIO_EXTS = {
-    ext: AudioDocument for ext in ["aac", "mid", "mp3", "m4a", "ogg", "flac", "wav", "amr", "aiff"]
-}
+_AUDIO_EXTS = {ext: AudioDocument for ext in ["aac", "mid", "mp3", "m4a", "ogg", "flac", "wav", "amr", "aiff"]}
 
 # Merged mapping table
 _DOC_TYPE_MAP = {**_TEXT_EXTS, **_OFFICE_EXTS, **_IMAGE_EXTS, **_AUDIO_EXTS}
+
 
 def _parse_memory_spaces(doc: Document) -> None:
     """Parse external metadata and populate associated memory spaces."""
@@ -92,6 +88,7 @@ def _parse_memory_spaces(doc: Document) -> None:
         )
         for nm in space_names
     ]
+
 
 async def detect_format(data_documents: list[Data]) -> list[Document]:
     """
@@ -137,4 +134,3 @@ async def detect_format(data_documents: list[Data]) -> list[Document]:
         output.append(doc)
 
     return output
-

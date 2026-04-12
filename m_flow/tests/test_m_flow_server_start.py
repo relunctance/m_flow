@@ -31,8 +31,14 @@ class TestMflowServerStart(unittest.TestCase):
     def setUpClass(cls):
         cls.server_process = subprocess.Popen(
             [
-                sys.executable, "-m", "uvicorn", "m_flow.api.client:app",
-                "--host", SERVER_HOST, "--port", SERVER_PORT,
+                sys.executable,
+                "-m",
+                "uvicorn",
+                "m_flow.api.client:app",
+                "--host",
+                SERVER_HOST,
+                "--port",
+                SERVER_PORT,
             ],
             preexec_fn=os.setsid,
         )
@@ -81,7 +87,9 @@ class TestMflowServerStart(unittest.TestCase):
 
         add_resp = requests.post(
             f"{BASE_URL}/api/v1/add",
-            headers=auth_hdr, data=upload_payload, files=file_part,
+            headers=auth_hdr,
+            data=upload_payload,
+            files=file_part,
             timeout=REQUEST_TIMEOUT_LONG,
         )
         if add_resp.status_code not in (200, 201):
@@ -92,14 +100,14 @@ class TestMflowServerStart(unittest.TestCase):
 
         mem_resp = requests.post(
             f"{BASE_URL}/api/v1/memorize",
-            headers=pipeline_hdrs, json=pipeline_body, timeout=REQUEST_TIMEOUT_PIPELINE,
+            headers=pipeline_hdrs,
+            json=pipeline_body,
+            timeout=REQUEST_TIMEOUT_PIPELINE,
         )
         if mem_resp.status_code not in (200, 201):
             mem_resp.raise_for_status()
 
-        all_datasets = requests.get(
-            f"{BASE_URL}/api/v1/datasets", headers=auth_hdr
-        ).json()
+        all_datasets = requests.get(f"{BASE_URL}/api/v1/datasets", headers=auth_hdr).json()
 
         target_ds_id = None
         for ds in all_datasets:
@@ -107,20 +115,18 @@ class TestMflowServerStart(unittest.TestCase):
                 target_ds_id = ds["id"]
                 break
 
-        graph_resp = requests.get(
-            f"{BASE_URL}/api/v1/datasets/{target_ds_id}/graph", headers=auth_hdr
-        )
+        graph_resp = requests.get(f"{BASE_URL}/api/v1/datasets/{target_ds_id}/graph", headers=auth_hdr)
         self.assertEqual(graph_resp.status_code, 200)
 
         graph_payload = graph_resp.json()
-        self.assertGreater(
-            len(graph_payload.get("nodes", [])), 0, "No nodes found in knowledge graph"
-        )
+        self.assertGreater(len(graph_payload.get("nodes", [])), 0, "No nodes found in knowledge graph")
 
         search_body = {"searchType": "TRIPLET_COMPLETION", "query": "What's in the document?"}
         search_resp = requests.post(
             f"{BASE_URL}/api/v1/search",
-            headers=pipeline_hdrs, json=search_body, timeout=REQUEST_TIMEOUT_LONG,
+            headers=pipeline_hdrs,
+            json=search_body,
+            timeout=REQUEST_TIMEOUT_LONG,
         )
         if search_resp.status_code not in (200, 201):
             search_resp.raise_for_status()

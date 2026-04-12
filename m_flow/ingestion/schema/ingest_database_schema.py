@@ -137,9 +137,7 @@ async def ingest_database_schema(
 async def _estimate_row_count(cursor, engine, table_name: str, quoted: str) -> int:
     """Get row count estimate (fast for PostgreSQL)."""
     if engine.engine.dialect.name == "postgresql":
-        schema_part, table_part = (
-            table_name.split(".", 1) if "." in table_name else ("public", table_name)
-        )
+        schema_part, table_part = table_name.split(".", 1) if "." in table_name else ("public", table_name)
         result = await cursor.execute(
             text(
                 "SELECT reltuples::bigint AS est FROM pg_class c "

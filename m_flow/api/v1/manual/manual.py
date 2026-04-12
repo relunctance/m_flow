@@ -152,7 +152,7 @@ def _build_episode(
     dataset_id: Optional[str] = None,
 ) -> tuple[Episode, List[Facet], List[FacetPoint], List[Entity]]:
     """Build an Episode node with all associated structures from user input.
-    
+
     Args:
         episode_input: User-provided episode definition
         nodeset_name: Name for the MemorySpace nodeset
@@ -317,12 +317,11 @@ async def manual_ingest(
             )
             _log.info(
                 "[manual_ingest] Dataset created & DB context set: %s (id=%s)",
-                request.dataset_name, dataset_id,
+                request.dataset_name,
+                dataset_id,
             )
         except Exception as e:
-            _log.warning(
-                "[manual_ingest] Could not set DB context: %s, using global DB", e
-            )
+            _log.warning("[manual_ingest] Could not set DB context: %s, using global DB", e)
 
     errors: List[str] = []
     all_memory_nodes = []
@@ -422,9 +421,7 @@ _NODE_TYPE_MAP = {
 }
 
 
-def _reconstruct_node_from_props(
-    node_type: str, props: dict
-) -> "Episode | Facet | FacetPoint | Entity | None":
+def _reconstruct_node_from_props(node_type: str, props: dict) -> "Episode | Facet | FacetPoint | Entity | None":
     """
     Reconstruct a MemoryNode from graph database properties.
 
@@ -446,9 +443,7 @@ def _reconstruct_node_from_props(
 
     # Get model field names and required fields
     model_fields = set(node_cls.model_fields.keys())
-    required_fields = {
-        name for name, field_info in node_cls.model_fields.items() if field_info.is_required()
-    }
+    required_fields = {name for name, field_info in node_cls.model_fields.items() if field_info.is_required()}
 
     # Filter props to only include fields that exist in the model
     filtered_props = {}

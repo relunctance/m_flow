@@ -6,6 +6,7 @@ from typing import Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+
 class Entity(MemoryNode):
     """
     Entity represents an atomic entity (name, number, date, tool, person, etc.)
@@ -55,5 +56,6 @@ class Entity(MemoryNode):
     display_only: Optional[str] = None
 
     metadata: dict = {"index_fields": ["name", "canonical_name"]}
+
 
 # Backward compatibility alias

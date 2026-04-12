@@ -67,9 +67,7 @@ class PreprocessedQuery:
     original: str  # Original query
     vector_query: str  # Query for vector retrieval (stripped question words + time expressions)
     keyword: str  # Keyword for keyword matching
-    hybrid_reason: Optional[
-        str
-    ]  # Hybrid retrieval trigger reason: "number" | "mixed_lang" | "short_query" | None
+    hybrid_reason: Optional[str]  # Hybrid retrieval trigger reason: "number" | "mixed_lang" | "short_query" | None
     use_hybrid: bool  # Whether to use hybrid retrieval
 
     # Time enhancement fields

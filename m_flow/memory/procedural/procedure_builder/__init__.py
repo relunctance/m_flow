@@ -119,21 +119,14 @@ async def process_candidate(
     )
 
     if decision.action == MergeAction.skip:
-        logger.info(
-            f"[procedural.incremental] Skipping candidate: "
-            f"{candidate.search_text[:30]}"
-        )
+        logger.info(f"[procedural.incremental] Skipping candidate: {candidate.search_text[:30]}")
         return None
 
     # Find matching existing procedure
     existing_procedure = None
     if decision.match_procedure_id and existing_procedures:
         existing_procedure = next(
-            (
-                p
-                for p in existing_procedures
-                if p.procedure_id == decision.match_procedure_id
-            ),
+            (p for p in existing_procedures if p.procedure_id == decision.match_procedure_id),
             existing_procedures[0] if existing_procedures else None,
         )
 
@@ -146,10 +139,7 @@ async def process_candidate(
     )
 
     if not draft:
-        logger.warning(
-            f"[procedural.incremental] Compilation failed for: "
-            f"{candidate.search_text[:30]}"
-        )
+        logger.warning(f"[procedural.incremental] Compilation failed for: {candidate.search_text[:30]}")
         return None
 
     # Stage 4: Write
@@ -188,10 +178,7 @@ async def process_candidates(
         return []
 
     deduped = dedup_candidates(candidates)
-    logger.info(
-        f"[procedural.incremental] Processing {len(deduped)} candidates "
-        f"(deduped from {len(candidates)})"
-    )
+    logger.info(f"[procedural.incremental] Processing {len(deduped)} candidates (deduped from {len(candidates)})")
 
     results = []
     for candidate in deduped:

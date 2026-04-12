@@ -108,9 +108,7 @@ def create_vector_engine(
         "Pinecone",
         "Milvus",
     ]
-    raise EnvironmentError(
-        f"Unknown vector provider: {vector_db_provider}. Supported: {', '.join(known)}"
-    )
+    raise EnvironmentError(f"Unknown vector provider: {vector_db_provider}. Supported: {', '.join(known)}")
 
 
 def _create_pgvector_adapter(embedder, api_key: str):
@@ -123,17 +121,12 @@ def _create_pgvector_adapter(embedder, api_key: str):
     if not all(required):
         raise EnvironmentError("Missing PGVector credentials")
 
-    conn_str = (
-        f"postgresql+asyncpg://{cfg.db_username}:{cfg.db_password}"
-        f"@{cfg.db_host}:{cfg.db_port}/{cfg.db_name}"
-    )
+    conn_str = f"postgresql+asyncpg://{cfg.db_username}:{cfg.db_password}@{cfg.db_host}:{cfg.db_port}/{cfg.db_name}"
 
     try:
         from .pgvector.PGVectorAdapter import PGVectorAdapter
     except ImportError:
-        raise ImportError(
-            "PGVector dependencies missing. Install with: pip install m_flow[postgres]"
-        )
+        raise ImportError("PGVector dependencies missing. Install with: pip install m_flow[postgres]")
 
     return PGVectorAdapter(conn_str, api_key, embedder)
 

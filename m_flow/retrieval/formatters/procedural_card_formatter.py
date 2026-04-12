@@ -66,9 +66,7 @@ class ProcedureCard:
 
         # Title line
         status = "[ACTIVE]" if self.is_active else "[DEPRECATED]"
-        conf_emoji = {"high": "[HIGH]", "medium": "[MED]", "low": "[LOW]"}.get(
-            self.confidence, "[LOW]"
-        )
+        conf_emoji = {"high": "[HIGH]", "medium": "[MED]", "low": "[LOW]"}.get(self.confidence, "[LOW]")
         lines.append(f"[CARD] **{self.title}** (v{self.version}) {status} {conf_emoji}")
 
         if self.procedure_key:
@@ -210,9 +208,7 @@ class ProceduralCardFormatter:
                 version=props.get("version") or attrs.get("version", 1),
                 is_active=is_active,
                 confidence=props.get("confidence", "high"),
-                summary=self._truncate(
-                    props.get("summary") or attrs.get("summary", ""), self.max_summary_length
-                ),
+                summary=self._truncate(props.get("summary") or attrs.get("summary", ""), self.max_summary_length),
                 provenance=props.get("source_refs") or [],
             )
 
@@ -242,9 +238,7 @@ class ProceduralCardFormatter:
                                     np = json.loads(np)
                                 except (json.JSONDecodeError, TypeError):
                                     np = {}
-                            context_str = (
-                                np.get("anchor_text") or node.attributes.get("anchor_text") or ""
-                            )
+                            context_str = np.get("anchor_text") or node.attributes.get("anchor_text") or ""
                         elif nt == "ProcedureStepsPack" and not steps_str:
                             np = node.attributes.get("properties") or {}
                             if isinstance(np, str):
@@ -254,9 +248,7 @@ class ProceduralCardFormatter:
                                     np = json.loads(np)
                                 except (json.JSONDecodeError, TypeError):
                                     np = {}
-                            steps_str = (
-                                np.get("anchor_text") or node.attributes.get("anchor_text") or ""
-                            )
+                            steps_str = np.get("anchor_text") or node.attributes.get("anchor_text") or ""
 
             card.context = self._truncate(context_str, self.max_context_length)
             card.steps = self._truncate(steps_str, self.max_steps_length)

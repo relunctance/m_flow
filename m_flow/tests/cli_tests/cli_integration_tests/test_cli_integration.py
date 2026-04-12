@@ -101,13 +101,9 @@ class TestAddCommand:
 
             lower_out = result.stdout.lower() + result.stderr.lower()
             arg_parse_ok = (
-                "unrecognized arguments" not in lower_out
-                and "invalid" not in lower_out
-                and "usage:" not in lower_out
+                "unrecognized arguments" not in lower_out and "invalid" not in lower_out and "usage:" not in lower_out
             )
-            execution_started = any(
-                x in lower_out for x in ["adding", "processing", "pipeline"]
-            )
+            execution_started = any(x in lower_out for x in ["adding", "processing", "pipeline"])
 
             assert arg_parse_ok or execution_started
         finally:

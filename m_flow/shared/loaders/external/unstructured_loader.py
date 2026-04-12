@@ -129,9 +129,7 @@ class UnstructuredLoader(LoaderInterface):
         try:
             from unstructured.partition.auto import partition
         except ImportError as err:
-            raise ImportError(
-                "The unstructured library is required. Install with: pip install unstructured"
-            ) from err
+            raise ImportError("The unstructured library is required. Install with: pip install unstructured") from err
 
         _log.info("Processing document: %s", file_path)
 

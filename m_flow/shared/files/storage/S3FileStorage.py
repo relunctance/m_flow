@@ -33,9 +33,7 @@ class S3FileStorage(Storage):
         try:
             import s3fs as _s3fs
         except ImportError:
-            raise ImportError(
-                's3fs is required for S3FileStorage. Install it with: pip install m_flow"[aws]"'
-            )
+            raise ImportError('s3fs is required for S3FileStorage. Install it with: pip install m_flow"[aws]"')
 
         self.storage_path = root_uri
         cfg = get_s3_config()

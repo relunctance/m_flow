@@ -14,12 +14,14 @@ from m_flow.knowledge.graph_ops.utils import extract_graph
 
 class Project(MemoryNode):
     """顶层项目实体"""
+
     root_path: str
     metadata: dict = {"index_fields": []}
 
 
 class Module(MemoryNode):
     """项目内模块，可相互依赖"""
+
     belongs_to: Project
     fragments: List["Fragment"] = []
     imports: List["Module"] = []
@@ -29,6 +31,7 @@ class Module(MemoryNode):
 
 class Fragment(MemoryNode):
     """模块中的代码片段"""
+
     parent_module: Module
     content: str
     metadata: dict = {"index_fields": []}

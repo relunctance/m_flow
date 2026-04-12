@@ -147,12 +147,8 @@ class GenericAPIAdapter(LLMBackend):
 
             try:
                 async with llm_rate_limiter_context_manager():
-                    return await self._call_llm(
-                        text_input, system_prompt, response_model, use_fallback=True
-                    )
+                    return await self._call_llm(text_input, system_prompt, response_model, use_fallback=True)
             except _CONTENT_ERRORS as fallback_err:
                 if not self._is_content_policy_error(fallback_err):
                     raise
-                raise ContentPolicyFilterError(
-                    f"Content blocked: {text_input[:80]}..."
-                ) from fallback_err
+                raise ContentPolicyFilterError(f"Content blocked: {text_input[:80]}...") from fallback_err

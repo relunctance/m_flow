@@ -51,9 +51,7 @@ async def test_text_chunking(mock_eng, filename, size):
     )
 
     expected = _EXPECTED[filename]
-    async for exp, chunk in async_gen_zip(
-        expected, doc.read(chunker_cls=TextChunker, max_chunk_size=size)
-    ):
+    async for exp, chunk in async_gen_zip(expected, doc.read(chunker_cls=TextChunker, max_chunk_size=size)):
         assert exp["words"] == chunk.chunk_size, f"词数: {exp['words']} != {chunk.chunk_size}"
         assert exp["text_len"] == len(chunk.text), f"长度: {exp['text_len']} != {len(chunk.text)}"
         assert exp["cut"] == chunk.cut_type, f"类型: {exp['cut']} != {chunk.cut_type}"

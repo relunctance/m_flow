@@ -128,9 +128,7 @@ async def episodic_bundle_search(
         # Step 2: Vector search (time enhancement: expand candidate pool)
         effective_wide_search_top_k = cfg.wide_search_top_k
         if preprocessed.has_time and preprocessed.time_confidence >= cfg.time_conf_min:
-            effective_wide_search_top_k = min(
-                int(cfg.wide_search_top_k * cfg.time_wide_multiplier), cfg.time_wide_cap
-            )
+            effective_wide_search_top_k = min(int(cfg.wide_search_top_k * cfg.time_wide_multiplier), cfg.time_wide_cap)
             if cfg.time_debug_mode:
                 logger.info(
                     f"[TimeEnhance] Expanded wide_search_top_k: {cfg.wide_search_top_k} -> {effective_wide_search_top_k}"
@@ -164,12 +162,8 @@ async def episodic_bundle_search(
         # Step 2.5: Compute adaptive scoring context (before applying bonus, using raw scores)
         adaptive_context: AdaptiveScoringContext = None
         if cfg.enable_adaptive_weights:
-            collection_stats = compute_collection_stats(
-                node_distances, cfg, debug=cfg.adaptive_debug_mode
-            )
-            adaptive_context = compute_adaptive_context(
-                collection_stats, cfg, debug=cfg.adaptive_debug_mode
-            )
+            collection_stats = compute_collection_stats(node_distances, cfg, debug=cfg.adaptive_debug_mode)
+            adaptive_context = compute_adaptive_context(collection_stats, cfg, debug=cfg.adaptive_debug_mode)
             if cfg.adaptive_debug_mode:
                 logger.info(f"[AdaptiveScoring] {adaptive_context.debug_str()}")
 
@@ -179,9 +173,7 @@ async def episodic_bundle_search(
 
         # Step 4: Two-phase projection
         best_by_id = compute_best_node_distances(node_distances)
-        memory_fragment, projection_stats = await _two_phase_projection_with_stats(
-            node_distances, best_by_id, cfg
-        )
+        memory_fragment, projection_stats = await _two_phase_projection_with_stats(node_distances, best_by_id, cfg)
 
         # Log projection
         for phase_stat in projection_stats:
@@ -223,9 +215,7 @@ async def episodic_bundle_search(
         # Apply time bonus to bundles (before sorting)
         time_bonus_stats = None
         if preprocessed.has_time and preprocessed.time_confidence >= cfg.time_conf_min:
-            time_bonus_stats = _apply_time_bonus_to_bundles(
-                bundles, memory_fragment, preprocessed.time_info, cfg
-            )
+            time_bonus_stats = _apply_time_bonus_to_bundles(bundles, memory_fragment, preprocessed.time_info, cfg)
             if cfg.time_debug_mode and time_bonus_stats:
                 logger.info(f"[TimeEnhance] Bundle time bonus: {time_bonus_stats}")
             rlog.log_time_bonus(bundles=len(bundles), **time_bonus_stats)
@@ -236,19 +226,14 @@ async def episodic_bundle_search(
         rlog.log_bundle_scoring(
             total_bundles=len(bundles),
             top_k=cfg.top_k,
-            top_bundles=[
-                {"episode_id": b.episode_id, "score": b.score, "path": b.best_path}
-                for b in top_bundles[:5]
-            ],
+            top_bundles=[{"episode_id": b.episode_id, "score": b.score, "path": b.best_path} for b in top_bundles[:5]],
         )
 
         TraceManager.event(
             "episodic.bundles.top",
             {
                 "total": len(bundles),
-                "top": [
-                    {"ep": b.episode_id[:20], "score": round(b.score, 4)} for b in top_bundles[:5]
-                ],
+                "top": [{"ep": b.episode_id[:20], "score": round(b.score, 4)} for b in top_bundles[:5]],
             },
         )
 
@@ -468,7 +453,7 @@ async def _two_phase_projection(
 
     # Priority for neighbor node types (lower = higher priority)
     # Support both "Entity" (new) and "Entity" (legacy) type values
-    TYPE_PRIO = {"Episode": 0, "Facet": 1, "FacetPoint": 2, "Entity": 3, "Entity": 3}
+    TYPE_PRIO = {"Episode": 0, "Facet": 1, "FacetPoint": 2, "Entity": 3}
 
     def neighbor_sort_key(nid: str):
         n = fragment_1.nodes.get(nid)
@@ -546,7 +531,7 @@ async def _two_phase_projection_with_stats(
 
     # Priority for neighbor node types (lower = higher priority)
     # Support both "Entity" (new) and "Entity" (legacy) type values
-    TYPE_PRIO = {"Episode": 0, "Facet": 1, "FacetPoint": 2, "Entity": 3, "Entity": 3}
+    TYPE_PRIO = {"Episode": 0, "Facet": 1, "FacetPoint": 2, "Entity": 3}
 
     def neighbor_sort_key(nid: str):
         n = fragment_1.nodes.get(nid)
@@ -579,9 +564,7 @@ async def _two_phase_projection_with_stats(
     return result, projection_stats
 
 
-def _apply_node_distances(
-    memory_fragment, best_by_id: Dict[str, float], cfg: EpisodicConfig
-) -> None:
+def _apply_node_distances(memory_fragment, best_by_id: Dict[str, float], cfg: EpisodicConfig) -> None:
     """Write back node distances."""
     for n in memory_fragment.nodes.values():
         nid = str(n.id)

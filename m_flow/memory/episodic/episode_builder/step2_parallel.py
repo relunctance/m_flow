@@ -124,8 +124,7 @@ async def _entity_description_task(
         start += batch_size
 
     logger.info(
-        f"[episodic] Entity description: {total} entities -> "
-        f"{len(batches)} batches: {[len(b) for b in batches]}"
+        f"[episodic] Entity description: {total} entities -> {len(batches)} batches: {[len(b) for b in batches]}"
     )
 
     async def _write_batch(batch_names: List[str], batch_idx: int):
@@ -153,9 +152,7 @@ async def _entity_description_task(
             if n and desc and n not in entity_desc_map:
                 entity_desc_map[n] = (desc, entity_type)
 
-    logger.info(
-        f"[episodic] Entity description complete: {len(entity_desc_map)}/{len(all_entity_names)}"
-    )
+    logger.info(f"[episodic] Entity description complete: {len(entity_desc_map)}/{len(all_entity_names)}")
     return entity_desc_map
 
 
@@ -251,9 +248,7 @@ async def _facetpoint_extraction_task(
                         raw_points=extracted,
                         facet_search_text=upd.search_text,
                         facet_description=facet_desc,
-                        candidate_chunks=candidate_chunks_for_refiner
-                        if candidate_chunks_for_refiner
-                        else None,
+                        candidate_chunks=candidate_chunks_for_refiner if candidate_chunks_for_refiner else None,
                     )
                     extracted = refined
                 except Exception as e:
@@ -302,9 +297,7 @@ async def _update_entity_descriptions_and_types(
     entity_type_cache: Dict[str, EntityType] = {}
 
     # Build lookup for existing entities (for description merging)
-    existing_entity_descs: Dict[str, str] = {
-        normalize_for_id(e.name): e.description or "" for e in state.entities
-    }
+    existing_entity_descs: Dict[str, str] = {normalize_for_id(e.name): e.description or "" for e in state.entities}
     existing_entity_merge_counts: Dict[str, int] = {
         normalize_for_id(e.name): e.merge_count or 0 for e in state.entities
     }
@@ -409,9 +402,7 @@ async def execute_step2(
         and is_a relationships.
     """
     _llm_concurrency_limit = get_llm_concurrency_limit()
-    logger.info(
-        f"[episodic] Starting parallel Entity + FacetPoint processing (concurrency={_llm_concurrency_limit})"
-    )
+    logger.info(f"[episodic] Starting parallel Entity + FacetPoint processing (concurrency={_llm_concurrency_limit})")
 
     _parallel_start = time.time()
 

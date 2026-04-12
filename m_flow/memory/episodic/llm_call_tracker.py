@@ -84,9 +84,7 @@ class LLMCallRecord:
                 {
                     "attempt": r.attempt,
                     "error_type": r.error_type,
-                    "error_message": r.error_message[:200] + "..."
-                    if len(r.error_message) > 200
-                    else r.error_message,
+                    "error_message": r.error_message[:200] + "..." if len(r.error_message) > 200 else r.error_message,
                     "duration_ms": round(r.duration_ms, 2),
                 }
                 for r in self.retries
@@ -201,9 +199,7 @@ class LLMCallTracker:
                     extra=log_data,
                 )
 
-    def record_attempt(
-        self, attempt: int, error: Optional[Exception] = None, duration_ms: float = 0
-    ):
+    def record_attempt(self, attempt: int, error: Optional[Exception] = None, duration_ms: float = 0):
         """
         Record an attempt (called by retry callback).
         Uses ContextVar to ensure concurrency safety, each async task has its own context.
@@ -342,11 +338,7 @@ class LLMCallTracker:
                 f"[LLM Summary] {module_name}: calls={stats['calls']}, "
                 f"success={stats['success']}, failures={stats['failures']}, "
                 f"retries={stats['retry_count']}, avg_duration={stats['avg_duration_ms']:.2f}ms"
-                + (
-                    f", retry_reasons={stats['retry_reasons']}"
-                    if stats.get("retry_reasons")
-                    else ""
-                )
+                + (f", retry_reasons={stats['retry_reasons']}" if stats.get("retry_reasons") else "")
             )
 
 

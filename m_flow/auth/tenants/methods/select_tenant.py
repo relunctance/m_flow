@@ -62,9 +62,7 @@ async def select_tenant(
 
         # Verify membership
         membership_query = (
-            select(UserTenant)
-            .where(UserTenant.user_id == user.id)
-            .where(UserTenant.tenant_id == tenant_id)
+            select(UserTenant).where(UserTenant.user_id == user.id).where(UserTenant.tenant_id == tenant_id)
         )
 
         try:

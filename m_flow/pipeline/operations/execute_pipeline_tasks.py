@@ -19,26 +19,29 @@ from ..tasks import Stage
 
 logger = get_logger("task_runner")
 
+
 async def _update_current_step(context: dict, step_name: str) -> None:
     """Update current step in progress (fire-and-forget)."""
     if not context:
         logger.debug(f"[step_update] No context, skipping step update for: {step_name}")
         return
-    
+
     run_id_str = context.get("workflow_run_id")
     if not run_id_str:
         logger.debug(f"[step_update] No workflow_run_id in context, skipping: {step_name}")
         return
-    
+
     try:
         from m_flow.pipeline.operations.update_pipeline_progress import (
             update_pipeline_progress,
         )
+
         run_id = UUID(run_id_str)
         logger.info(f"[step_update] Updating currentStep to: {step_name}")
         await update_pipeline_progress(run_id, current_step=step_name)
     except Exception as e:
         logger.warning(f"[step_update] Failed to update step: {e}")
+
 
 async def execute_pipeline_tasks(
     tasks: list[Stage],
@@ -77,6 +80,7 @@ async def execute_pipeline_tasks(
 
     async for result in _execute_task(current, args, remaining, batch_size, user, context):
         yield result
+
 
 async def _execute_task(
     task: Stage,
@@ -120,6 +124,7 @@ async def _execute_task(
         _send_event(f"{task_type} Task Errored", user, name)
         raise
 
+
 def _send_event(event: str, user: User, task_name: str):
     """Emit telemetry event."""
     tenant = str(user.tenant_id) if user.tenant_id else "default"
@@ -133,5 +138,6 @@ def _send_event(event: str, user: User, task_name: str):
             "tenant_id": tenant,
         },
     )
+
 
 # Backward-compatible alias

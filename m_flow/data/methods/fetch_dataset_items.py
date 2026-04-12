@@ -23,11 +23,7 @@ async def fetch_dataset_items(
     engine = get_db_adapter()
 
     async with engine.get_async_session() as session:
-        query = (
-            select(Data)
-            .join(Data.datasets)
-            .filter(Dataset.id == dataset_id)
-        )
+        query = select(Data).join(Data.datasets).filter(Dataset.id == dataset_id)
         if data_ids:
             query = query.filter(Data.id.in_(data_ids))
         query = query.order_by(Data.data_size.desc())

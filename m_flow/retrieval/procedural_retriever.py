@@ -41,8 +41,6 @@ def _build_procedural_structured_json(triplets: List[Edge]) -> str:
     _inject_text_for_procedural_nodes(triplets)
 
     procedures: dict = {}
-    step_owner: dict = {}
-    ctx_owner: dict = {}
     seen_ids: set = set()
 
     for edge in triplets:
@@ -128,12 +126,7 @@ def _build_procedural_structured_json(triplets: List[Edge]) -> str:
             for nd in (edge.node1, edge.node2):
                 attrs = nd.attributes
                 ntype = (attrs.get("type") or "").strip()
-                text = (
-                    attrs.get("text")
-                    or attrs.get("search_text")
-                    or attrs.get("name")
-                    or ""
-                )
+                text = attrs.get("text") or attrs.get("search_text") or attrs.get("name") or ""
                 if ntype == "Procedure":
                     first_proc["title"] = attrs.get("name") or text or "Procedure"
                     first_proc["summary"] = attrs.get("summary") or text
@@ -149,10 +142,7 @@ def _build_procedural_structured_json(triplets: List[Edge]) -> str:
     _noise = {"auto_coverage", "none", "None", ""}
 
     for proc in procedures.values():
-        proc["steps"] = [
-            s for s in dict.fromkeys(proc["steps"])
-            if s.strip() not in _noise
-        ]
+        proc["steps"] = [s for s in dict.fromkeys(proc["steps"]) if s.strip() not in _noise]
         seen_ctx: set = set()
         deduped = []
         for cp in proc["context_points"]:
@@ -343,7 +333,6 @@ class ProceduralRetriever(BaseGraphRetriever):
                     }
 
         for edge in triplets:
-            rel = edge.attributes.get("relationship_type") or edge.attributes.get("edge_text", "")
             for nd in (edge.node1, edge.node2):
                 attrs = nd.attributes
                 ntype = attrs.get("type", "")
@@ -471,16 +460,16 @@ def has_procedural_intent(query: str) -> bool:
 
     # Chinese strong procedural patterns (standalone indicators)
     zh_strong_patterns = [
-        r"步骤",      # steps
-        r"流程",      # process/workflow
-        r"排查",      # troubleshoot
-        r"配置",      # configure
-        r"回滚",      # rollback
-        r"修复",      # fix/repair
-        r"部署",      # deploy
-        r"上线",      # go live
-        r"复盘",      # review/retrospect
-        r"安装",      # install
+        r"步骤",  # steps
+        r"流程",  # process/workflow
+        r"排查",  # troubleshoot
+        r"配置",  # configure
+        r"回滚",  # rollback
+        r"修复",  # fix/repair
+        r"部署",  # deploy
+        r"上线",  # go live
+        r"复盘",  # review/retrospect
+        r"安装",  # install
         r"操作流程",  # operation process
         r"操作步骤",  # operation steps
     ]
@@ -492,7 +481,7 @@ def has_procedural_intent(query: str) -> bool:
     # Chinese weak "how to" patterns (need verb after)
     zh_how_patterns = [
         r"怎么[^\s样了]{1,}",  # "how to" + verb (not state-asking)
-        r"如何[^\s了]{1,}",    # "how to" + verb
+        r"如何[^\s了]{1,}",  # "how to" + verb
     ]
 
     for pattern in zh_how_patterns:

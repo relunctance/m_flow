@@ -211,6 +211,7 @@ class OpenAIAdapter(LLMBackend):
     def _build_messages(self, user_input: str, system_prompt: str) -> list:
         """Construct chat message list."""
         import logging
+
         _dbg = logging.getLogger("llm.debug")
         _dbg.warning(
             f"[STRUCTURED.DEBUG] user_input_len={len(user_input)}, "
@@ -279,9 +280,7 @@ class OpenAIAdapter(LLMBackend):
             ContentPolicyViolationError,
             InstructorRetryException,
         ) as exc:
-            return await self._handle_policy_error_async(
-                exc, text_input, system_prompt, response_model, kwargs
-            )
+            return await self._handle_policy_error_async(exc, text_input, system_prompt, response_model, kwargs)
 
     async def _handle_policy_error_async(
         self,
@@ -314,9 +313,7 @@ class OpenAIAdapter(LLMBackend):
                 if "content management policy" not in str(fallback_exc).lower():
                     raise fallback_exc
 
-            raise ContentPolicyFilterError(
-                f"Content policy violation: {text_input[:100]}..."
-            ) from fallback_exc
+            raise ContentPolicyFilterError(f"Content policy violation: {text_input[:100]}...") from fallback_exc
 
     @_observe
     @retry(

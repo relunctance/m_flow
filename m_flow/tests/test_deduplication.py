@@ -117,9 +117,7 @@ async def run_deduplication_test() -> None:
 
     data_records = await fetch_table_data("data")
     assert_single_data_entity(data_records, "Text file deduplication failed")
-    assert data_records[0]["name"] == "Natural_language_processing_copy", (
-        "Expected copy file name to be stored"
-    )
+    assert data_records[0]["name"] == "Natural_language_processing_copy", "Expected copy file name to be stored"
 
     dataset_records = await fetch_table_data("datasets")
     assert_dual_datasets(dataset_records)
@@ -140,9 +138,7 @@ async def run_deduplication_test() -> None:
 
     expected_hash = compute_content_hash(QUANTUM_COMPUTING_TEXT)
     actual_name = data_records[0]["name"]
-    assert expected_hash in actual_name, (
-        f"Content hash {expected_hash} not found in name {actual_name}"
-    )
+    assert expected_hash in actual_name, f"Content hash {expected_hash} not found in name {actual_name}"
 
     # --- Image file deduplication ---
     await reset_system()

@@ -13,12 +13,8 @@ from m_flow.llm.backends.litellm_instructor.llm.rate_limiter import (
     rate_limit_sync,
 )
 
-_LIMITER_PATH = (
-    "m_flow.llm.backends.litellm_instructor.llm.rate_limiter.llm_rate_limiter"
-)
-_CONFIG_PATH = (
-    "m_flow.llm.backends.litellm_instructor.llm.rate_limiter.get_llm_config"
-)
+_LIMITER_PATH = "m_flow.llm.backends.litellm_instructor.llm.rate_limiter.llm_rate_limiter"
+_CONFIG_PATH = "m_flow.llm.backends.litellm_instructor.llm.rate_limiter.get_llm_config"
 
 
 @pytest.fixture(autouse=True)
@@ -92,9 +88,7 @@ class TestDecorators:
             LLMRateLimiter,
         )
 
-        with patch.object(
-            LLMRateLimiter, "wait_async", new_callable=AsyncMock, return_value=0
-        ) as mock_wait:
+        with patch.object(LLMRateLimiter, "wait_async", new_callable=AsyncMock, return_value=0) as mock_wait:
 
             @rate_limit_async
             async def fn():

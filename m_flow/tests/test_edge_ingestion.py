@@ -107,8 +107,7 @@ async def test_edge_ingestion():
 
     # Structural edge consistency
     assert type_counts.get("made_from", 0) == type_counts.get("is_part_of", 0), (
-        f"made_from ({type_counts.get('made_from', 0)}) != "
-        f"is_part_of ({type_counts.get('is_part_of', 0)})"
+        f"made_from ({type_counts.get('made_from', 0)}) != is_part_of ({type_counts.get('is_part_of', 0)})"
     )
 
     assert type_counts.get("contains", 0) == type_counts.get("is_a", 0), (
@@ -124,9 +123,7 @@ async def test_edge_ingestion():
         # When Entity edges enabled, verify they exist
         found_count = sum(1 for t in relationship_types if t in type_counts)
         assert found_count >= 2, f"Expected at least 2 relationship edges, found {found_count}"
-        assert len(type_counts) > 4, (
-            f"Expected >4 edge types with relationships, found {len(type_counts)}"
-        )
+        assert len(type_counts) > 4, f"Expected >4 edge types with relationships, found {len(type_counts)}"
     else:
         _logger.info(
             "Entity edges disabled. Found %d types: %s",

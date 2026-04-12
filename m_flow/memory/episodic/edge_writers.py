@@ -111,8 +111,7 @@ async def write_facet_entity_edges(memory_nodes: List[Any]) -> List[Any]:
 
         await graph_engine.add_edges(edges_to_add)
         logger.info(
-            f"[episodic] Wrote {len(edges_to_add)} Facet-Entity edges "
-            f"linking facets to entities that appear in them"
+            f"[episodic] Wrote {len(edges_to_add)} Facet-Entity edges linking facets to entities that appear in them"
         )
     except Exception as e:
         logger.warning(f"[episodic] Failed to write Facet-Entity edges: {e}")

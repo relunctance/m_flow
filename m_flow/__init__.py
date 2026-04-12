@@ -56,19 +56,39 @@ from . import pipeline as pipelines  # noqa: E402
 
 __all__ = [
     # Core operations
-    "add", "memorize", "learn", "search", "query", "ingest",
+    "add",
+    "memorize",
+    "learn",
+    "search",
+    "query",
+    "ingest",
     # Search types
-    "RecallMode", "QueryResult", "SearchConfig",
-    "IngestResult", "IngestStatus", "ContentType",
+    "RecallMode",
+    "QueryResult",
+    "SearchConfig",
+    "IngestResult",
+    "IngestStatus",
+    "ContentType",
     # Data management
-    "datasets", "delete", "update", "prune",
+    "datasets",
+    "delete",
+    "update",
+    "prune",
     # Manual ingestion
-    "manual_ingest", "manual_add_episode", "patch_node",
-    "ManualIngestRequest", "ManualEpisodeInput",
-    "ManualFacetInput", "ManualFacetPointInput",
-    "ManualConceptInput", "PatchNodeRequest",
+    "manual_ingest",
+    "manual_add_episode",
+    "patch_node",
+    "ManualIngestRequest",
+    "ManualEpisodeInput",
+    "ManualFacetInput",
+    "ManualFacetPointInput",
+    "ManualConceptInput",
+    "PatchNodeRequest",
     # Configuration & UI
-    "config", "start_ui", "maintenance",
+    "config",
+    "start_ui",
+    "maintenance",
     # Advanced
-    "pipelines", "run_custom_pipeline",
+    "pipelines",
+    "run_custom_pipeline",
 ]

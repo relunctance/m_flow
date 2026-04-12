@@ -86,9 +86,7 @@ async def _probe_relational() -> ProbeResult:
         if sess is not None:
             sess.close()
         ms = int((time.monotonic() - t0) * 1000)
-        return ProbeResult(
-            verdict=Verdict.UP, backend=cfg.db_provider, latency_ms=ms, note="session ok"
-        )
+        return ProbeResult(verdict=Verdict.UP, backend=cfg.db_provider, latency_ms=ms, note="session ok")
     except Exception as exc:
         ms = int((time.monotonic() - t0) * 1000)
         _log.error("relational probe failed: %s", exc, exc_info=True)
@@ -125,7 +123,7 @@ async def _probe_vector() -> ProbeResult:
 async def _probe_graph() -> ProbeResult:
     """
     Probe graph database connectivity.
-    
+
     Note: Uses a 3-second timeout to avoid blocking when the graph DB lock
     is held by a long-running operation (e.g., batch ingestion). This prevents
     the entire /health endpoint from timing out.
@@ -136,7 +134,7 @@ async def _probe_graph() -> ProbeResult:
         from m_flow.adapters.graph.get_graph_adapter import get_graph_provider
 
         cfg = get_graph_config()
-        
+
         # Use timeout to prevent blocking on Kuzu exclusive lock
         try:
             eng = await asyncio.wait_for(get_graph_provider(), timeout=3.0)
@@ -151,10 +149,7 @@ async def _probe_graph() -> ProbeResult:
 
         if callable(getattr(eng, "query", None)):
             try:
-                await asyncio.wait_for(
-                    eng.query("MATCH () RETURN count(*) LIMIT 1", {}),
-                    timeout=2.0
-                )
+                await asyncio.wait_for(eng.query("MATCH () RETURN count(*) LIMIT 1", {}), timeout=2.0)
             except asyncio.TimeoutError:
                 ms = int((time.monotonic() - t0) * 1000)
                 return ProbeResult(
@@ -200,9 +195,7 @@ async def _probe_storage() -> ProbeResult:
             os.remove(full)
 
         ms = int((time.monotonic() - t0) * 1000)
-        return ProbeResult(
-            verdict=Verdict.UP, backend=backend_label, latency_ms=ms, note="read/write ok"
-        )
+        return ProbeResult(verdict=Verdict.UP, backend=backend_label, latency_ms=ms, note="read/write ok")
     except Exception as exc:
         ms = int((time.monotonic() - t0) * 1000)
         return ProbeResult(verdict=Verdict.DOWN, latency_ms=ms, note=str(exc)[:200])
@@ -211,7 +204,7 @@ async def _probe_storage() -> ProbeResult:
 async def _probe_llm() -> ProbeResult:
     """
     Probe LLM provider configuration.
-    
+
     Checks that API key and model are configured without making actual API calls.
     Actual LLM connectivity is validated on first real usage.
     """
@@ -250,7 +243,7 @@ async def _probe_llm() -> ProbeResult:
 async def _probe_embedding() -> ProbeResult:
     """
     Probe embedding service configuration.
-    
+
     Checks that embedding provider and model are configured without making actual API calls.
     """
     t0 = time.monotonic()
@@ -374,9 +367,7 @@ async def run_health_probes(*, include_optional: bool = False) -> SystemHealth:
             collected[probe_def.label] = raw
 
     # Derive aggregate verdict
-    any_critical_down = any(
-        collected[p.label].verdict == Verdict.DOWN for p in _PROBES if p.critical
-    )
+    any_critical_down = any(collected[p.label].verdict == Verdict.DOWN for p in _PROBES if p.critical)
     any_warn = any(r.verdict == Verdict.WARN for r in collected.values())
 
     if any_critical_down:

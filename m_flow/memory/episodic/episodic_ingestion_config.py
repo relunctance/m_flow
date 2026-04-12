@@ -120,17 +120,12 @@ class EpisodicIngestionConfig:
         """Validate configuration values."""
         if not 0.0 <= self.semantic_merge_threshold <= 1.0:
             raise ValueError(
-                f"semantic_merge_threshold must be between 0.0 and 1.0, "
-                f"got {self.semantic_merge_threshold}"
+                f"semantic_merge_threshold must be between 0.0 and 1.0, got {self.semantic_merge_threshold}"
             )
         if self.llm_concurrency_limit < 1:
-            raise ValueError(
-                f"llm_concurrency_limit must be >= 1, got {self.llm_concurrency_limit}"
-            )
+            raise ValueError(f"llm_concurrency_limit must be >= 1, got {self.llm_concurrency_limit}")
         if self.max_new_facets_per_batch < 1:
-            raise ValueError(
-                f"max_new_facets_per_batch must be >= 1, got {self.max_new_facets_per_batch}"
-            )
+            raise ValueError(f"max_new_facets_per_batch must be >= 1, got {self.max_new_facets_per_batch}")
 
 
 def get_ingestion_config() -> EpisodicIngestionConfig:
@@ -158,18 +153,14 @@ def get_ingestion_config() -> EpisodicIngestionConfig:
         enable_semantic_merge=_as_bool_env("MFLOW_EPISODIC_ENABLE_SEMANTIC_MERGE", False),
         enable_episode_routing=_as_bool_env("MFLOW_EPISODIC_ENABLE_ROUTING", True),
         enable_facet_points=_as_bool_env("MFLOW_EPISODIC_ENABLE_FACET_POINTS", True),
-        enable_llm_entity_for_routing=_as_bool_env(
-            "MFLOW_EPISODIC_USE_LLM_ENTITY_FOR_ROUTING", True
-        ),
+        enable_llm_entity_for_routing=_as_bool_env("MFLOW_EPISODIC_USE_LLM_ENTITY_FOR_ROUTING", True),
         enable_point_refiner=_as_bool_env("MFLOW_EPISODIC_POINT_REFINER", True),
         mock_episodic=_as_bool_env("MOCK_EPISODIC", False),
         # Numerical thresholds
         semantic_merge_threshold=_as_float_env("MFLOW_EPISODIC_SEMANTIC_MERGE_THRESHOLD", 0.90),
         llm_concurrency_limit=_as_int_env("MFLOW_LLM_CONCURRENCY_LIMIT", 20),
         # File configuration
-        facet_points_prompt_file=os.getenv(
-            "MFLOW_EPISODIC_FACET_POINTS_PROMPT", "episodic_extract_facet_points.txt"
-        ),
+        facet_points_prompt_file=os.getenv("MFLOW_EPISODIC_FACET_POINTS_PROMPT", "episodic_extract_facet_points.txt"),
     )
 
 
@@ -218,18 +209,12 @@ def merge_config_with_params(
     return EpisodicIngestionConfig(
         # Feature flags
         enable_semantic_merge=(
-            enable_semantic_merge
-            if enable_semantic_merge is not None
-            else config.enable_semantic_merge
+            enable_semantic_merge if enable_semantic_merge is not None else config.enable_semantic_merge
         ),
         enable_episode_routing=(
-            enable_episode_routing
-            if enable_episode_routing is not None
-            else config.enable_episode_routing
+            enable_episode_routing if enable_episode_routing is not None else config.enable_episode_routing
         ),
-        enable_facet_points=(
-            enable_facet_points if enable_facet_points is not None else config.enable_facet_points
-        ),
+        enable_facet_points=(enable_facet_points if enable_facet_points is not None else config.enable_facet_points),
         enable_llm_entity_for_routing=(
             enable_llm_entity_for_routing
             if enable_llm_entity_for_routing is not None
@@ -239,21 +224,15 @@ def merge_config_with_params(
         mock_episodic=config.mock_episodic,
         # Numerical thresholds
         semantic_merge_threshold=(
-            semantic_merge_threshold
-            if semantic_merge_threshold is not None
-            else config.semantic_merge_threshold
+            semantic_merge_threshold if semantic_merge_threshold is not None else config.semantic_merge_threshold
         ),
         llm_concurrency_limit=config.llm_concurrency_limit,
         # Capacity limits
         max_entities_per_episode=(
-            max_entities_per_episode
-            if max_entities_per_episode is not None
-            else config.max_entities_per_episode
+            max_entities_per_episode if max_entities_per_episode is not None else config.max_entities_per_episode
         ),
         max_new_facets_per_batch=(
-            max_new_facets_per_batch
-            if max_new_facets_per_batch is not None
-            else config.max_new_facets_per_batch
+            max_new_facets_per_batch if max_new_facets_per_batch is not None else config.max_new_facets_per_batch
         ),
         max_existing_facets_in_prompt=(
             max_existing_facets_in_prompt
@@ -271,19 +250,13 @@ def merge_config_with_params(
             else config.max_candidate_entities_in_prompt
         ),
         max_aliases_per_facet=(
-            max_aliases_per_facet
-            if max_aliases_per_facet is not None
-            else config.max_aliases_per_facet
+            max_aliases_per_facet if max_aliases_per_facet is not None else config.max_aliases_per_facet
         ),
         aliases_text_max_chars=(
-            aliases_text_max_chars
-            if aliases_text_max_chars is not None
-            else config.aliases_text_max_chars
+            aliases_text_max_chars if aliases_text_max_chars is not None else config.aliases_text_max_chars
         ),
         evidence_chunks_per_facet=(
-            evidence_chunks_per_facet
-            if evidence_chunks_per_facet is not None
-            else config.evidence_chunks_per_facet
+            evidence_chunks_per_facet if evidence_chunks_per_facet is not None else config.evidence_chunks_per_facet
         ),
         max_point_aliases_text_chars=(
             max_point_aliases_text_chars
@@ -292,13 +265,9 @@ def merge_config_with_params(
         ),
         # File configuration
         episodic_nodeset_name=(
-            episodic_nodeset_name
-            if episodic_nodeset_name is not None
-            else config.episodic_nodeset_name
+            episodic_nodeset_name if episodic_nodeset_name is not None else config.episodic_nodeset_name
         ),
         facet_points_prompt_file=(
-            facet_points_prompt_file
-            if facet_points_prompt_file is not None
-            else config.facet_points_prompt_file
+            facet_points_prompt_file if facet_points_prompt_file is not None else config.facet_points_prompt_file
         ),
     )

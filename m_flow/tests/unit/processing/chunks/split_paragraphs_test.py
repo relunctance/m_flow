@@ -47,9 +47,7 @@ _REFERENCE_SEGMENTS_NO_PERIOD = [
 @pytest.mark.parametrize(
     "document,reference_segments",
     [
-        pytest.param(
-            _DOC_ENDING_WITH_PERIOD, _REFERENCE_SEGMENTS_PERIOD, id="terminated"
-        ),
+        pytest.param(_DOC_ENDING_WITH_PERIOD, _REFERENCE_SEGMENTS_PERIOD, id="terminated"),
         pytest.param(
             _DOC_WITHOUT_TRAILING_PERIOD,
             _REFERENCE_SEGMENTS_NO_PERIOD,
@@ -60,9 +58,7 @@ _REFERENCE_SEGMENTS_NO_PERIOD = [
 @patch.object(_SENTENCE_MOD, "get_embedding_engine", side_effect=_stub_embedding_engine)
 def test_paragraph_splitting(mock_eng, document, reference_segments):
     """Splitting a multi-paragraph document must yield three segments with matching attributes."""
-    produced = list(
-        split_paragraphs(data=document, batch_paragraphs=False, max_chunk_size=12)
-    )
+    produced = list(split_paragraphs(data=document, batch_paragraphs=False, max_chunk_size=12))
 
     assert len(produced) == len(reference_segments)
 

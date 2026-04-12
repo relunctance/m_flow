@@ -86,46 +86,33 @@ class TestUnifiedTripletSearch:
         assert "Node: Christina Mayer" in context, "Missing node header for Christina Mayer"
 
         # --- Node contents ---
-        assert (
-            "__node_content_start__\nThis is description about Steve Rodger\n__node_content_end__"
-            in context
-        ), "Description block for Steve Rodger altered"
+        assert "__node_content_start__\nThis is description about Steve Rodger\n__node_content_end__" in context, (
+            "Description block for Steve Rodger altered"
+        )
         assert "__node_content_start__\nFigma is a company\n__node_content_end__" in context, (
             "Description block for Figma altered"
         )
-        assert (
-            "__node_content_start__\nThis is description about Ike Loma\n__node_content_end__"
-            in context
-        ), "Description block for Ike Loma altered"
-        assert (
-            "__node_content_start__\nThis is description about Jason Statham\n__node_content_end__"
-            in context
-        ), "Description block for Jason Statham altered"
-        assert (
-            "__node_content_start__\nThis is description about Mike Broski\n__node_content_end__"
-            in context
-        ), "Description block for Mike Broski altered"
+        assert "__node_content_start__\nThis is description about Ike Loma\n__node_content_end__" in context, (
+            "Description block for Ike Loma altered"
+        )
+        assert "__node_content_start__\nThis is description about Jason Statham\n__node_content_end__" in context, (
+            "Description block for Jason Statham altered"
+        )
+        assert "__node_content_start__\nThis is description about Mike Broski\n__node_content_end__" in context, (
+            "Description block for Mike Broski altered"
+        )
         assert "__node_content_start__\nCanvas is a company\n__node_content_end__" in context, (
             "Description block for Canva altered"
         )
-        assert (
-            "__node_content_start__\nThis is description about Christina Mayer\n__node_content_end__"
-            in context
-        ), "Description block for Christina Mayer altered"
+        assert "__node_content_start__\nThis is description about Christina Mayer\n__node_content_end__" in context, (
+            "Description block for Christina Mayer altered"
+        )
 
         # --- Connections ---
-        assert "Steve Rodger --[works_for]--> Figma" in context, (
-            "Connection Steve Rodger→Figma missing or changed"
-        )
-        assert "Ike Loma --[works_for]--> Figma" in context, (
-            "Connection Ike Loma→Figma missing or changed"
-        )
-        assert "Jason Statham --[works_for]--> Figma" in context, (
-            "Connection Jason Statham→Figma missing or changed"
-        )
-        assert "Mike Broski --[works_for]--> Canva" in context, (
-            "Connection Mike Broski→Canva missing or changed"
-        )
+        assert "Steve Rodger --[works_for]--> Figma" in context, "Connection Steve Rodger→Figma missing or changed"
+        assert "Ike Loma --[works_for]--> Figma" in context, "Connection Ike Loma→Figma missing or changed"
+        assert "Jason Statham --[works_for]--> Figma" in context, "Connection Jason Statham→Figma missing or changed"
+        assert "Mike Broski --[works_for]--> Canva" in context, "Connection Mike Broski→Canva missing or changed"
         assert "Christina Mayer --[works_for]--> Canva" in context, (
             "Connection Christina Mayer→Canva missing or changed"
         )

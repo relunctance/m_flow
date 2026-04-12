@@ -37,20 +37,20 @@ async def save_embedding_config(dto: EmbeddingConfigDTO, persist: bool = True) -
     * ``provider``, ``model``, and ``dimensions`` are always overwritten.
     * ``api_key`` is written **only** when the caller supplies a
       non-empty, non-masked value.
-    
+
     Args:
         dto: Configuration update data.
         persist: If True, also write changes to .env file for persistence.
     """
     from m_flow.adapters.vector.embeddings import get_embedding_config
-    
+
     active_cfg = get_embedding_config()
     active_cfg.embedding_provider = dto.provider
     active_cfg.embedding_model = dto.model
-    
+
     if dto.dimensions is not None:
         active_cfg.embedding_dimensions = dto.dimensions
-    
+
     if dto.endpoint:
         active_cfg.embedding_endpoint = dto.endpoint
 
@@ -62,7 +62,7 @@ async def save_embedding_config(dto: EmbeddingConfigDTO, persist: bool = True) -
     if persist:
         try:
             from m_flow.config.settings.persist_env import persist_env_values
-            
+
             updates = {
                 "EMBEDDING_PROVIDER": dto.provider,
                 "EMBEDDING_MODEL": dto.model,
@@ -73,7 +73,7 @@ async def save_embedding_config(dto: EmbeddingConfigDTO, persist: bool = True) -
                 updates["EMBEDDING_ENDPOINT"] = dto.endpoint
             if key_is_real:
                 updates["EMBEDDING_API_KEY"] = dto.api_key
-            
+
             await persist_env_values(updates)
             logger.info(f"Embedding config persisted: provider={dto.provider}, model={dto.model}")
         except Exception as e:

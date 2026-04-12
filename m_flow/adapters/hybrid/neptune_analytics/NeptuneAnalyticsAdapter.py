@@ -156,11 +156,7 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorProvider):
         memory_node_ids: list[str],
     ) -> list[VectorSearchHit]:
         """Fetch nodes by ID from a collection."""
-        cypher = (
-            f"MATCH (n:{self._VEC_LABEL}) "
-            f"WHERE id(n) IN $ids AND n.{self._COLL_TAG} = $coll "
-            "RETURN n AS payload"
-        )
+        cypher = f"MATCH (n:{self._VEC_LABEL}) WHERE id(n) IN $ids AND n.{self._COLL_TAG} = $coll RETURN n AS payload"
         params = {"ids": memory_node_ids, "coll": collection_name}
         try:
             rows = self._client.query(cypher, params)
@@ -248,11 +244,7 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorProvider):
         memory_node_ids: list[str],
     ) -> None:
         """Remove nodes from a collection."""
-        cypher = (
-            f"MATCH (n:{self._VEC_LABEL}) "
-            f"WHERE id(n) IN $ids AND n.{self._COLL_TAG} = $coll "
-            "DETACH DELETE n"
-        )
+        cypher = f"MATCH (n:{self._VEC_LABEL}) WHERE id(n) IN $ids AND n.{self._COLL_TAG} = $coll DETACH DELETE n"
         params = {"ids": memory_node_ids, "coll": collection_name}
         try:
             self._client.query(cypher, params)

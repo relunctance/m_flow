@@ -56,13 +56,14 @@ async def _run_context_pipeline() -> None:
     ]
 
     stream = execute_pipeline_tasks(
-        chain, data=SEED_VALUE, user=usr, context=CTX_PARAM,
+        chain,
+        data=SEED_VALUE,
+        user=usr,
+        context=CTX_PARAM,
     )
 
     async for result in stream:
-        assert result == EXPECTED_OUTPUT, (
-            f"Context pipeline produced {result}, expected {EXPECTED_OUTPUT}"
-        )
+        assert result == EXPECTED_OUTPUT, f"Context pipeline produced {result}, expected {EXPECTED_OUTPUT}"
 
 
 def test_context_is_threaded_through_pipeline() -> None:

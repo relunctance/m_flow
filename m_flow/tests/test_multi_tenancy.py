@@ -165,9 +165,7 @@ async def main():
 
     # Only datasets from current tenant should be visible
     assert len(tenant_2_search) == 1, f"Should see only current tenant's dataset: {tenant_2_search}"
-    assert tenant_2_search[0]["dataset_name"] == "AI_MFLOW_LAB", (
-        f"Dataset name mismatch: {tenant_2_search[0]}"
-    )
+    assert tenant_2_search[0]["dataset_name"] == "AI_MFLOW_LAB", f"Dataset name mismatch: {tenant_2_search[0]}"
     assert tenant_2_search[0]["dataset_tenant_id"] == primary_user.tenant_id, (
         f"Tenant ID mismatch: {tenant_2_search[0]}"
     )
@@ -185,9 +183,7 @@ async def main():
     )
 
     assert len(default_search) == 1, f"Should see only default tenant's dataset: {default_search}"
-    assert default_search[0]["dataset_name"] == "AI", (
-        f"Should see original AI dataset: {default_search[0]}"
-    )
+    assert default_search[0]["dataset_name"] == "AI", f"Should see original AI dataset: {default_search[0]}"
 
     _logger.info("Multi-tenancy test completed successfully")
 

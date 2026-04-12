@@ -470,9 +470,7 @@ class IngestionLogger:
             self.log_phase_end(IngestionPhase.SAME_ENTITY_EDGES, triggered=False, edges=0)
             return
 
-        self._log_info(
-            f"[{self.batch_id}] [SameConcept] same_entity_as edges", {"edges": edges_created}
-        )
+        self._log_info(f"[{self.batch_id}] [SameConcept] same_entity_as edges", {"edges": edges_created})
 
         self.log_phase_end(
             IngestionPhase.SAME_ENTITY_EDGES,

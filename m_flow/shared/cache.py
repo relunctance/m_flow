@@ -343,9 +343,7 @@ async def download_and_extract_zip(
     force: bool = False,
 ) -> str:
     """Download and extract a ZIP to cache."""
-    return await get_cache_manager().download_and_extract_zip(
-        url, cache_dir_name, version_or_hash, force
-    )
+    return await get_cache_manager().download_and_extract_zip(url, cache_dir_name, version_or_hash, force)
 
 
 async def get_tutorial_data_dir() -> str:

@@ -7,7 +7,6 @@ Write Procedural Memories 纯逻辑函数单元测试
 - contains_dangerous_content: 危险内容检测
 """
 
-
 from m_flow.memory.procedural.write_procedural_memories import (
     redact_secrets,
     contains_dangerous_content,
@@ -118,9 +117,7 @@ MIIBOgIBAAJBALRmn...
 
     def test_bearer_token_pattern(self):
         """应脱敏 Bearer Token"""
-        text = (
-            "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0"
-        )
+        text = "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0"
         result = redact_secrets(text)
         assert "eyJhbGciOiJIUzI1" not in result
         assert "REDACTED" in result

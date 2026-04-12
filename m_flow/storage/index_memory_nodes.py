@@ -178,10 +178,7 @@ async def index_memory_nodes(memory_nodes: list[MemoryNode]):
 
     if tasks:
         await asyncio.gather(*tasks, return_exceptions=True)
-        _log.info(
-            f"[index_memory_nodes] Complete: {success_count}/{total_batches} succeeded, "
-            f"{fail_count} failed"
-        )
+        _log.info(f"[index_memory_nodes] Complete: {success_count}/{total_batches} succeeded, {fail_count} failed")
 
     return memory_nodes
 

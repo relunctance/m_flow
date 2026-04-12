@@ -74,9 +74,7 @@ def safe_payload(
         out: Dict[str, Any] = {}
         items = list(obj.items())[:max_list_len]
         for k, v in items:
-            out[str(k)] = safe_payload(
-                v, max_str_len=max_str_len, max_list_len=max_list_len, max_depth=max_depth - 1
-            )
+            out[str(k)] = safe_payload(v, max_str_len=max_str_len, max_list_len=max_list_len, max_depth=max_depth - 1)
         if len(obj) > max_list_len:
             out["__truncated__"] = f"dict_size={len(obj)}"
         return out
@@ -84,9 +82,7 @@ def safe_payload(
     if isinstance(obj, (list, tuple, set)):
         lst = list(obj)
         out_list = [
-            safe_payload(
-                v, max_str_len=max_str_len, max_list_len=max_list_len, max_depth=max_depth - 1
-            )
+            safe_payload(v, max_str_len=max_str_len, max_list_len=max_list_len, max_depth=max_depth - 1)
             for v in lst[:max_list_len]
         ]
         if len(lst) > max_list_len:

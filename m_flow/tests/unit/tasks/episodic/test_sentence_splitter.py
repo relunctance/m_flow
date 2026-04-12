@@ -284,7 +284,7 @@ class TestDialogFormat:
         """Dialog splitting preserves speaker attribution with explicit DIALOG type."""
         text = """[August 14, 2023] Melanie: Hey! How are you? I'm doing great!
 [August 14, 2023] Caroline: Good to hear! What's new?"""
-        
+
         sentences = smart_split_sentences(text, content_type=ContentType.DIALOG)
         assert len(sentences) == 2
         assert "Melanie:" in sentences[0]
@@ -297,7 +297,7 @@ class TestDialogFormat:
         """Dialog with various timestamp formats."""
         text = """[2023-08-14 10:00 AM] Alice: First message. Second sentence!
 [2023-08-14 10:01 AM] Bob: Reply here. Another sentence."""
-        
+
         sentences = smart_split_sentences(text, content_type=ContentType.DIALOG)
         assert len(sentences) == 2
         assert "First message. Second sentence!" in sentences[0]
@@ -309,7 +309,7 @@ class TestDialogFormat:
         text = """[10:00] Alice: Check this out!
   [Image shared by Alice: a photo of a sunset]
 [10:01] Bob: That's beautiful!"""
-        
+
         sentences = smart_split_sentences(text, content_type=ContentType.DIALOG)
         assert len(sentences) == 2
         # Image description should be attached to Alice's message
@@ -320,7 +320,7 @@ class TestDialogFormat:
         """Simple Speaker: message format."""
         text = """Alice: Hello! How are you?
 Bob: I'm fine! Thanks for asking."""
-        
+
         sentences = smart_split_sentences(text, content_type=ContentType.DIALOG)
         assert len(sentences) == 2
         assert "Alice:" in sentences[0]
@@ -338,16 +338,16 @@ Bob: I'm fine! Thanks for asking."""
         text = "The recipe includes: eggs, milk, flour. Mix well. Bake at 350F."
         sentences = smart_split_sentences(text)  # No content_type = default TEXT
         assert len(sentences) == 3
-    
+
     def test_dialog_vs_text_mode_comparison(self):
         """Same input produces different output based on content_type."""
         text = """Alice: Hello! How are you?
 Bob: I'm fine! Thanks for asking."""
-        
+
         # DIALOG mode: splits by speaker
         dialog_sentences = smart_split_sentences(text, content_type=ContentType.DIALOG)
         assert len(dialog_sentences) == 2
-        
+
         # TEXT mode: splits by sentence boundaries
         text_sentences = smart_split_sentences(text, content_type=ContentType.TEXT)
         # TEXT mode will split differently (by periods/exclamation marks)

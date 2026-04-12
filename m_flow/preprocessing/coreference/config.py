@@ -72,16 +72,12 @@ class CorefConfig:
 
         # language: must be one of "auto", "zh", "en"
         if self.language not in ("auto", "zh", "en"):
-            logger.warning(
-                f"Invalid language '{self.language}', defaulting to 'auto'"
-            )
+            logger.warning(f"Invalid language '{self.language}', defaulting to 'auto'")
             self.language = "auto"
 
         # Log any clamped values
         clamped = {
-            k: (original_values[k], getattr(self, k))
-            for k in original_values
-            if original_values[k] != getattr(self, k)
+            k: (original_values[k], getattr(self, k)) for k in original_values if original_values[k] != getattr(self, k)
         }
         if clamped:
             logger.warning(f"Config values clamped: {clamped}")

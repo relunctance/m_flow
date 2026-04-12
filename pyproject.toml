@@ -270,10 +270,15 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-ignore = ["F401", "F403"]
+ignore = [
+    "F401",   # unused imports (re-exports in __init__.py)
+    "F403",   # wildcard imports
+    "E402",   # module-level import not at top (lazy / circular-safe imports)
+    "F821",   # undefined name in string type annotations (forward refs)
+]
 
 [tool.ruff.lint.per-file-ignores]
-"m_flow/tests/**" = ["S101", "PLR2004"]
+"m_flow/tests/**" = ["S101", "PLR2004", "E712"]
 "examples/**" = ["T201"]
 
 # ---------------------------------------------------------------------------

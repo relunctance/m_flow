@@ -35,13 +35,9 @@ async def resolve_dataset_database_connection_info(
     graph_handler = get_graph_dataset_database_handler(dataset_database)
 
     # Resolve vector connection
-    dataset_database = await vector_handler["handler_instance"].resolve_dataset_connection_info(
-        dataset_database
-    )
+    dataset_database = await vector_handler["handler_instance"].resolve_dataset_connection_info(dataset_database)
 
     # Resolve graph connection
-    dataset_database = await graph_handler["handler_instance"].resolve_dataset_connection_info(
-        dataset_database
-    )
+    dataset_database = await graph_handler["handler_instance"].resolve_dataset_connection_info(dataset_database)
 
     return dataset_database

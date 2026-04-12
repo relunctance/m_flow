@@ -29,9 +29,7 @@ async def _extract_and_check(chunks: list) -> bool:
     """提取图并检查实体"""
     results = await asyncio.gather(*[extract_content_graph(c.text, ExtractedGraph) for c in chunks])
 
-    return all(
-        any(term in n.name.lower() for r in results for n in r.nodes) for term in _TARGET_TERMS
-    )
+    return all(any(term in n.name.lower() for r in results for n in r.nodes) for term in _TARGET_TERMS)
 
 
 async def run_entity_extraction_test():
@@ -59,9 +57,7 @@ async def run_entity_extraction_test():
     )
 
     chunks = []
-    async for chunk in segment_documents(
-        [doc], max_chunk_size=get_max_chunk_tokens(), chunker=TextChunker
-    ):
+    async for chunk in segment_documents([doc], max_chunk_size=get_max_chunk_tokens(), chunker=TextChunker):
         chunks.append(chunk)
 
     results = await asyncio.gather(*[_extract_and_check(chunks) for _ in range(_REPS)])

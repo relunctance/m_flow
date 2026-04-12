@@ -15,6 +15,7 @@ References
 - GenericAPIAdapter source: m_flow/llm/backends/litellm_instructor/llm/generic_llm_api/adapter.py
 - LLMBackend protocol:      m_flow/llm/backends/litellm_instructor/llm/llm_interface.py
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -30,11 +31,13 @@ from pydantic import BaseModel
 # ---------------------------------------------------------------------------
 class SimpleResponse(BaseModel):
     """Minimal schema for structured output tests."""
+
     answer: str
 
 
 class DetailedResponse(BaseModel):
     """Multi-field schema for richer extraction tests."""
+
     summary: str
     confidence: float
     tags: list[str]
@@ -64,8 +67,7 @@ def _build_adapter(
     fallback_endpoint: str | None = None,
 ):
     """Construct a GenericAPIAdapter with mocked instructor client."""
-    with patch(f"{_MODULE}.instructor") as mock_instructor, \
-         patch(f"{_MODULE}.litellm"):
+    with patch(f"{_MODULE}.instructor") as mock_instructor, patch(f"{_MODULE}.litellm"):
         mock_instructor.from_litellm.return_value = MagicMock()
         mock_instructor.Mode = MagicMock(side_effect=lambda x: x)
 
@@ -139,6 +141,7 @@ class TestProtocolCompliance:
 
     def test_runtime_checkable_protocol(self):
         from m_flow.llm.backends.litellm_instructor.llm.llm_interface import LLMBackend
+
         adapter = _build_adapter()
         assert isinstance(adapter, LLMBackend)
 
@@ -190,9 +193,7 @@ class TestCallLLMRouting:
         mock_create = AsyncMock(return_value=SimpleResponse(answer="ok"))
         adapter.aclient.chat.completions.create = mock_create
 
-        asyncio.get_event_loop().run_until_complete(
-            adapter._call_llm("user text", "sys prompt", SimpleResponse)
-        )
+        asyncio.get_event_loop().run_until_complete(adapter._call_llm("user text", "sys prompt", SimpleResponse))
 
         call_kwargs = mock_create.call_args
         messages = call_kwargs.kwargs["messages"]
@@ -204,14 +205,10 @@ class TestCallLLMRouting:
 
     def test_response_model_passed_through(self):
         adapter = _build_adapter()
-        mock_create = AsyncMock(return_value=DetailedResponse(
-            summary="test", confidence=0.9, tags=["a"]
-        ))
+        mock_create = AsyncMock(return_value=DetailedResponse(summary="test", confidence=0.9, tags=["a"]))
         adapter.aclient.chat.completions.create = mock_create
 
-        asyncio.get_event_loop().run_until_complete(
-            adapter._call_llm("text", "prompt", DetailedResponse)
-        )
+        asyncio.get_event_loop().run_until_complete(adapter._call_llm("text", "prompt", DetailedResponse))
 
         call_kwargs = mock_create.call_args
         assert call_kwargs.kwargs["response_model"] is DetailedResponse
@@ -272,6 +269,7 @@ def _get_unwrapped_extract():
     from m_flow.llm.backends.litellm_instructor.llm.generic_llm_api.adapter import (
         GenericAPIAdapter,
     )
+
     fn = GenericAPIAdapter.extract_structured
     # tenacity stores the original function as __wrapped__
     return getattr(fn, "__wrapped__", fn)
@@ -290,9 +288,7 @@ class TestContentPolicyErrorHandling:
             fallback_endpoint="https://safe.example.com",
         )
 
-        primary_error = ContentFilterFinishReasonError.__new__(
-            ContentFilterFinishReasonError
-        )
+        primary_error = ContentFilterFinishReasonError.__new__(ContentFilterFinishReasonError)
         primary_error.args = ("content_filter",)
 
         call_count = 0
@@ -307,9 +303,7 @@ class TestContentPolicyErrorHandling:
         adapter._call_llm = mock_call_llm
         unwrapped = _get_unwrapped_extract()
 
-        result = asyncio.get_event_loop().run_until_complete(
-            unwrapped(adapter, "risky text", "prompt", SimpleResponse)
-        )
+        result = asyncio.get_event_loop().run_until_complete(unwrapped(adapter, "risky text", "prompt", SimpleResponse))
 
         assert call_count == 2  # primary + fallback
         assert result.answer == "safe answer"
@@ -322,18 +316,14 @@ class TestContentPolicyErrorHandling:
 
         adapter = _build_adapter()  # no fallback configured
 
-        primary_error = ContentFilterFinishReasonError.__new__(
-            ContentFilterFinishReasonError
-        )
+        primary_error = ContentFilterFinishReasonError.__new__(ContentFilterFinishReasonError)
         primary_error.args = ("content_filter",)
 
         adapter._call_llm = AsyncMock(side_effect=primary_error)
         unwrapped = _get_unwrapped_extract()
 
         with pytest.raises(ContentPolicyFilterError):
-            asyncio.get_event_loop().run_until_complete(
-                unwrapped(adapter, "risky", "prompt", SimpleResponse)
-            )
+            asyncio.get_event_loop().run_until_complete(unwrapped(adapter, "risky", "prompt", SimpleResponse))
 
 
 # ---------------------------------------------------------------------------
@@ -381,9 +371,7 @@ class TestFactoryIntegration:
     @patch("m_flow.llm.backends.litellm_instructor.llm.get_llm_client.get_llm_config")
     @patch(f"{_MODULE}.instructor")
     @patch(f"{_MODULE}.litellm")
-    def test_custom_provider_creates_generic_adapter(
-        self, mock_litellm, mock_instructor, mock_config, mock_max_tokens
-    ):
+    def test_custom_provider_creates_generic_adapter(self, mock_litellm, mock_instructor, mock_config, mock_max_tokens):
         mock_instructor.from_litellm.return_value = MagicMock()
         mock_instructor.Mode = MagicMock(side_effect=lambda x: x)
 

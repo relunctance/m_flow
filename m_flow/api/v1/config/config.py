@@ -436,9 +436,7 @@ class config:
         if category:
             valid_categories = get_categories()
             if category not in valid_categories:
-                raise ValueError(
-                    f"Unknown category '{category}'. Valid: {sorted(valid_categories)}"
-                )
+                raise ValueError(f"Unknown category '{category}'. Valid: {sorted(valid_categories)}")
 
         return _get_env_var_registry(category=category, mask_sensitive=True)
 

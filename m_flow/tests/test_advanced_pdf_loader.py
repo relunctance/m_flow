@@ -47,9 +47,7 @@ def test_can_handle(loader, ext, mime, ok):
 
 @pytest.mark.asyncio
 @patch("m_flow.shared.loaders.external.advanced_pdf_loader.open", new_callable=mock_open)
-@patch(
-    "m_flow.shared.loaders.external.advanced_pdf_loader.get_file_metadata", new_callable=AsyncMock
-)
+@patch("m_flow.shared.loaders.external.advanced_pdf_loader.get_file_metadata", new_callable=AsyncMock)
 @patch("m_flow.shared.loaders.external.advanced_pdf_loader.get_storage_config")
 @patch("m_flow.shared.loaders.external.advanced_pdf_loader.get_file_storage")
 @patch("m_flow.shared.loaders.external.advanced_pdf_loader.PyPdfLoader")
@@ -82,9 +80,7 @@ async def test_unstructured_flow(mock_part, mock_py, mock_fs, mock_cfg, mock_met
 
 @pytest.mark.asyncio
 @patch("m_flow.shared.loaders.external.advanced_pdf_loader.open", new_callable=mock_open)
-@patch(
-    "m_flow.shared.loaders.external.advanced_pdf_loader.get_file_metadata", new_callable=AsyncMock
-)
+@patch("m_flow.shared.loaders.external.advanced_pdf_loader.get_file_metadata", new_callable=AsyncMock)
 @patch("m_flow.shared.loaders.external.advanced_pdf_loader.PyPdfLoader")
 @patch(
     "m_flow.shared.loaders.external.advanced_pdf_loader.partition_pdf",

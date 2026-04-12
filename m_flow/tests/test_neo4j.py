@@ -134,9 +134,7 @@ async def main():
     # =========================================
     await m_flow.prune.prune_data()
     storage_cfg = get_storage_config()
-    assert not os.path.isdir(storage_cfg["data_root_directory"]), (
-        "Data directory persists after cleanup"
-    )
+    assert not os.path.isdir(storage_cfg["data_root_directory"]), "Data directory persists after cleanup"
 
     await m_flow.prune.prune_system(metadata=True)
     is_empty = await graph.is_empty()

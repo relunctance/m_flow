@@ -42,7 +42,7 @@ class SearchPayloadDTO(InDTO):
     top_k: int | None = Field(default=10)
     only_context: bool = Field(default=False)
     use_combined_context: bool = Field(default=False)
-    
+
     # Advanced search parameters
     wide_search_top_k: int | None = Field(
         default=None,
@@ -56,7 +56,7 @@ class SearchPayloadDTO(InDTO):
         default=False,
         description="If True, return detailed results including graph representation",
     )
-    
+
     # Episodic retrieval parameters (Phase 0.4)
     enable_hybrid_search: bool | None = Field(
         default=None,
@@ -99,10 +99,10 @@ class SearchPayloadDTO(InDTO):
     collections: list[str] | None = Field(
         default=None,
         description="Vector collections to search. Available: Episode_summary, Entity_name, "
-                    "Concept_name, Facet_search_text, Facet_anchor_text, FacetPoint_search_text, "
-                    "Entity_canonical_name, RelationType_relationship_name. "
-                    "Default (TRIPLET): Episode_summary + Entity_name + Concept_name + "
-                    "RelationType_relationship_name (auto-included).",
+        "Concept_name, Facet_search_text, Facet_anchor_text, FacetPoint_search_text, "
+        "Entity_canonical_name, RelationType_relationship_name. "
+        "Default (TRIPLET): Episode_summary + Entity_name + Concept_name + "
+        "RelationType_relationship_name (auto-included).",
         examples=[["Episode_summary", "Entity_name", "Facet_search_text"]],
     )
 
@@ -236,6 +236,7 @@ def get_search_router() -> APIRouter:
             pass
         except Exception as coref_err:
             from m_flow.shared.logging_utils import get_logger
+
             get_logger().warning(f"Coreference preprocessing failed: {coref_err}")
 
         ds_ids_str = [str(d) for d in payload.dataset_ids or []]

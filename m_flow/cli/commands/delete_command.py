@@ -107,9 +107,7 @@ class DeleteCommand(SupportsCliCommand):
             if not args.force:
                 output.echo("Analyzing deletion scope...")
                 try:
-                    preview = asyncio.run(
-                        self._fetch_preview(args.dataset_name, args.user_id, args.all)
-                    )
+                    preview = asyncio.run(self._fetch_preview(args.dataset_name, args.user_id, args.all))
                 except Exception as err:
                     output.error(f"Preview failed: {err}")
                     return

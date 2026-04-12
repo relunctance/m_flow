@@ -192,9 +192,7 @@ class ProceduralTrigger:
         for pattern in self.EXCLUDE_PATTERNS:
             if re.search(pattern, user_msg):
                 # Check if there are other strong signal words overriding
-                has_override = any(
-                    re.search(p[0], user_msg, re.IGNORECASE) for p in self.STRONG_PATTERNS
-                )
+                has_override = any(re.search(p[0], user_msg, re.IGNORECASE) for p in self.STRONG_PATTERNS)
                 if not has_override:
                     return TriggerResult(
                         triggered=False,

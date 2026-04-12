@@ -93,17 +93,19 @@ def get_extract_from_episodic_router() -> APIRouter:
 
                     try:
                         async with engine.get_async_session() as sess:
-                            sess.add(WorkflowRun(
-                                workflow_run_id=run_id,
-                                workflow_name=PIPELINE_NAME,
-                                workflow_id=pipe_id,
-                                status=RunStatus.DATASET_PROCESSING_STARTED,
-                                dataset_id=ds_id,
-                                run_detail={
-                                    "data": f"Extracting procedures from {dataset.name}",
-                                    "current_step": "Extracting procedures",
-                                },
-                            ))
+                            sess.add(
+                                WorkflowRun(
+                                    workflow_run_id=run_id,
+                                    workflow_name=PIPELINE_NAME,
+                                    workflow_id=pipe_id,
+                                    status=RunStatus.DATASET_PROCESSING_STARTED,
+                                    dataset_id=ds_id,
+                                    run_detail={
+                                        "data": f"Extracting procedures from {dataset.name}",
+                                        "current_step": "Extracting procedures",
+                                    },
+                                )
+                            )
                             await sess.commit()
                     except Exception as db_err:
                         logger.warning(f"[extract_from_episodic] Pipeline record write failed: {db_err}")
@@ -121,7 +123,9 @@ def get_extract_from_episodic_router() -> APIRouter:
                         analyzed = result.get("episodes_analyzed", 0)
                         written = result.get("nodes_written", 0)
                         nodes = result.get("result", [])
-                        procs = len([n for n in nodes if hasattr(n, "__class__") and n.__class__.__name__ == "Procedure"])
+                        procs = len(
+                            [n for n in nodes if hasattr(n, "__class__") and n.__class__.__name__ == "Procedure"]
+                        )
 
                         total_analyzed += analyzed
                         total_procedures += procs
@@ -129,14 +133,16 @@ def get_extract_from_episodic_router() -> APIRouter:
 
                         try:
                             async with engine.get_async_session() as sess:
-                                sess.add(WorkflowRun(
-                                    workflow_run_id=run_id,
-                                    workflow_name=PIPELINE_NAME,
-                                    workflow_id=pipe_id,
-                                    status=RunStatus.DATASET_PROCESSING_COMPLETED,
-                                    dataset_id=ds_id,
-                                    run_detail={"episodes": analyzed, "procedures": procs, "nodes": written},
-                                ))
+                                sess.add(
+                                    WorkflowRun(
+                                        workflow_run_id=run_id,
+                                        workflow_name=PIPELINE_NAME,
+                                        workflow_id=pipe_id,
+                                        status=RunStatus.DATASET_PROCESSING_COMPLETED,
+                                        dataset_id=ds_id,
+                                        run_detail={"episodes": analyzed, "procedures": procs, "nodes": written},
+                                    )
+                                )
                                 await sess.commit()
                         except Exception as db_err:
                             logger.warning(f"[extract_from_episodic] Pipeline complete record failed: {db_err}")
@@ -145,14 +151,16 @@ def get_extract_from_episodic_router() -> APIRouter:
                         logger.error(f"[extract_from_episodic] Failed for {dataset.name}: {e}")
                         try:
                             async with engine.get_async_session() as sess:
-                                sess.add(WorkflowRun(
-                                    workflow_run_id=run_id,
-                                    workflow_name=PIPELINE_NAME,
-                                    workflow_id=pipe_id,
-                                    status=RunStatus.DATASET_PROCESSING_ERRORED,
-                                    dataset_id=ds_id,
-                                    run_detail={"error": str(e)},
-                                ))
+                                sess.add(
+                                    WorkflowRun(
+                                        workflow_run_id=run_id,
+                                        workflow_name=PIPELINE_NAME,
+                                        workflow_id=pipe_id,
+                                        status=RunStatus.DATASET_PROCESSING_ERRORED,
+                                        dataset_id=ds_id,
+                                        run_detail={"error": str(e)},
+                                    )
+                                )
                                 await sess.commit()
                         except Exception as db_err:
                             logger.warning(f"[extract_from_episodic] Pipeline error record failed: {db_err}")

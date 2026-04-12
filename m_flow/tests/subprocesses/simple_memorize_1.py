@@ -9,8 +9,7 @@ from m_flow.api.v1.search import RecallMode
 
 PRIMARY_DATASET = "first_memorize_dataset"
 PRIMARY_QUERY = (
-    "Summarize the information available in the context. "
-    "Start your answer with the marker 'FIRST_MEMORIZE'."
+    "Summarize the information available in the context. Start your answer with the marker 'FIRST_MEMORIZE'."
 )
 
 

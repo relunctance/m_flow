@@ -113,9 +113,7 @@ def _extract_time_fields_from_episode(episode_time_dict: dict) -> dict:
     }
 
 
-def _split_long_summary(
-    summaries: List[str], min_split_len: int = 200, max_items: int = 10
-) -> List[str]:
+def _split_long_summary(summaries: List[str], min_split_len: int = 200, max_items: int = 10) -> List[str]:
     """
     Split long summaries into multiple shorter items.
 
@@ -147,9 +145,7 @@ def _split_long_summary(
         parts = [p.strip() for p in parts if p and p.strip()]
         # Only use this pattern if it produces 2+ meaningful parts
         if len(parts) >= 2 and all(len(p) >= 20 for p in parts):
-            logger.info(
-                f"[episodic] Split long summary into {len(parts)} parts using pattern: {pattern[:30]}..."
-            )
+            logger.info(f"[episodic] Split long summary into {len(parts)} parts using pattern: {pattern[:30]}...")
             return parts[:max_items]
 
     # If no pattern worked, try splitting by semicolon (Chinese or English)
@@ -224,22 +220,12 @@ def _extract_chunk_summaries_from_text_summaries(
                 if target_event_id:
                     # Filter to ONLY the target event's sentences
                     # This ensures Episode Routing sees only the current event's content
-                    event_sentences = [
-                        c for c in all_sentences if c.get("event_id") == target_event_id
-                    ]
+                    event_sentences = [c for c in all_sentences if c.get("event_id") == target_event_id]
 
                     if event_sentences:
                         # Get topic from first sentence
-                        topic = (
-                            event_sentences[0].get("event_topic")
-                            or event_sentences[0].get("suggested_topic")
-                            or ""
-                        )
-                        sentences = [
-                            c.get("text", "").strip()
-                            for c in event_sentences
-                            if c.get("text", "").strip()
-                        ]
+                        topic = event_sentences[0].get("event_topic") or event_sentences[0].get("suggested_topic") or ""
+                        sentences = [c.get("text", "").strip() for c in event_sentences if c.get("text", "").strip()]
 
                         if sentences:
                             event_text = " ".join(sentences)
@@ -409,9 +395,7 @@ def _extract_event_sentences(
                     topic = c.get("event_topic", "") or c.get("suggested_topic", "")
 
                 # Determine if atomic
-                routing_type = original_event_routing_types.get(event_id) or c.get(
-                    "routing_type", "episodic"
-                )
+                routing_type = original_event_routing_types.get(event_id) or c.get("routing_type", "episodic")
                 if routing_type == "episodic":
                     is_atomic = False
 

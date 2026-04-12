@@ -271,9 +271,7 @@ class EpisodeCandidate(BaseModel):
 
     episode_id: str = Field(..., description="The unique ID of the candidate episode.")
     episode_name: str = Field(..., description="The name/title of the candidate episode.")
-    episode_summary: str = Field(
-        ..., description="The summary of the candidate episode (may be truncated)."
-    )
+    episode_summary: str = Field(..., description="The summary of the candidate episode (may be truncated).")
     top_facets: List[str] = Field(
         default_factory=list,
         description="Top facet search_texts from this episode (for quick reference).",

@@ -23,6 +23,7 @@ from m_flow.api.DTO import InDTO, OutDTO
 # Identifier factories
 # ---------------------------------------------------------------------------
 
+
 def _generate_call_identifier() -> str:
     """Produce a globally unique call identifier prefixed with ``call_``."""
     return f"call_{uuid.uuid4().hex}"
@@ -42,6 +43,7 @@ def _current_epoch() -> int:
 # Enumerations
 # ---------------------------------------------------------------------------
 
+
 class MflowModel(str, Enum):
     """Supported M-Flow model revisions."""
 
@@ -51,6 +53,7 @@ class MflowModel(str, Enum):
 # ---------------------------------------------------------------------------
 # Function / Tool primitives
 # ---------------------------------------------------------------------------
+
 
 class FunctionParameters(BaseModel):
     """
@@ -115,6 +118,7 @@ class ToolCall(BaseModel):
 # Usage / output helpers
 # ---------------------------------------------------------------------------
 
+
 class ChatUsage(BaseModel):
     """
     Aggregated token-budget accounting for a single response cycle.
@@ -138,6 +142,7 @@ class ToolCallOutput(BaseModel):
 # ---------------------------------------------------------------------------
 # Request / Response envelopes
 # ---------------------------------------------------------------------------
+
 
 class ResponseRequest(InDTO):
     """

@@ -44,9 +44,7 @@ class TestFileContentHash:
         content = "Test content: café ☕"
         expected = hashlib.md5(content.encode("utf-8")).hexdigest()
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", delete=False, suffix=".txt", encoding="utf-8"
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".txt", encoding="utf-8") as f:
             f.write(content)
             path = f.name
 

@@ -372,9 +372,7 @@ class TestOrphansSyntax:
                 imports.append(node.module)
 
         # Should not import from api.v1 (except maintenance itself)
-        problematic = [
-            imp for imp in imports if "m_flow.api.v1" in imp and "maintenance" not in imp
-        ]
+        problematic = [imp for imp in imports if "m_flow.api.v1" in imp and "maintenance" not in imp]
 
         assert len(problematic) == 0, f"Potential circular imports: {problematic}"
 

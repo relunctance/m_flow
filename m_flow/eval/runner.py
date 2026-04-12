@@ -224,9 +224,9 @@ class EvalRunner:
                     hit_info["title"] = hit.bundle_metadata.get("procedure_name", "")
                     hit_info["active"] = hit.bundle_metadata.get("is_active", True)
                     # P7 document requires: use procedure_key instead of procedure_id
-                    hit_info["procedure_key"] = hit.bundle_metadata.get(
-                        "procedure_key"
-                    ) or hit.bundle_metadata.get("signature", "")
+                    hit_info["procedure_key"] = hit.bundle_metadata.get("procedure_key") or hit.bundle_metadata.get(
+                        "signature", ""
+                    )
 
                 procedural.top_hits.append(hit_info)
                 procedural.selected_titles.append(hit_info["title"])

@@ -12,8 +12,8 @@ Models are grouped by the memory subsystem they belong to.
 
 # ── Semantic / Structural models ────────────────────────────────────
 from .ColumnValue import ColumnValue
-from .Entity import Entity, Entity  # Entity is the new name, Entity is alias
-from .EntityType import EntityType, EntityType  # EntityType is new, EntityType is alias
+from .Entity import Entity  # Entity is the new name, Entity is alias
+from .EntityType import EntityType  # EntityType is new, EntityType is alias
 from .Event import Event
 from .Interval import Interval
 from .memory_space import MemorySpace

@@ -55,9 +55,7 @@ After memorize completes, use `mflow search` to query the knowledge graph.
             action="store_true",
             help="Run processing in background and return immediately (recommended for large datasets)",
         )
-        parser.add_argument(
-            "--verbose", "-v", action="store_true", help="Show detailed progress information"
-        )
+        parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed progress information")
         parser.add_argument(
             "--content-type",
             "-t",
@@ -80,9 +78,7 @@ After memorize completes, use `mflow search` to query the knowledge graph.
                 fmt.note("This process will analyze your data and build knowledge graphs.")
                 fmt.note("Depending on data size, this may take several minutes.")
                 if args.background:
-                    fmt.note(
-                        "Running in background mode - the process will continue after this command exits."
-                    )
+                    fmt.note("Running in background mode - the process will continue after this command exits.")
 
             # Prepare chunker parameter - will be handled in the async function
 
@@ -125,9 +121,7 @@ After memorize completes, use `mflow search` to query the knowledge graph.
             if args.background:
                 fmt.success("Memorization started in background!")
                 if args.verbose and result:
-                    fmt.echo(
-                        "Background processing initiated. Use pipeline monitoring to track progress."
-                    )
+                    fmt.echo("Background processing initiated. Use pipeline monitoring to track progress.")
             else:
                 fmt.success("Memorization completed successfully!")
                 if args.verbose and result:

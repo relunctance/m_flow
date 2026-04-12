@@ -91,9 +91,7 @@ class TestEpisodesToSummaries:
         mock_engine = AsyncMock()
         mock_engine.get_edges.return_value = []
 
-        with patch.object(
-            learn_module, "get_graph_provider", new_callable=AsyncMock
-        ) as mock_get_graph_adapter:
+        with patch.object(learn_module, "get_graph_provider", new_callable=AsyncMock) as mock_get_graph_adapter:
             mock_get_graph_adapter.return_value = mock_engine
 
             episode = Episode(
@@ -130,9 +128,7 @@ class TestEpisodesToSummaries:
             ),
         ]
 
-        with patch.object(
-            learn_module, "get_graph_provider", new_callable=AsyncMock
-        ) as mock_get_graph_adapter:
+        with patch.object(learn_module, "get_graph_provider", new_callable=AsyncMock) as mock_get_graph_adapter:
             mock_get_graph_adapter.return_value = mock_engine
 
             episode = Episode(
@@ -154,14 +150,10 @@ class TestEpisodesToSummaries:
         mock_engine = AsyncMock()
         mock_engine.get_edges.return_value = []
 
-        with patch.object(
-            learn_module, "get_graph_provider", new_callable=AsyncMock
-        ) as mock_get_graph_adapter:
+        with patch.object(learn_module, "get_graph_provider", new_callable=AsyncMock) as mock_get_graph_adapter:
             mock_get_graph_adapter.return_value = mock_engine
 
-            episodes = [
-                Episode(id=uuid4(), name=f"Episode {i}", summary=f"Content {i}") for i in range(3)
-            ]
+            episodes = [Episode(id=uuid4(), name=f"Episode {i}", summary=f"Content {i}") for i in range(3)]
 
             summaries = await episodes_to_summaries(episodes)
 
@@ -183,9 +175,7 @@ class TestFetchEpisodesFromGraph:
             "summary": "Summary",
         }
 
-        with patch.object(
-            learn_module, "get_graph_provider", new_callable=AsyncMock
-        ) as mock_get_graph_adapter:
+        with patch.object(learn_module, "get_graph_provider", new_callable=AsyncMock) as mock_get_graph_adapter:
             mock_get_graph_adapter.return_value = mock_engine
 
             episodes = await fetch_episodes_from_graph(episode_ids=[ep_id])
@@ -207,9 +197,7 @@ class TestFetchEpisodesFromGraph:
         # get_edges returns List[Tuple[Dict, str, Dict]] - no derived_procedure edge
         mock_engine.get_edges.return_value = []
 
-        with patch.object(
-            learn_module, "get_graph_provider", new_callable=AsyncMock
-        ) as mock_get_graph_adapter:
+        with patch.object(learn_module, "get_graph_provider", new_callable=AsyncMock) as mock_get_graph_adapter:
             mock_get_graph_adapter.return_value = mock_engine
 
             episodes = await fetch_episodes_from_graph()
@@ -236,9 +224,7 @@ class TestFetchEpisodesFromGraph:
             {"relationship_name": "derived_procedure", "target_id": str(uuid4())},
         ]
 
-        with patch.object(
-            learn_module, "get_graph_provider", new_callable=AsyncMock
-        ) as mock_get_graph_adapter:
+        with patch.object(learn_module, "get_graph_provider", new_callable=AsyncMock) as mock_get_graph_adapter:
             mock_get_graph_adapter.return_value = mock_engine
 
             episodes = await fetch_episodes_from_graph()
@@ -251,9 +237,7 @@ class TestFetchEpisodesFromGraph:
         mock_engine = AsyncMock()
         mock_engine.get_node.side_effect = Exception("Database error")
 
-        with patch.object(
-            learn_module, "get_graph_provider", new_callable=AsyncMock
-        ) as mock_get_graph_adapter:
+        with patch.object(learn_module, "get_graph_provider", new_callable=AsyncMock) as mock_get_graph_adapter:
             mock_get_graph_adapter.return_value = mock_engine
 
             episodes = await fetch_episodes_from_graph(episode_ids=[uuid4()])
@@ -342,9 +326,7 @@ class TestLearnIntegration:
         mock_engine = AsyncMock()
         mock_engine.extract_typed_subgraph.return_value = {"nodes": []}
 
-        with patch.object(
-            learn_module, "get_graph_provider", new_callable=AsyncMock
-        ) as mock_get_graph_adapter:
+        with patch.object(learn_module, "get_graph_provider", new_callable=AsyncMock) as mock_get_graph_adapter:
             mock_get_graph_adapter.return_value = mock_engine
 
             result = await learn()

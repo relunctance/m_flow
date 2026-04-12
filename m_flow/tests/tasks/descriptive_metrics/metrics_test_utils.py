@@ -186,6 +186,5 @@ async def validate_metrics(provider: str, extended: bool = True) -> None:
         actual_value = actual[key]
         if actual_value != expected_value:
             raise AssertionError(
-                f"Metric '{key}' mismatch with {provider}: "
-                f"expected {expected_value}, got {actual_value}"
+                f"Metric '{key}' mismatch with {provider}: expected {expected_value}, got {actual_value}"
             )

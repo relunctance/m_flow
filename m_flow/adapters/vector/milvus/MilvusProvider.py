@@ -44,9 +44,7 @@ class MilvusProvider:
         try:
             from pymilvus import MilvusClient
         except ImportError as exc:
-            raise ImportError(
-                "pymilvus is required. Install with: pip install m_flow[milvus]"
-            ) from exc
+            raise ImportError("pymilvus is required. Install with: pip install m_flow[milvus]") from exc
 
         self._uri = uri or os.getenv("MILVUS_URI", "http://localhost:19530")
         self._token = token or os.getenv("MILVUS_TOKEN", "")
@@ -111,12 +109,14 @@ class MilvusProvider:
         for node in memory_nodes:
             text = node.extract_index_text() if hasattr(node, "extract_index_text") else str(node)
             embedding = await self.embedding_engine.embed_data([text])
-            rows.append({
-                "id": str(node.id),
-                "vector": embedding[0] if embedding else [0.0] * self._dim,
-                "text": text[:65535],
-                "node_type": getattr(node, "type", ""),
-            })
+            rows.append(
+                {
+                    "id": str(node.id),
+                    "vector": embedding[0] if embedding else [0.0] * self._dim,
+                    "text": text[:65535],
+                    "node_type": getattr(node, "type", ""),
+                }
+            )
 
         if rows:
             self._client.upsert(collection_name=col, data=rows)

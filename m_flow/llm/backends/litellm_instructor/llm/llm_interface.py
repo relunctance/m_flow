@@ -17,6 +17,7 @@ from pydantic import BaseModel
 
 _M = TypeVar("_M", bound=BaseModel)
 
+
 @runtime_checkable
 class LLMBackend(Protocol):
     """Structural protocol that every M-Flow LLM adapter must satisfy.
@@ -60,4 +61,3 @@ class LLMBackend(Protocol):
             A fully-validated instance of *response_model*.
         """
         ...
-

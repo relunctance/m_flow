@@ -35,10 +35,10 @@ logger = get_logger("procedural_from_episodic")
 def _safe_uuid(s: str) -> UUID:
     """
     Safely convert string to UUID, generate new UUID on failure.
-    
+
     Args:
         s: String that may or may not be a valid UUID
-        
+
     Returns:
         UUID object (either parsed from string or newly generated)
     """
@@ -51,20 +51,20 @@ def _safe_uuid(s: str) -> UUID:
 def _create_virtual_chunk_for_extract(episode_id: str, summary: str) -> ContentFragment:
     """
     Create virtual ContentFragment for FragmentDigest.made_from field.
-    
+
     This is required because FragmentDigest has a required 'made_from' field
     that expects a ContentFragment. For episodic extraction, we create a
     virtual ContentFragment that represents the Episode summary.
-    
+
     Args:
         episode_id: The episode ID (used for tracing)
         summary: The episode summary text
-        
+
     Returns:
         A virtual ContentFragment representing the episode summary
     """
     ep_uuid = _safe_uuid(episode_id)
-    
+
     virtual_doc = Document(
         id=ep_uuid,
         name=f"[Episode Extract] {episode_id[:8] if episode_id else 'unknown'}",
@@ -72,7 +72,7 @@ def _create_virtual_chunk_for_extract(episode_id: str, summary: str) -> ContentF
         external_metadata=None,
         mime_type="text/episodic-extract",
     )
-    
+
     return ContentFragment(
         id=ep_uuid,
         text=summary,
@@ -204,13 +204,13 @@ async def extract_procedural_from_episodic(
     """
     # Convert to set for O(1) lookup
     authorized_ds_set = set(authorized_dataset_ids) if authorized_dataset_ids else None
-    
+
     logger.info(
         f"[extract_from_episodic] Starting extraction, limit={limit}, "
         f"dataset_id={dataset_id}, force={force_reprocess}, "
         f"authorized_datasets={len(authorized_ds_set) if authorized_ds_set else 'all'}"
     )
-    
+
     # Initialize counters at function start to avoid NameError on early returns
     marked = 0
     nodes_written = 0
@@ -295,13 +295,13 @@ async def extract_procedural_from_episodic(
 
         # Get episode's dataset_id from properties
         ep_dataset_id = props.get("dataset_id")
-        
+
         # Security: Filter by authorized datasets if provided
         if authorized_ds_set:
             if not ep_dataset_id or ep_dataset_id not in authorized_ds_set:
                 logger.debug(f"[extract_from_episodic] Skipping {episode_id}: not in authorized datasets")
                 continue
-        
+
         # Filter by specific dataset_id if requested
         if dataset_id:
             if ep_dataset_id != dataset_id:
@@ -317,7 +317,7 @@ async def extract_procedural_from_episodic(
 
         # Create virtual ContentFragment for FragmentDigest.made_from
         virtual_chunk = _create_virtual_chunk_for_extract(str(episode_id), summary)
-        
+
         digest = FragmentDigest(
             text=summary,
             made_from=virtual_chunk,
@@ -346,15 +346,12 @@ async def extract_procedural_from_episodic(
         summaries_for_procedural,
         **kwargs,
     )
-    
+
     # Write to graph database (filter out temporary FragmentDigest nodes)
     if result:
         # Filter out FragmentDigest - they are temporary and should not be persisted
         # Only write: Procedure, MemorySpace, ProcedureStepPoint, ProcedureContextPoint
-        memory_nodes_to_write = [
-            node for node in result 
-            if not isinstance(node, FragmentDigest)
-        ]
+        memory_nodes_to_write = [node for node in result if not isinstance(node, FragmentDigest)]
         if memory_nodes_to_write:
             await persist_memory_nodes(memory_nodes_to_write)
             nodes_written = len(memory_nodes_to_write)
@@ -362,7 +359,7 @@ async def extract_procedural_from_episodic(
                 f"[extract_from_episodic] Wrote {nodes_written} nodes to graph "
                 f"(filtered {len(result) - nodes_written} FragmentDigest)"
             )
-    
+
     # Skip marking if no nodes were written
     if nodes_written == 0 and not result:
         logger.info("[extract_from_episodic] No procedures created, skipping episode marking")
@@ -413,9 +410,7 @@ async def extract_procedural_from_episodic(
             except Exception as e:
                 logger.debug(f"[extract_from_episodic] Failed to mark episode {ep_id}: {e}")
 
-        logger.info(
-            f"[extract_from_episodic] Marked {marked}/{len(episode_id_list)} episodes as processed"
-        )
+        logger.info(f"[extract_from_episodic] Marked {marked}/{len(episode_id_list)} episodes as processed")
 
     return {
         "result": result,

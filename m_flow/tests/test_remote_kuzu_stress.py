@@ -43,8 +43,7 @@ async def _process_batch(adapter: RemoteKuzuAdapter, start: int, size: int) -> f
 
     # 构建节点数据
     nodes = [
-        {"id": str(start + i), "name": f"TestNode_{start + i}", "value": random.randint(1, 1000)}
-        for i in range(size)
+        {"id": str(start + i), "name": f"TestNode_{start + i}", "value": random.randint(1, 1000)} for i in range(size)
     ]
 
     # 并发创建节点
@@ -56,24 +55,17 @@ async def _process_batch(adapter: RemoteKuzuAdapter, start: int, size: int) -> f
     # 并发创建边
     log.info(f"批次 {batch_num}: 创建边...")
     t2 = time.time()
-    await asyncio.gather(
-        *[_insert_edge(adapter, nodes[j]["id"], nodes[j + 1]["id"]) for j in range(len(nodes) - 1)]
-    )
+    await asyncio.gather(*[_insert_edge(adapter, nodes[j]["id"], nodes[j + 1]["id"]) for j in range(len(nodes) - 1)])
     edge_time = time.time() - t2
 
     elapsed = time.time() - t0
-    log.info(
-        f"批次 {batch_num} 完成: {elapsed:.2f}s (节点: {node_time:.2f}s, 边: {edge_time:.2f}s)"
-    )
+    log.info(f"批次 {batch_num} 完成: {elapsed:.2f}s (节点: {node_time:.2f}s, 边: {edge_time:.2f}s)")
     return elapsed
 
 
 async def _create_test_data(adapter: RemoteKuzuAdapter) -> float:
     """创建所有测试数据"""
-    tasks = [
-        asyncio.create_task(_process_batch(adapter, i, _BATCH_SIZE))
-        for i in range(0, _TOTAL_NODES, _BATCH_SIZE)
-    ]
+    tasks = [asyncio.create_task(_process_batch(adapter, i, _BATCH_SIZE)) for i in range(0, _TOTAL_NODES, _BATCH_SIZE)]
     times = await asyncio.gather(*tasks)
     return sum(times)
 
@@ -81,9 +73,7 @@ async def _create_test_data(adapter: RemoteKuzuAdapter) -> float:
 async def run_stress_test():
     """运行压力测试"""
     cfg = get_graph_config()
-    adapter = RemoteKuzuAdapter(
-        cfg.graph_database_url, cfg.graph_database_username, cfg.graph_database_password
-    )
+    adapter = RemoteKuzuAdapter(cfg.graph_database_url, cfg.graph_database_username, cfg.graph_database_password)
 
     try:
         log.info("=== Kuzu 压力测试开始 ===")
@@ -99,15 +89,11 @@ async def run_stress_test():
 
         # 创建节点表
         log.info("[2/5] 创建节点表...")
-        await adapter.query(
-            "CREATE NODE TABLE TestNode (id STRING, name STRING, value INT64, PRIMARY KEY (id))"
-        )
+        await adapter.query("CREATE NODE TABLE TestNode (id STRING, name STRING, value INT64, PRIMARY KEY (id))")
 
         # 创建边表
         log.info("[3/5] 创建边表...")
-        await adapter.query(
-            "CREATE REL TABLE CONNECTS_TO (FROM TestNode TO TestNode, weight DOUBLE)"
-        )
+        await adapter.query("CREATE REL TABLE CONNECTS_TO (FROM TestNode TO TestNode, weight DOUBLE)")
 
         # 清空数据
         log.info("[4/5] 清空数据...")

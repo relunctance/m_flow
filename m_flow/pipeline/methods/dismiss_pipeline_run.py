@@ -26,22 +26,22 @@ logger = get_logger("pipeline_dismiss")
 async def dismiss_pipeline_run(workflow_run_id: UUID) -> Dict[str, Any]:
     """
     Dismiss a pipeline by adding an ERRORED record.
-    
+
     This marks the pipeline as no longer active so it won't appear
     in the active pipelines list.
-    
+
     Note: Supports dismissing pipelines in both STARTED and INITIATED states.
     Uses ORDER BY created_at DESC LIMIT 1 to handle deterministic run_ids
     where multiple records may exist for the same run_id.
-    
+
     Args:
         workflow_run_id: The pipeline run to dismiss.
-        
+
     Returns:
         Dict with success status and message.
     """
     engine = get_db_adapter()
-    
+
     async with engine.get_async_session() as session:
         # Find the latest STARTED or INITIATED record for this run_id
         # ORDER BY created_at DESC LIMIT 1 ensures we get the most recent one
@@ -60,13 +60,13 @@ async def dismiss_pipeline_run(workflow_run_id: UUID) -> Dict[str, Any]:
             .limit(1)
         )
         record = await session.scalar(stmt)
-        
+
         if not record:
             return {
                 "success": False,
                 "message": f"No active pipeline found with ID {workflow_run_id}",
             }
-        
+
         # Create an ERRORED record to mark it as dismissed
         dismissed_record = WorkflowRun(
             id=uuid4(),
@@ -82,12 +82,12 @@ async def dismiss_pipeline_run(workflow_run_id: UUID) -> Dict[str, Any]:
             },
             created_at=datetime.now(timezone.utc),
         )
-        
+
         session.add(dismissed_record)
         await session.commit()
-        
+
         logger.info(f"Dismissed pipeline {workflow_run_id}")
-        
+
         return {
             "success": True,
             "message": f"Pipeline {workflow_run_id} dismissed successfully",

@@ -66,12 +66,8 @@ async def run_deletion_test():
         graph_db_file = user_db_folder / f"{dataset_uuid}.pkl"
 
         # Assert databases were created
-        assert os.path.exists(graph_db_file), (
-            f"Graph database missing before delete: {graph_db_file}"
-        )
-        assert os.path.exists(vector_db_file), (
-            f"Vector database missing before delete: {vector_db_file}"
-        )
+        assert os.path.exists(graph_db_file), f"Graph database missing before delete: {graph_db_file}"
+        assert os.path.exists(vector_db_file), f"Vector database missing before delete: {vector_db_file}"
 
         # Retrieve and delete dataset
         target_dataset = await get_dataset(
@@ -81,12 +77,8 @@ async def run_deletion_test():
         await delete_dataset(target_dataset)
 
         # Confirm complete cleanup
-        assert not os.path.exists(graph_db_file), (
-            f"Graph database persists after delete: {graph_db_file}"
-        )
-        assert not os.path.exists(vector_db_file), (
-            f"Vector database persists after delete: {vector_db_file}"
-        )
+        assert not os.path.exists(graph_db_file), f"Graph database persists after delete: {graph_db_file}"
+        assert not os.path.exists(vector_db_file), f"Vector database persists after delete: {vector_db_file}"
 
     print("Dataset deletion test completed successfully.")
 

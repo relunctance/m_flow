@@ -119,23 +119,17 @@ def _parse_filter_clause(filter_str: str) -> Optional[dict]:
     match = re.match(pattern, filter_str.strip())
 
     if not match:
-        raise ValueError(
-            f"Invalid filter format: '{filter_str}'. Expected: payload.field = 'value'"
-        )
+        raise ValueError(f"Invalid filter format: '{filter_str}'. Expected: payload.field = 'value'")
 
     field, value = match.groups()
 
     if field not in _FILTER_WHITELIST:
-        raise ValueError(
-            f"Field '{field}' not filterable. Allowed: {list(_FILTER_WHITELIST.keys())}"
-        )
+        raise ValueError(f"Field '{field}' not filterable. Allowed: {list(_FILTER_WHITELIST.keys())}")
 
     allowed_values = _FILTER_WHITELIST[field]
     # None means any value is allowed (for dynamic fields like dataset_id)
     if allowed_values is not None and value not in allowed_values:
-        raise ValueError(
-            f"Value '{value}' invalid for '{field}'. Allowed: {allowed_values}"
-        )
+        raise ValueError(f"Value '{value}' invalid for '{field}'. Allowed: {allowed_values}")
 
     return {field: value}
 
@@ -322,7 +316,7 @@ class ChromaDBAdapter(VectorProvider):
         memory_nodes: list[MemoryNode],
     ):
         """Index memory nodes by specific property.
-        
+
         Preserves dataset_id and memory_type fields for:
         - Episode Routing dataset isolation filtering
         - Retrieval memory_type filtering
@@ -341,9 +335,7 @@ class ChromaDBAdapter(VectorProvider):
 
         await self.create_memory_nodes(combined_name, schema_nodes)
 
-    async def retrieve(
-        self, collection_name: str, memory_node_ids: list[str]
-    ) -> list[VectorSearchHit]:
+    async def retrieve(self, collection_name: str, memory_node_ids: list[str]) -> list[VectorSearchHit]:
         """Retrieve nodes by IDs."""
         coll = await self.get_collection(collection_name)
         results = await coll.get(ids=memory_node_ids, include=["metadatas"])

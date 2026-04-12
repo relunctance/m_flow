@@ -78,9 +78,7 @@ def copy_model(
     exclude_fields = set(exclude_fields or [])
 
     collected: Dict[str, Any] = {
-        name: _resolve_field_default(info)
-        for name, info in model.model_fields.items()
-        if name not in exclude_fields
+        name: _resolve_field_default(info) for name, info in model.model_fields.items() if name not in exclude_fields
     }
     collected.update(include_fields)
 

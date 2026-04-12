@@ -32,16 +32,12 @@ def get_client_auth_backend() -> AuthenticationBackend:
     """
     # Check secret at startup time (not just when JWT is needed)
     # This ensures configuration errors are caught immediately
-    get_secret_with_production_check(
-        _JWT_SECRET_ENV, _DEFAULT_SECRET, "JWT client authentication"
-    )
+    get_secret_with_production_check(_JWT_SECRET_ENV, _DEFAULT_SECRET, "JWT client authentication")
 
     def _jwt_strategy() -> JWTStrategy[models.UP, models.ID]:
         from .default.default_jwt_strategy import DefaultJWTStrategy
 
-        secret = get_secret_with_production_check(
-            _JWT_SECRET_ENV, _DEFAULT_SECRET, "JWT client authentication"
-        )
+        secret = get_secret_with_production_check(_JWT_SECRET_ENV, _DEFAULT_SECRET, "JWT client authentication")
         return DefaultJWTStrategy(secret, lifetime_seconds=_TOKEN_LIFETIME)
 
     return AuthenticationBackend(

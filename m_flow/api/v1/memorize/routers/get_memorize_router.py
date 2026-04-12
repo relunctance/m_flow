@@ -46,98 +46,87 @@ CHUNKER_MAP = {
 class MemorizePayloadDTO(InDTO):
     """
     Memorize request payload.
-    
+
     Supports all configuration options for knowledge graph construction,
     including feature toggles, chunking settings, and processing parameters.
     """
-    
+
     # Dataset selection
     datasets: Optional[List[str]] = Field(default=None)
     dataset_ids: Optional[List[UUID]] = Field(default=None, examples=[[]])
-    
+
     # Execution mode
     run_in_background: Optional[bool] = Field(
-        default=False,
-        description="If true, process asynchronously and return immediately"
+        default=False, description="If true, process asynchronously and return immediately"
     )
-    
+
     # Chunking configuration
     chunk_size: Optional[int] = Field(
-        default=None,
-        description="Maximum tokens per chunk. Auto-calculated based on LLM if None."
+        default=None, description="Maximum tokens per chunk. Auto-calculated based on LLM if None."
     )
     chunker: Optional[str] = Field(
         default="TextChunker",
-        description="Text chunking strategy: 'TextChunker' (paragraph-based) or 'LangchainChunker' (recursive with overlap)"
+        description="Text chunking strategy: 'TextChunker' (paragraph-based) or 'LangchainChunker' (recursive with overlap)",
     )
-    chunks_per_batch: Optional[int] = Field(
-        default=100,
-        description="Number of chunks to process in a single batch"
-    )
+    chunks_per_batch: Optional[int] = Field(default=100, description="Number of chunks to process in a single batch")
     items_per_batch: Optional[int] = Field(
-        default=20,
-        description="Number of data items (files/texts) to process per batch"
+        default=20, description="Number of data items (files/texts) to process per batch"
     )
-    
+
     # Processing behavior
-    incremental_loading: Optional[bool] = Field(
-        default=True,
-        description="Skip already processed files/content"
-    )
+    incremental_loading: Optional[bool] = Field(default=True, description="Skip already processed files/content")
     conflict_mode: Optional[str] = Field(
-        default="warn",
-        description="Concurrent conflict handling: 'warn', 'error', or 'ignore'"
+        default="warn", description="Concurrent conflict handling: 'warn', 'error', or 'ignore'"
     )
-    
+
     # ========================================================================
     # Feature toggles (override environment variables)
     # ========================================================================
     enable_episode_routing: Optional[bool] = Field(
         default=None,
         description="Merge new content into existing related episodes. "
-                    "Enable when new content may relate to previously ingested content. "
-                    "Disable for much faster concurrent ingestion of independent documents. "
-                    "Default: MFLOW_EPISODIC_ENABLE_ROUTING env var (true)."
+        "Enable when new content may relate to previously ingested content. "
+        "Disable for much faster concurrent ingestion of independent documents. "
+        "Default: MFLOW_EPISODIC_ENABLE_ROUTING env var (true).",
     )
     enable_content_routing: Optional[bool] = Field(
         default=None,
         description="Classify each sentence by topic within a chunk. "
-                    "Enable when text may contain multiple topics per block. "
-                    "Costs extra LLM tokens per multi-sentence chunk. "
-                    "Default: MFLOW_CONTENT_ROUTING env var (true)."
+        "Enable when text may contain multiple topics per block. "
+        "Costs extra LLM tokens per multi-sentence chunk. "
+        "Default: MFLOW_CONTENT_ROUTING env var (true).",
     )
     content_type: Optional[str] = Field(
         default=None,
         description="'text' for articles/documents, 'dialog' for chat logs and meeting transcripts "
-                    "(splits by speaker turn). Auto-detected when omitted."
+        "(splits by speaker turn). Auto-detected when omitted.",
     )
     enable_procedural: Optional[bool] = Field(
         default=None,
         description="Extract reusable procedures/preferences to complement episodic facts. "
-                    "Experimental. Costs extra LLM tokens. "
-                    "Default: MFLOW_PROCEDURAL_ENABLED env var (false)."
+        "Experimental. Costs extra LLM tokens. "
+        "Default: MFLOW_PROCEDURAL_ENABLED env var (false).",
     )
     enable_semantic_merge: Optional[bool] = Field(
         default=None,
         description="Merge semantically similar facets to reduce redundancy. "
-                    "Default: MFLOW_EPISODIC_ENABLE_SEMANTIC_MERGE env var (false)."
+        "Default: MFLOW_EPISODIC_ENABLE_SEMANTIC_MERGE env var (false).",
     )
     enable_facet_points: Optional[bool] = Field(
         default=None,
         description="Generate fine-grained FacetPoint nodes for more precise retrieval. "
-                    "Costs extra LLM tokens per facet. "
-                    "Default: MFLOW_EPISODIC_ENABLE_FACET_POINTS env var (true)."
+        "Costs extra LLM tokens per facet. "
+        "Default: MFLOW_EPISODIC_ENABLE_FACET_POINTS env var (true).",
     )
     extract_relationships: Optional[bool] = Field(
-        default=None,
-        description="Extract relationship edges between entities. Default: true."
+        default=None, description="Extract relationship edges between entities. Default: true."
     )
     precise_mode: Optional[bool] = Field(
         default=None,
         description="Preserve ALL factual information (dates, numbers, names) with zero compression loss. "
-                    "Use for contracts, financial reports, or content where every data point matters. "
-                    "Costs significantly more LLM tokens. "
-                    "Default: MFLOW_PRECISE_MODE env var (false)."
+        "Use for contracts, financial reports, or content where every data point matters. "
+        "Costs significantly more LLM tokens. "
+        "Default: MFLOW_PRECISE_MODE env var (false).",
     )
 
 
@@ -209,9 +198,7 @@ def get_memorize_router() -> APIRouter:
         )
 
         if not payload.datasets and not payload.dataset_ids:
-            return JSONResponse(
-                status_code=400, content={"error": "No datasets or dataset_ids provided"}
-            )
+            return JSONResponse(status_code=400, content={"error": "No datasets or dataset_ids provided"})
 
         from m_flow.api.v1.memorize import memorize as m_flow_memorize
 
@@ -229,6 +216,7 @@ def get_memorize_router() -> APIRouter:
                 kwargs["enable_content_routing"] = payload.enable_content_routing
             if payload.content_type is not None:
                 from m_flow.shared.enums import ContentType
+
                 kwargs["content_type"] = ContentType(payload.content_type)
             if payload.enable_procedural is not None:
                 kwargs["enable_procedural"] = payload.enable_procedural
@@ -266,9 +254,8 @@ def get_memorize_router() -> APIRouter:
         await websocket.accept()
 
         # Support both query parameter token and cookie
-        access_token = (
-            websocket.query_params.get("token")
-            or websocket.cookies.get(os.getenv("AUTH_TOKEN_COOKIE_NAME", "auth_token"))
+        access_token = websocket.query_params.get("token") or websocket.cookies.get(
+            os.getenv("AUTH_TOKEN_COOKIE_NAME", "auth_token")
         )
 
         if not access_token:

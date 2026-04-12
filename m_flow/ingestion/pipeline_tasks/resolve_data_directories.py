@@ -107,6 +107,4 @@ def _resolve_local_dir(path: str, recursive: bool) -> list[str]:
             files.extend(os.path.join(root, f) for f in filenames)
         return files
     else:
-        return [
-            os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))
-        ]
+        return [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]

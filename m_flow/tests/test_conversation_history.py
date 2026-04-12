@@ -42,9 +42,7 @@ async def main():
     # Prepare test content
     ds_name = "conversation_history_test"
     content_a = """TechCorp is a technology company based in San Francisco. They specialize in artificial intelligence and machine learning."""
-    content_b = (
-        """DataCo is a data analytics company. They help businesses make sense of their data."""
-    )
+    content_b = """DataCo is a data analytics company. They help businesses make sense of their data."""
 
     await m_flow.add(data=content_a, dataset_name=ds_name)
     await m_flow.add(data=content_b, dataset_name=ds_name)
@@ -70,9 +68,7 @@ async def main():
 
     techcorp_qa = [e for e in qa_entries if e["question"] == "What is TechCorp?"]
     assert len(techcorp_qa) >= 1, "Should find TechCorp question"
-    assert "answer" in techcorp_qa[0] and "context" in techcorp_qa[0], (
-        "Q&A must have answer and context"
-    )
+    assert "answer" in techcorp_qa[0] and "context" in techcorp_qa[0], "Q&A must have answer and context"
 
     # =========================================
     # Test 2: Follow-up query uses context
@@ -85,11 +81,7 @@ async def main():
     assert isinstance(follow_up, list) and follow_up, "Follow-up should return results"
 
     qa_after_followup = await cache.get_latest_qa(str(user.id), session_graph, last_n=10)
-    relevant_qa = [
-        e
-        for e in qa_after_followup
-        if e["question"] in ["What is TechCorp?", "Tell me more about it"]
-    ]
+    relevant_qa = [e for e in qa_after_followup if e["question"] in ["What is TechCorp?", "Tell me more about it"]]
     assert len(relevant_qa) == 2, f"Expected 2 Q&A pairs, found {len(relevant_qa)}"
 
     # =========================================
@@ -102,9 +94,7 @@ async def main():
         query_text="What is DataCo?",
         session_id=session_separate,
     )
-    assert isinstance(dataco_result, list) and dataco_result, (
-        "Separate session should return results"
-    )
+    assert isinstance(dataco_result, list) and dataco_result, "Separate session should return results"
 
     separate_qa = await cache.get_latest_qa(str(user.id), session_separate, last_n=10)
     dataco_entries = [e for e in separate_qa if e["question"] == "What is DataCo?"]
@@ -118,9 +108,7 @@ async def main():
         query_text="Test default session",
         session_id=None,
     )
-    assert isinstance(default_result, list) and default_result, (
-        "Default session should return results"
-    )
+    assert isinstance(default_result, list) and default_result, "Default session should return results"
 
     default_qa = await cache.get_latest_qa(str(user.id), "default_session", last_n=10)
     default_entries = [e for e in default_qa if e["question"] == "Test default session"]

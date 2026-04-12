@@ -65,7 +65,7 @@ def get_secret_with_production_check(
     if not is_dev:
         raise RuntimeError(
             f"CRITICAL: {env_var} must be set when MFLOW_ENV={env!r}. "
-            f"Generate with: python -c \"import secrets; print(secrets.token_urlsafe(32))\""
+            f'Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"'
         )
 
     # Development environment: use default secret with warning (warn only once)

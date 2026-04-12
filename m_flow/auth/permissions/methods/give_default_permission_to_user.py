@@ -40,9 +40,7 @@ async def give_default_permission_to_user(user_id: UUID, permission_name: str) -
 
         # Assign permission to user
         try:
-            await session.execute(
-                insert(UserDefaultPermissions).values(user_id=user.id, permission_id=perm.id)
-            )
+            await session.execute(insert(UserDefaultPermissions).values(user_id=user.id, permission_id=perm.id))
         except IntegrityError:
             raise ConceptAlreadyExistsError(message="User permission already exists.")
 

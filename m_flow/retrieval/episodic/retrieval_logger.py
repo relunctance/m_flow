@@ -258,13 +258,9 @@ class RetrievalLogger:
 
             try:
                 if start_ms:
-                    start_str = datetime.fromtimestamp(start_ms / 1000, tz=timezone.utc).strftime(
-                        "%Y-%m-%d"
-                    )
+                    start_str = datetime.fromtimestamp(start_ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
                     end_str = (
-                        datetime.fromtimestamp(end_ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
-                        if end_ms
-                        else "?"
+                        datetime.fromtimestamp(end_ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d") if end_ms else "?"
                     )
                     details["range"] = f"{start_str} ~ {end_str}"
             except Exception:
@@ -436,9 +432,7 @@ class RetrievalLogger:
             {"ep": episodes, "fa": facets, "pt": points, "en": entities},
         )
 
-        self.log_step_end(
-            RetrievalStep.INDEX_BUILD, triggered=episodes > 0, output_count=episodes, **details
-        )
+        self.log_step_end(RetrievalStep.INDEX_BUILD, triggered=episodes > 0, output_count=episodes, **details)
 
     def log_bundle_scoring(
         self,
@@ -552,8 +546,7 @@ class RetrievalLogger:
         for step_name, step in m.steps.items():
             status = "[OK]" if step.triggered else "[SKIP]"
             lines.append(
-                f"    {status} {step_name}: {step.duration_ms:.1f}ms "
-                f"(in={step.input_count}, out={step.output_count})"
+                f"    {status} {step_name}: {step.duration_ms:.1f}ms (in={step.input_count}, out={step.output_count})"
             )
 
         lines.extend(

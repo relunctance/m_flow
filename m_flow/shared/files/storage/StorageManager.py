@@ -55,9 +55,7 @@ class StorageManager:
     async def store(self, file_path: str, data: BinaryIO, overwrite: bool = False) -> str:
         """Persist *data* at *file_path* and return the resulting full path."""
         op = self.storage.store
-        return (
-            await op(file_path, data, overwrite) if _is_coro(op) else op(file_path, data, overwrite)
-        )
+        return await op(file_path, data, overwrite) if _is_coro(op) else op(file_path, data, overwrite)
 
     @asynccontextmanager
     async def open(self, file_path: str, encoding: str | None = None, *args, **kwargs):
@@ -91,9 +89,7 @@ class StorageManager:
     async def list_files(self, directory_path: str, recursive: bool = False) -> list[str]:
         """Enumerate objects under *directory_path*."""
         op = self.storage.list_files
-        return (
-            await op(directory_path, recursive) if _is_coro(op) else op(directory_path, recursive)
-        )
+        return await op(directory_path, recursive) if _is_coro(op) else op(directory_path, recursive)
 
     async def remove_all(self, tree_path: str | None = None) -> None:
         """Recursively remove everything under *tree_path*."""

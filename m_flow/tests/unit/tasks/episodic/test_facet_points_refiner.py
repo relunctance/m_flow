@@ -8,7 +8,6 @@ FacetPointsRefiner 纯逻辑函数单元测试
 - check_coverage: 检查 points 是否覆盖所有锚点
 """
 
-
 from m_flow.memory.episodic.facet_points_refiner import (
     is_bad_point_handle,
     extract_anchors_from_description,
@@ -219,9 +218,7 @@ class TestExtractAnchorsFromDescription:
 
     def test_extract_multiple_types(self):
         """应同时提取多种类型的锚点"""
-        result = extract_anchors_from_description(
-            "UserService 处理了90%的请求，延迟降低到50ms，使用 API"
-        )
+        result = extract_anchors_from_description("UserService 处理了90%的请求，延迟降低到50ms，使用 API")
         assert "UserService" in result
         assert "90%" in result
         assert "50ms" in result

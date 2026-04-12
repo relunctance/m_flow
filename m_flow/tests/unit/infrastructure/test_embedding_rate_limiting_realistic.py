@@ -49,9 +49,7 @@ class TestEmbeddingRateLimiting:
         _setup_env(requests=3, interval=5)
 
         cfg = get_llm_config()
-        log.info(
-            f"配置: {cfg.embedding_rate_limit_requests}请求/{cfg.embedding_rate_limit_interval}秒"
-        )
+        log.info(f"配置: {cfg.embedding_rate_limit_requests}请求/{cfg.embedding_rate_limit_interval}秒")
 
         engine = MockEmbeddingEngine()
         engine.setup(delay=0.1)

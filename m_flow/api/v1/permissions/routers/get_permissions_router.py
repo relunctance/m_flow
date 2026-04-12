@@ -28,9 +28,7 @@ if TYPE_CHECKING:
 class TenantSelectionDTO(InDTO):
     """Payload for tenant selection request."""
 
-    tenant_id: UUID | None = Field(
-        default=None, description="Target tenant UUID or None for default"
-    )
+    tenant_id: UUID | None = Field(default=None, description="Target tenant UUID or None for default")
 
 
 # ---------------------------------------------------------------------------

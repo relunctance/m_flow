@@ -31,65 +31,48 @@ _log = get_logger()
 class IngestRequest(BaseModel):
     """
     Ingest request body for JSON-based ingestion.
-    
+
     Use this for text content ingestion without file upload.
     For file uploads, use multipart/form-data with the /upload endpoint.
     """
-    
+
     content: str = Field(..., description="Text content to ingest")
-    dataset_name: Optional[str] = Field(
-        default=None,
-        description="Target dataset name (default: 'main_dataset')"
-    )
-    graph_scope: Optional[list[str]] = Field(
-        default=None,
-        description="Node identifiers for graph organization"
-    )
-    skip_memorize: bool = Field(
-        default=False,
-        description="If true, only add data without building knowledge graph"
-    )
+    dataset_name: Optional[str] = Field(default=None, description="Target dataset name (default: 'main_dataset')")
+    graph_scope: Optional[list[str]] = Field(default=None, description="Node identifiers for graph organization")
+    skip_memorize: bool = Field(default=False, description="If true, only add data without building knowledge graph")
     run_in_background: bool = Field(
-        default=False,
-        description="If true, memorize runs in background (returns immediately)"
+        default=False, description="If true, memorize runs in background (returns immediately)"
     )
-    chunk_size: Optional[int] = Field(
-        default=None,
-        description="Chunk size for text splitting"
-    )
-    chunks_per_batch: Optional[int] = Field(
-        default=None,
-        description="Number of chunks per processing batch"
-    )
+    chunk_size: Optional[int] = Field(default=None, description="Chunk size for text splitting")
+    chunks_per_batch: Optional[int] = Field(default=None, description="Number of chunks per processing batch")
     enable_episode_routing: Optional[bool] = Field(
         default=None,
         description="Merge new content into existing related episodes. "
-                    "Disable for faster concurrent ingestion of independent documents."
+        "Disable for faster concurrent ingestion of independent documents.",
     )
     enable_content_routing: Optional[bool] = Field(
         default=None,
         description="Classify each sentence by topic within a chunk. "
-                    "Enable when text may contain multiple topics per block. "
-                    "Costs extra LLM tokens per multi-sentence chunk."
+        "Enable when text may contain multiple topics per block. "
+        "Costs extra LLM tokens per multi-sentence chunk.",
     )
     content_type: Optional[Literal["text", "dialog"]] = Field(
         default=None,
         description="'text' for articles/documents, 'dialog' for chat logs and meeting transcripts "
-                    "(splits by speaker turn). Auto-detected when omitted."
+        "(splits by speaker turn). Auto-detected when omitted.",
     )
     enable_procedural: Optional[bool] = Field(
         default=None,
         description="Extract reusable procedures/preferences to complement episodic facts. "
-                    "Experimental. Costs extra LLM tokens."
+        "Experimental. Costs extra LLM tokens.",
     )
     enable_facet_points: Optional[bool] = Field(
         default=None,
         description="Generate fine-grained FacetPoint nodes for more precise retrieval. "
-                    "Costs extra LLM tokens per facet."
+        "Costs extra LLM tokens per facet.",
     )
     conflict_mode: Optional[str] = Field(
-        default=None,
-        description="Conflict resolution mode: 'skip', 'overwrite', 'merge'"
+        default=None, description="Conflict resolution mode: 'skip', 'overwrite', 'merge'"
     )
     created_at: Optional[Union[int, str]] = Field(
         default=None,
@@ -98,7 +81,7 @@ class IngestRequest(BaseModel):
             "Accepts: Unix milliseconds (int), ISO 8601 string, or null. "
             "When set, this timestamp is used as anchor for relative time parsing "
             "(e.g., 'yesterday' will be parsed relative to this timestamp)."
-        )
+        ),
     )
     incremental_loading: bool = Field(
         default=True,
@@ -129,10 +112,12 @@ class IngestRequest(BaseModel):
 
 class IngestResponse(BaseModel):
     """Ingest operation result."""
-    
+
     dataset_id: str = Field(..., description="Dataset UUID")
     dataset_name: str = Field(..., description="Dataset name")
-    status: str = Field(..., description="Ingest status: completed, background_started, memorize_skipped, memorize_failed")
+    status: str = Field(
+        ..., description="Ingest status: completed, background_started, memorize_skipped, memorize_failed"
+    )
     add_run_id: str = Field(..., description="Add phase pipeline run ID")
     memorize_run_id: Optional[str] = Field(default=None, description="Memorize phase pipeline run ID")
     error_message: Optional[str] = Field(default=None, description="Error message if failed")
@@ -146,25 +131,25 @@ class IngestResponse(BaseModel):
 def _parse_created_at(value: Optional[Union[int, str]]) -> Optional[int]:
     """
     Parse created_at value to milliseconds timestamp.
-    
+
     Args:
         value: Input timestamp
             - int: Unix milliseconds, return as-is
             - str: ISO 8601 datetime string (e.g., "2023-05-08T13:56:00Z")
             - None: Return None
-    
+
     Returns:
         Milliseconds timestamp or None
-    
+
     Raises:
         ValueError: If string is not valid ISO 8601 format
     """
     if value is None:
         return None
-    
+
     if isinstance(value, int):
         return value
-    
+
     if isinstance(value, str):
         try:
             # Try ISO 8601 format
@@ -172,10 +157,9 @@ def _parse_created_at(value: Optional[Union[int, str]]) -> Optional[int]:
             return int(dt.timestamp() * 1000)
         except ValueError:
             raise ValueError(
-                f"Invalid created_at format: '{value}'. "
-                f"Expected Unix milliseconds (int) or ISO 8601 string."
+                f"Invalid created_at format: '{value}'. Expected Unix milliseconds (int) or ISO 8601 string."
             )
-    
+
     raise ValueError(f"created_at must be int or str, got {type(value)}")
 
 
@@ -215,7 +199,7 @@ def _auth():
 def get_ingest_router() -> APIRouter:
     """
     Construct the unified ingest API router.
-    
+
     Provides endpoints for:
     - POST / : Text content ingestion via JSON body
     - POST /upload : File upload ingestion via multipart/form-data
@@ -229,19 +213,19 @@ def get_ingest_router() -> APIRouter:
     ) -> IngestResponse:
         """
         Ingest text content into a dataset with knowledge graph construction.
-        
+
         This is a unified operation that combines:
         1. add() - Store raw data in the database
         2. memorize() - Build knowledge graph (episodes, facets, entities)
-        
+
         For file uploads, use the /upload endpoint instead.
-        
+
         Args:
             request: Ingest request with content and options.
-            
+
         Returns:
             IngestResponse with dataset info and status.
-            
+
         Status values:
             - completed: Synchronous completion, data is queryable
             - background_started: Background processing started
@@ -258,7 +242,7 @@ def get_ingest_router() -> APIRouter:
                 "user": user,
                 "skip_memorize": request.skip_memorize,
             }
-            
+
             # Add optional parameters if provided
             if request.graph_scope:
                 kwargs["graph_scope"] = request.graph_scope
@@ -274,6 +258,7 @@ def get_ingest_router() -> APIRouter:
                 kwargs["enable_content_routing"] = request.enable_content_routing
             if request.content_type is not None:
                 from m_flow.shared.enums import ContentType
+
                 kwargs["content_type"] = ContentType(request.content_type)
             if request.enable_procedural is not None:
                 kwargs["enable_procedural"] = request.enable_procedural
@@ -326,20 +311,37 @@ def get_ingest_router() -> APIRouter:
     async def ingest_files(
         data: list[UploadFile] = File(..., description="Files to upload and ingest"),
         datasetName: Optional[str] = Form(default=None, description="Target dataset name"),
-        datasetId: Union[UUID, Literal[""], None] = Form(default=None, examples=[""], description="Existing dataset UUID"),
+        datasetId: Union[UUID, Literal[""], None] = Form(
+            default=None, examples=[""], description="Existing dataset UUID"
+        ),
         graph_scope: Optional[list[str]] = Form(default=None, examples=[[""]], description="Node identifiers"),
         skip_memorize: bool = Form(default=False, description="Skip knowledge graph construction"),
         run_in_background: bool = Form(default=False, description="Run memorize in background"),
         chunk_size: Optional[int] = Form(default=None, description="Chunk size"),
         chunks_per_batch: Optional[int] = Form(default=None, description="Chunks per batch"),
-        enable_episode_routing: Optional[bool] = Form(default=None, description="Merge new content into existing related episodes; disable for faster independent ingestion"),
-        enable_content_routing: Optional[bool] = Form(default=None, description="Classify sentences by topic within chunks; costs extra LLM tokens"),
-        content_type: Optional[Literal["text", "dialog"]] = Form(default=None, description="'text' or 'dialog' (speaker-turn split); auto-detected when omitted"),
-        enable_procedural: Optional[bool] = Form(default=None, description="Extract procedures/preferences (experimental, extra LLM tokens)"),
-        enable_facet_points: Optional[bool] = Form(default=None, description="Fine-grained FacetPoint nodes for precise retrieval (extra LLM tokens)"),
+        enable_episode_routing: Optional[bool] = Form(
+            default=None,
+            description="Merge new content into existing related episodes; disable for faster independent ingestion",
+        ),
+        enable_content_routing: Optional[bool] = Form(
+            default=None, description="Classify sentences by topic within chunks; costs extra LLM tokens"
+        ),
+        content_type: Optional[Literal["text", "dialog"]] = Form(
+            default=None, description="'text' or 'dialog' (speaker-turn split); auto-detected when omitted"
+        ),
+        enable_procedural: Optional[bool] = Form(
+            default=None, description="Extract procedures/preferences (experimental, extra LLM tokens)"
+        ),
+        enable_facet_points: Optional[bool] = Form(
+            default=None, description="Fine-grained FacetPoint nodes for precise retrieval (extra LLM tokens)"
+        ),
         conflict_mode: Optional[str] = Form(default=None, description="Conflict mode"),
-        created_at: Optional[Union[int, str]] = Form(default=None, description="Timestamp for content (Unix ms or ISO 8601)"),
-        incremental_loading: bool = Form(default=True, description="add() only; false for repeated ingest to same dataset"),
+        created_at: Optional[Union[int, str]] = Form(
+            default=None, description="Timestamp for content (Unix ms or ISO 8601)"
+        ),
+        incremental_loading: bool = Form(
+            default=True, description="add() only; false for repeated ingest to same dataset"
+        ),
         memorize_incremental_loading: Optional[bool] = Form(
             default=None,
             description="Override memorize incremental; omit to keep true (recommended)",
@@ -349,12 +351,12 @@ def get_ingest_router() -> APIRouter:
     ) -> IngestResponse:
         """
         Ingest uploaded files into a dataset with knowledge graph construction.
-        
+
         Accepts file uploads via multipart/form-data.
         Files are processed, analyzed, and integrated into the knowledge graph.
-        
+
         For text content without file upload, use the base / endpoint.
-        
+
         Args:
             data: Files to upload (required).
             datasetName: Target dataset name (creates if new).
@@ -368,7 +370,7 @@ def get_ingest_router() -> APIRouter:
             enable_content_routing: Content routing toggle.
             enable_procedural: Procedural memory toggle.
             conflict_mode: Conflict resolution mode.
-            
+
         Returns:
             IngestResponse with dataset info and status.
         """
@@ -386,7 +388,7 @@ def get_ingest_router() -> APIRouter:
                 "user": user,
                 "skip_memorize": skip_memorize,
             }
-            
+
             if effective_nodes:
                 kwargs["graph_scope"] = effective_nodes
             if effective_dataset_id:
@@ -403,6 +405,7 @@ def get_ingest_router() -> APIRouter:
                 kwargs["enable_content_routing"] = enable_content_routing
             if content_type is not None:
                 from m_flow.shared.enums import ContentType
+
                 kwargs["content_type"] = ContentType(content_type)
             if enable_procedural is not None:
                 kwargs["enable_procedural"] = enable_procedural

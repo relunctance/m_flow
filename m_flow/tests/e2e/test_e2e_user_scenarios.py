@@ -136,16 +136,10 @@ class TestE2E001NewUserFlow:
     @patch("m_flow.api.v1.add.add")
     def test_first_dataset_creation(self, mock_add, test_client):
         """Step 7-8: User can create first dataset and upload documents."""
-        mock_add.return_value = MagicMock(
-            model_dump=lambda: {"status": "success", "count": 1}
-        )
+        mock_add.return_value = MagicMock(model_dump=lambda: {"status": "success", "count": 1})
 
         files = {"data": ("test.txt", b"First document content", "text/plain")}
-        response = test_client.post(
-            "/api/v1/add",
-            files=files,
-            data={"datasetName": "first_dataset"}
-        )
+        response = test_client.post("/api/v1/add", files=files, data={"datasetName": "first_dataset"})
         assert response.status_code != 401
 
     def test_search_endpoint_accessible(self, test_client):
@@ -187,16 +181,10 @@ class TestE2E002DailyUsageFlow:
     @patch("m_flow.api.v1.add.add")
     def test_upload_to_existing_dataset(self, mock_add, test_client):
         """Step 3: User can upload new documents to existing dataset."""
-        mock_add.return_value = MagicMock(
-            model_dump=lambda: {"status": "success", "count": 1}
-        )
+        mock_add.return_value = MagicMock(model_dump=lambda: {"status": "success", "count": 1})
 
         files = {"data": ("additional.txt", b"Additional content", "text/plain")}
-        response = test_client.post(
-            "/api/v1/add",
-            files=files,
-            data={"datasetName": "existing_dataset"}
-        )
+        response = test_client.post("/api/v1/add", files=files, data={"datasetName": "existing_dataset"})
         assert response.status_code != 401
 
     def test_search_existing_knowledge(self, test_client):
@@ -231,10 +219,7 @@ class TestE2E003AdminOperationsFlow:
 
     def test_admin_data_cleanup_endpoint_exists(self, admin_client):
         """Step 7: Data cleanup endpoint exists (requires superuser via fastapi-users)."""
-        response = admin_client.post(
-            "/api/v1/prune/data",
-            json={"dry_run": True}
-        )
+        response = admin_client.post("/api/v1/prune/data", json={"dry_run": True})
         assert response.status_code in [200, 400, 401, 403, 422, 500]
         assert response.status_code != 404
 
@@ -256,8 +241,6 @@ class TestE2E004MultiUserCollaboration:
         """Verify different users have isolated sessions."""
         from m_flow.api.client import app
         from m_flow.auth.methods import get_authenticated_user
-
-        user_ids_seen = []
 
         async def mock_auth_user1():
             return mock_user
@@ -290,26 +273,17 @@ class TestE2E005ErrorRecoveryFlow:
     def test_invalid_file_upload_handled(self, test_client):
         """Step 2: Error handled gracefully for invalid uploads."""
         files = {"data": ("empty.txt", b"", "text/plain")}
-        response = test_client.post(
-            "/api/v1/add",
-            files=files,
-            data={"datasetName": "test"}
-        )
+        response = test_client.post("/api/v1/add", files=files, data={"datasetName": "test"})
         assert response.status_code in [200, 400, 409, 422, 500]
 
     def test_nonexistent_dataset_handled(self, test_client):
         """Error handled for operations on non-existent datasets."""
-        response = test_client.get(
-            f"/api/v1/datasets/{uuid.uuid4()}/graph"
-        )
+        response = test_client.get(f"/api/v1/datasets/{uuid.uuid4()}/graph")
         assert response.status_code in [404, 500, 200]
 
     def test_malformed_request_handled(self, test_client):
         """Malformed requests are handled gracefully."""
-        response = test_client.post(
-            "/api/v1/search",
-            json={"invalid_field": "value"}
-        )
+        response = test_client.post("/api/v1/search", json={"invalid_field": "value"})
         assert response.status_code in [200, 400, 409, 422, 500]
 
 
@@ -352,12 +326,7 @@ class TestE2E007OpenAICompatibleAPI:
 
     def test_responses_endpoint_structure(self, test_client):
         """Step 3-5: Test responses endpoint exists."""
-        response = test_client.post(
-            "/api/v1/responses/",
-            json={
-                "messages": [{"role": "user", "content": "test"}]
-            }
-        )
+        response = test_client.post("/api/v1/responses/", json={"messages": [{"role": "user", "content": "test"}]})
         assert response.status_code != 404
 
 
@@ -371,10 +340,7 @@ class TestE2E010DataUpdateFlow:
 
     def test_update_endpoint_accessible(self, test_client):
         """Step 4: Update endpoint is accessible."""
-        response = test_client.patch(
-            "/api/v1/update",
-            json={"memory_ids": [str(uuid.uuid4())], "new_data": "updated"}
-        )
+        response = test_client.patch("/api/v1/update", json={"memory_ids": [str(uuid.uuid4())], "new_data": "updated"})
         assert response.status_code != 404
 
 
@@ -401,12 +367,15 @@ class TestE2E011DataExportFlow:
 class TestAPIEndpointCoverage:
     """Verify all major API endpoints are accessible."""
 
-    @pytest.mark.parametrize("endpoint,method", [
-        ("/health", "GET"),
-        ("/health/detailed", "GET"),
-        ("/", "GET"),
-        ("/openapi.json", "GET"),
-    ])
+    @pytest.mark.parametrize(
+        "endpoint,method",
+        [
+            ("/health", "GET"),
+            ("/health/detailed", "GET"),
+            ("/", "GET"),
+            ("/openapi.json", "GET"),
+        ],
+    )
     def test_public_endpoints(self, unauthenticated_client, endpoint, method):
         """Test public endpoints are accessible without authentication."""
         if method == "GET":
@@ -416,17 +385,20 @@ class TestAPIEndpointCoverage:
 
         assert response.status_code != 404, f"Endpoint {endpoint} not found"
 
-    @pytest.mark.parametrize("endpoint,method", [
-        ("/api/v1/datasets", "GET"),
-        ("/api/v1/search", "GET"),
-        ("/api/v1/activity", "GET"),
-        ("/api/v1/users", "GET"),
-        ("/api/v1/settings", "GET"),
-        ("/api/v1/prompts", "GET"),
-        ("/api/v1/sync/status", "GET"),
-        ("/api/v1/pipeline/active", "GET"),
-        ("/api/v1/graph", "GET"),
-    ])
+    @pytest.mark.parametrize(
+        "endpoint,method",
+        [
+            ("/api/v1/datasets", "GET"),
+            ("/api/v1/search", "GET"),
+            ("/api/v1/activity", "GET"),
+            ("/api/v1/users", "GET"),
+            ("/api/v1/settings", "GET"),
+            ("/api/v1/prompts", "GET"),
+            ("/api/v1/sync/status", "GET"),
+            ("/api/v1/pipeline/active", "GET"),
+            ("/api/v1/graph", "GET"),
+        ],
+    )
     def test_authenticated_get_endpoints(self, test_client, endpoint, method):
         """Test authenticated GET endpoints are accessible."""
         response = test_client.get(endpoint)
@@ -457,13 +429,11 @@ class TestCrossCuttingConcerns:
 
     def test_cors_headers_if_enabled(self, unauthenticated_client):
         """Test CORS headers are set if enabled."""
-        response = unauthenticated_client.options("/api/v1/datasets")
-        pass
+        unauthenticated_client.options("/api/v1/datasets")
 
     def test_request_id_tracking(self, test_client):
         """Test request ID tracking in headers."""
-        response = test_client.get("/api/v1/datasets")
-        pass
+        test_client.get("/api/v1/datasets")
 
 
 # ============================================================================
@@ -477,22 +447,12 @@ class TestDataConsistency:
     @patch("m_flow.api.v1.add.add")
     def test_sequential_operations_consistent(self, mock_add, test_client):
         """Verify sequential operations maintain consistency."""
-        mock_add.return_value = MagicMock(
-            model_dump=lambda: {"status": "success", "count": 1}
-        )
+        mock_add.return_value = MagicMock(model_dump=lambda: {"status": "success", "count": 1})
 
         files = {"data": ("doc1.txt", b"Content 1", "text/plain")}
-        response1 = test_client.post(
-            "/api/v1/add",
-            files=files,
-            data={"datasetName": "consistency_test"}
-        )
+        response1 = test_client.post("/api/v1/add", files=files, data={"datasetName": "consistency_test"})
 
         files = {"data": ("doc2.txt", b"Content 2", "text/plain")}
-        response2 = test_client.post(
-            "/api/v1/add",
-            files=files,
-            data={"datasetName": "consistency_test"}
-        )
+        response2 = test_client.post("/api/v1/add", files=files, data={"datasetName": "consistency_test"})
 
         assert response1.status_code == response2.status_code

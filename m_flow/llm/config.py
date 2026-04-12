@@ -103,12 +103,7 @@ class LLMConfig(MflowSettings):
             if fname not in self.__class__.model_fields:
                 continue
             val = getattr(self, fname, None)
-            if (
-                isinstance(val, str)
-                and len(val) >= 2
-                and val[0] == val[-1]
-                and val[0] in ('"', "'")
-            ):
+            if isinstance(val, str) and len(val) >= 2 and val[0] == val[-1] and val[0] in ('"', "'"):
                 setattr(self, fname, val[1:-1])
         return self
 
@@ -199,9 +194,7 @@ def _check_env_group(names: List[str], label: str) -> None:
     flags = {n: _env_is_set(n) for n in names}
     if any(flags.values()) and not all(flags.values()):
         missing = [n for n, ok in flags.items() if not ok]
-        raise ValueError(
-            f"Partial {label} environment: set all of {names} or none. Missing: {missing}"
-        )
+        raise ValueError(f"Partial {label} environment: set all of {names} or none. Missing: {missing}")
 
 
 # ---------------------------------------------------------------------------

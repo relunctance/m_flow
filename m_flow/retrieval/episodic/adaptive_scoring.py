@@ -134,9 +134,7 @@ def f_gap(gap: float, config: Any) -> float:
         return 0.2
 
 
-def compute_confidence(
-    raw_distance: float, baseline: float, gap: float, config: Any
-) -> Tuple[float, float]:
+def compute_confidence(raw_distance: float, baseline: float, gap: float, config: Any) -> Tuple[float, float]:
     """
     Compute confidence for a single collection.
 
@@ -220,10 +218,7 @@ def compute_collection_stats(
         # Check edge collections first to avoid false matches with node collections
         is_edge = "relationship" in coll_name.lower() or "edge" in coll_name.lower()
         is_node = not is_edge and (
-            "search_text" in coll_name
-            or "anchor_text" in coll_name
-            or "name" in coll_name
-            or "summary" in coll_name
+            "search_text" in coll_name or "anchor_text" in coll_name or "name" in coll_name or "summary" in coll_name
         )
 
         # Final type: edge collection takes priority, then check node features, default to edge
@@ -368,10 +363,7 @@ def compute_lambda(
         lambda_gap = 0.0
 
     # Extra boost when semantic score is very good
-    if (
-        semantic < config.semantic_threshold_excellent
-        and exact_match_bonus > config.exact_match_threshold_strong
-    ):
+    if semantic < config.semantic_threshold_excellent and exact_match_bonus > config.exact_match_threshold_strong:
         # semantic < 0.1 with strong exact match
         lambda_semantic = config.lambda_semantic_boost  # 0.3
     elif semantic < config.semantic_threshold_good:  # 0.2

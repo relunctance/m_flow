@@ -52,9 +52,7 @@ async def verify_file_lifecycle(text_content: str, external_path: str):
     # Test: External file preservation
     async with db.get_async_session() as session:
         external_uri = f"file://{external_path}"
-        record = (
-            await session.scalars(select(Data).where(Data.source_path == external_uri))
-        ).one()
+        record = (await session.scalars(select(Data).where(Data.source_path == external_uri))).one()
 
         path = record.source_path.replace("file://", "")
         assert os.path.isfile(path), f"Missing: {record.source_path}"

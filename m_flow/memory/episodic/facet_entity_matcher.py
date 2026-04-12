@@ -209,9 +209,7 @@ def match_entities_to_facets(
 
     if len(filtered_entities) < len(entity_names):
         skipped = len(entity_names) - len(filtered_entities)
-        logger.debug(
-            f"[facet_entity_matcher] Skipped {skipped} entities shorter than {min_entity_length} chars"
-        )
+        logger.debug(f"[facet_entity_matcher] Skipped {skipped} entities shorter than {min_entity_length} chars")
 
     if not filtered_entities:
         return {}
@@ -220,9 +218,7 @@ def match_entities_to_facets(
     sorted_entities = sorted(filtered_entities, key=len, reverse=True)
 
     # Pre-compile patterns for efficiency
-    entity_patterns: Dict[str, re.Pattern] = {
-        name: _build_entity_pattern(name) for name in sorted_entities
-    }
+    entity_patterns: Dict[str, re.Pattern] = {name: _build_entity_pattern(name) for name in sorted_entities}
 
     # Initialize result dict
     entity_to_facets: Dict[str, List[Dict[str, str]]] = {name: [] for name in sorted_entities}

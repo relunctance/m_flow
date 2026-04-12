@@ -23,9 +23,7 @@ class DatasetStore(Base):
 
     __tablename__ = "dataset_database"
 
-    owner_id = Column(
-        PG_UUID(as_uuid=True), ForeignKey("principals.id", ondelete="CASCADE"), index=True
-    )
+    owner_id = Column(PG_UUID(as_uuid=True), ForeignKey("principals.id", ondelete="CASCADE"), index=True)
     dataset_id = Column(
         PG_UUID(as_uuid=True),
         ForeignKey("datasets.id", ondelete="CASCADE"),

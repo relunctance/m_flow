@@ -28,9 +28,7 @@ def format_triplets(edges):
             if value is not None:
                 # If the value is a dict, extract relevant keys from it
                 if isinstance(value, dict):
-                    nested_values = {
-                        k: v for k, v in value.items() if k in attributes and v is not None
-                    }
+                    nested_values = {k: v for k, v in value.items() if k in attributes and v is not None}
                     result[attr] = nested_values
                 else:
                     result[attr] = value
@@ -158,10 +156,7 @@ async def fine_grained_triplet_search(
     # Validate memory_type_filter
     if memory_type_filter is not None:
         if memory_type_filter not in ("atomic", "episodic"):
-            raise ValueError(
-                f"memory_type_filter must be 'atomic', 'episodic', or None, "
-                f"got: '{memory_type_filter}'"
-            )
+            raise ValueError(f"memory_type_filter must be 'atomic', 'episodic', or None, got: '{memory_type_filter}'")
 
     # Setting wide search limit based on the parameters
     non_global_search = node_name is None
@@ -246,9 +241,7 @@ async def fine_grained_triplet_search(
     try:
         start_time = time.time()
 
-        results = await asyncio.gather(
-            *[search_in_collection(collection_name) for collection_name in collections]
-        )
+        results = await asyncio.gather(*[search_in_collection(collection_name) for collection_name in collections])
 
         if all(not item for item in results):
             return []
@@ -314,9 +307,7 @@ async def fine_grained_triplet_search(
                 if best_bonus > 0:
                     current_importance = edge.attributes.get("triplet_importance", 1.0)
                     # Lower importance is better, so subtract bonus
-                    edge.attributes["triplet_importance"] = max(
-                        time_score_floor, current_importance - best_bonus
-                    )
+                    edge.attributes["triplet_importance"] = max(time_score_floor, current_importance - best_bonus)
 
             # Re-rank
             results.sort(key=lambda e: e.attributes.get("triplet_importance", 1.0))

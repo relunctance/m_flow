@@ -128,10 +128,7 @@ async def get_recall_mode_tools(
         ],
     }
 
-    if (
-        query_type == RecallMode.CYPHER
-        and os.getenv("ALLOW_CYPHER_QUERY", "true").lower() == "false"
-    ):
+    if query_type == RecallMode.CYPHER and os.getenv("ALLOW_CYPHER_QUERY", "true").lower() == "false":
         raise UnsupportedRecallModeError("Cypher query search type is disabled.")
 
     from m_flow.retrieval.registered_community_retrievers import (

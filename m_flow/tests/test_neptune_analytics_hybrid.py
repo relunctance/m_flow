@@ -17,10 +17,7 @@ load_dotenv()
 _graph_id = os.getenv("GRAPH_ID", "")
 
 # 跳过测试，除非 GRAPH_ID 已配置
-pytestmark = pytest.mark.skipif(
-    not _graph_id,
-    reason="需要设置 GRAPH_ID 环境变量来运行 Neptune Analytics 测试"
-)
+pytestmark = pytest.mark.skipif(not _graph_id, reason="需要设置 GRAPH_ID 环境变量来运行 Neptune Analytics 测试")
 
 from m_flow.core.domain.models import Entity, EntityType
 from m_flow.data.processing.document_types import TextDocument
@@ -35,6 +32,7 @@ _log = get_logger("neptune_hybrid_test")
 def _get_adapters():
     from m_flow.adapters.hybrid.neptune_analytics.NeptuneAnalyticsAdapter import NeptuneAnalyticsAdapter
     from m_flow.adapters.vector.embeddings import get_embedding_engine
+
     _embed = get_embedding_engine()
     _graph = NeptuneAnalyticsAdapter(_graph_id)
     _vector = NeptuneAnalyticsAdapter(_graph_id, _embed)

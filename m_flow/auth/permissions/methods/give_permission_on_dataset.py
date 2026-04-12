@@ -57,9 +57,7 @@ async def give_permission_on_dataset(
         GivePermissionOnDatasetError: Database conflict.
     """
     if permission_name not in PERMISSION_TYPES:
-        raise PermissionNotFoundError(
-            message=f"Permission '{permission_name}' not in allowed types"
-        )
+        raise PermissionNotFoundError(message=f"Permission '{permission_name}' not in allowed types")
 
     engine = get_db_adapter()
 

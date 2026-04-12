@@ -37,9 +37,7 @@ def extract_number_tokens(text: str) -> List[NumberToken]:
     seen_positions: Set[int] = set()
 
     # Match numbers with units
-    pattern_with_unit = (
-        r"(\d+\.?\d*)\s*(万|亿|TB|GB|MB|KB|次|个|条|人|家|分钟|分|秒|小时|天|月|年|元|%)"
-    )
+    pattern_with_unit = r"(\d+\.?\d*)\s*(万|亿|TB|GB|MB|KB|次|个|条|人|家|分钟|分|秒|小时|天|月|年|元|%)"
     for match in re.finditer(pattern_with_unit, text, re.IGNORECASE):
         if match.start() in seen_positions:
             continue
@@ -130,13 +128,9 @@ def calculate_exact_match_bonus(
         query_english = extract_english_words(query)
         if query_english:
             node_english = extract_english_words(node_text)
-            matched_count = sum(
-                1 for qe in query_english if any(qe.lower() == ne.lower() for ne in node_english)
-            )
+            matched_count = sum(1 for qe in query_english if any(qe.lower() == ne.lower() for ne in node_english))
             if matched_count > 0:
-                bonus -= min(
-                    matched_count * config.english_match_bonus, config.english_match_bonus * 2
-                )
+                bonus -= min(matched_count * config.english_match_bonus, config.english_match_bonus * 2)
 
     return bonus
 

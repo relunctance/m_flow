@@ -93,9 +93,7 @@ def create_mock_fragment_digest(
     )
 
 
-def create_mock_by_doc(
-    num_docs: int = 1, chunks_per_doc: int = 1
-) -> Dict[str, List[MockFragmentDigest]]:
+def create_mock_by_doc(num_docs: int = 1, chunks_per_doc: int = 1) -> Dict[str, List[MockFragmentDigest]]:
     """Create mock by_doc dictionary for routing tests."""
     by_doc = {}
     for i in range(num_docs):

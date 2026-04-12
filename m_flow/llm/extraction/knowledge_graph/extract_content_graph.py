@@ -112,9 +112,7 @@ async def extract_content_graph(
         sys_prompt = render_prompt(prompt_file, {}, base_directory=base_dir)
 
     # Call LLM for extraction
-    graph_output = await LLMService.extract_structured(
-        content, sys_prompt, response_model, **api_params
-    )
+    graph_output = await LLMService.extract_structured(content, sys_prompt, response_model, **api_params)
 
     # Verify output is not a schema definition
     if _detect_schema_in_response(graph_output):

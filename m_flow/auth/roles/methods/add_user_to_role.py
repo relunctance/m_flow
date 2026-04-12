@@ -58,11 +58,7 @@ async def add_user_to_role(
             raise RoleNotFoundError()
 
         # Check tenant membership
-        tenant = (
-            (await session.execute(select(Tenant).where(Tenant.id == role.tenant_id)))
-            .scalars()
-            .first()
-        )
+        tenant = (await session.execute(select(Tenant).where(Tenant.id == role.tenant_id))).scalars().first()
 
         user_tenants = await user.awaitable_attrs.tenants
         user_tenant_ids = {t.id for t in user_tenants}

@@ -34,7 +34,7 @@ async def save_llm_config(dto: LLMConfigDTO, persist: bool = True) -> None:
     * ``provider`` and ``model`` are always overwritten.
     * ``api_key`` is written **only** when the caller supplies a
       non-empty, non-masked value.
-    
+
     Args:
         dto: Configuration update data.
         persist: If True, also write changes to .env file for persistence.
@@ -51,7 +51,7 @@ async def save_llm_config(dto: LLMConfigDTO, persist: bool = True) -> None:
     if persist:
         try:
             from m_flow.config.settings.persist_env import persist_llm_config as _persist
-            
+
             await _persist(
                 provider=dto.provider,
                 model=dto.model,

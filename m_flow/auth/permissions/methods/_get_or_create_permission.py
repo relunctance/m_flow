@@ -68,9 +68,7 @@ async def get_or_create_permission(
     try:
         async with session.begin_nested():
             # This INSERT is wrapped in a SAVEPOINT
-            await session.execute(
-                insert(Permission).values(name=permission_name)
-            )
+            await session.execute(insert(Permission).values(name=permission_name))
             # If we reach here, the INSERT succeeded
             # SAVEPOINT will be RELEASED (committed to outer transaction)
             # when exiting the context manager

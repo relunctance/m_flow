@@ -49,19 +49,11 @@ class RoutingResult:
     episode_doc_titles: Dict[str, List[str]]
     doc_entity_cache: Dict[str, List[str]]
     # New: for tracking Episode memory_type
-    original_event_routing_types: Dict[str, str] = field(
-        default_factory=dict
-    )  # event_id -> "episodic" | "atomic"
-    routing_decisions: Dict[str, str] = field(
-        default_factory=dict
-    )  # episode_id -> "new" | "existing" | "disabled"
-    episode_memory_types: Dict[str, str] = field(
-        default_factory=dict
-    )  # episode_id -> "episodic" | "atomic"
+    original_event_routing_types: Dict[str, str] = field(default_factory=dict)  # event_id -> "episodic" | "atomic"
+    routing_decisions: Dict[str, str] = field(default_factory=dict)  # episode_id -> "new" | "existing" | "disabled"
+    episode_memory_types: Dict[str, str] = field(default_factory=dict)  # episode_id -> "episodic" | "atomic"
     # Event-Level Sections: reverse lookup from episode_id to original event_ids
-    episode_source_events: Dict[str, List[str]] = field(
-        default_factory=dict
-    )  # episode_id -> [event_id, ...]
+    episode_source_events: Dict[str, List[str]] = field(default_factory=dict)  # episode_id -> [event_id, ...]
 
 
 @dataclass

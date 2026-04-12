@@ -35,11 +35,7 @@ async def get_user(user_id: UUID) -> User:
     engine = get_db_adapter()
 
     async with engine.get_async_session() as sess:
-        stmt = (
-            select(User)
-            .options(selectinload(User.roles), selectinload(User.tenants))
-            .where(User.id == user_id)
-        )
+        stmt = select(User).options(selectinload(User.roles), selectinload(User.tenants)).where(User.id == user_id)
         result = await sess.execute(stmt)
         user = result.scalar()
 

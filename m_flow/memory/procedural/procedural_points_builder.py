@@ -79,9 +79,7 @@ def extract_anchor_tokens(text: str, min_len: int = 2, max_count: int = 50) -> L
     seen: Set[str] = set()
 
     # Numbers with units
-    for m in re.finditer(
-        r"\d+\.?\d*\s*(?:TB|GB|MB|KB|%|次|个|分钟|秒|小时|天|ms|s|min)", text, re.I
-    ):
+    for m in re.finditer(r"\d+\.?\d*\s*(?:TB|GB|MB|KB|%|次|个|分钟|秒|小时|天|ms|s|min)", text, re.I):
         t = m.group(0).strip()
         k = t.lower()
         if k not in seen and len(t) >= min_len:
@@ -125,7 +123,7 @@ def pick_snippet_containing(text: str, token: str, window: int = 80) -> Optional
     sentence_starts = ["。", "；", "; ", ". ", "\n", "，"]
     if start > 0:
         best_start = start
-        search_region = text[max(0, start - 20):start + 5]
+        search_region = text[max(0, start - 20) : start + 5]
         for sep in sentence_starts:
             pos = search_region.rfind(sep)
             if pos >= 0:
@@ -331,11 +329,7 @@ def build_context_points(
                 continue
 
             # Generate ID (uses parent_id as seed)
-            point_id = str(
-                generate_node_id(
-                    f"ProcedureContextPoint:{context_pack_id}:{point_type}:{norm[:40]}"
-                )
-            )
+            point_id = str(generate_node_id(f"ProcedureContextPoint:{context_pack_id}:{point_type}:{norm[:40]}"))
 
             point = ProcedureContextPoint(
                 id=point_id,

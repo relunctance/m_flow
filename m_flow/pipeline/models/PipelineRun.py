@@ -49,4 +49,3 @@ class WorkflowRun(Base):
     workflow_id = Column(PG_UUID(as_uuid=True), index=True)
     dataset_id = Column(PG_UUID(as_uuid=True), index=True)
     run_detail = Column(JSON)
-

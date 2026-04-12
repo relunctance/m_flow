@@ -15,7 +15,6 @@ import typing_extensions
 from pydantic import BaseModel, ConfigDict
 
 
-
 StreamStateValueT = typing.TypeVar("StreamStateValueT")
 
 

@@ -584,6 +584,7 @@ async def _search_single_dataset(
             retrieved_ctx = await context_fn(query_text)
             if query_type == RecallMode.PROCEDURAL and isinstance(retrieved_ctx, list):
                 from m_flow.retrieval.procedural_retriever import _build_procedural_structured_json
+
                 try:
                     retrieved_ctx = _build_procedural_structured_json(retrieved_ctx)
                 except Exception:
@@ -611,9 +612,7 @@ async def _warn_empty_graph(dataset: Dataset) -> None:
             "but the knowledge graph is empty. Run memorize first."
         )
     else:
-        _logger.warning(
-            "Search attempted on empty knowledge graph - no data has been added to this dataset"
-        )
+        _logger.warning("Search attempted on empty knowledge graph - no data has been added to this dataset")
 
 
 # Backwards compatibility aliases

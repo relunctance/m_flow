@@ -35,10 +35,7 @@ def chunk_data_factory():
 
     def _make(*sentences, size=10):
         def _gen(text):
-            return [
-                {"text": s, "chunk_size": size, "cut_type": "sentence", "chunk_id": uuid4()}
-                for s in sentences
-            ]
+            return [{"text": s, "chunk_size": size, "cut_type": "sentence", "chunk_id": uuid4()} for s in sentences]
 
         return _gen
 

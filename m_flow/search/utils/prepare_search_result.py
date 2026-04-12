@@ -78,12 +78,7 @@ async def prepare_search_result(search_result) -> dict:
 
 def _is_insight_context(ctx) -> bool:
     """Check if context contains insight tuples."""
-    return (
-        isinstance(ctx, List)
-        and len(ctx) > 0
-        and isinstance(ctx[0], tuple)
-        and ctx[0][1].get("relationship_name")
-    )
+    return isinstance(ctx, List) and len(ctx) > 0 and isinstance(ctx[0], tuple) and ctx[0][1].get("relationship_name")
 
 
 def _is_edge_context(ctx) -> bool:

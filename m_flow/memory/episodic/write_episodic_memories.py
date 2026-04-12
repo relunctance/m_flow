@@ -142,7 +142,7 @@ import asyncio as _asyncio_global
 # Helpers: env (imported from env_utils.py)
 # -----------------------------
 
-# Note: _truncate, _nfkc, normalize_for_compare, normalize_for_id 
+# Note: _truncate, _nfkc, normalize_for_compare, normalize_for_id
 # are now imported from m_flow.memory.episodic.normalization
 
 # Note: _episode_sort_key, _extract_time_fields_from_episode, _SECTION_PATTERNS,
@@ -256,7 +256,7 @@ async def write_episodic_memories(
         facet_points_prompt_file=facet_points_prompt_file,
         max_point_aliases_text_chars=max_point_aliases_text_chars,
     )
-    
+
     # Use config values
     enable_semantic_merge = cfg.enable_semantic_merge
     semantic_merge_threshold = cfg.semantic_merge_threshold
@@ -280,28 +280,28 @@ async def write_episodic_memories(
     # Supports both V1 (FragmentDigest.routing_type) and V2 (chunk.metadata) routing
     # Atomic content now also creates Episodes for full graph structure
     # ============================================================
-    
+
     # Check for V1 routing (FragmentDigest.routing_type)
     has_v1_routing = any(getattr(s, "routing_type", None) is not None for s in summaries)
-    
+
     # Check for sentence-level routing (chunk.metadata["sentence_classifications"])
     has_sentence_routing = any(has_v2_routing(s.made_from) for s in summaries)
-    
+
     if has_sentence_routing:
         # V2 sentence-level routing
         # Process ALL chunks with sentence classifications (both episodic AND atomic)
         # Atomic sentences now also create Episodes for full graph structure
-        
+
         summaries_to_process = [
             s
             for s in summaries
             if get_sentence_classifications(s.made_from)  # Has any classified sentences
         ]
-        
+
         if not summaries_to_process:
             logger.info("[episodic] No classified content, skipping Episode creation")
             return list(summaries)
-        
+
         # Count episodic vs atomic for logging
         episodic_count = sum(
             1
@@ -310,12 +310,9 @@ async def write_episodic_memories(
             if c.get("routing_type") == "episodic"
         )
         atomic_count = sum(
-            1
-            for s in summaries
-            for c in get_sentence_classifications(s.made_from)
-            if c.get("routing_type") == "atomic"
+            1 for s in summaries for c in get_sentence_classifications(s.made_from) if c.get("routing_type") == "atomic"
         )
-        
+
         logger.info(
             f"[episodic] Content routing V2 enabled: processing "
             f"{len(summaries_to_process)}/{len(summaries)} chunks "
@@ -324,15 +321,11 @@ async def write_episodic_memories(
     elif has_v1_routing:
         # V1 chunk-level routing
         # Now processes ALL content (both Episodic and Atomic) as Episodes
-        episodic_count = sum(
-            1 for s in summaries if getattr(s, "routing_type", None) != RoutingType.ATOMIC
-        )
-        atomic_count = sum(
-            1 for s in summaries if getattr(s, "routing_type", None) == RoutingType.ATOMIC
-        )
-        
+        episodic_count = sum(1 for s in summaries if getattr(s, "routing_type", None) != RoutingType.ATOMIC)
+        atomic_count = sum(1 for s in summaries if getattr(s, "routing_type", None) == RoutingType.ATOMIC)
+
         summaries_to_process = summaries  # Process ALL content
-        
+
         logger.info(
             f"[episodic] Content routing V1 enabled: processing ALL "
             f"{len(summaries_to_process)} summaries ({episodic_count} episodic + {atomic_count} atomic → Episodes)"
@@ -353,46 +346,44 @@ async def write_episodic_memories(
     # V1 mode: Group by document_id
     # ============================================================
     by_doc: Dict[str, List[FragmentDigest]] = {}
-    
+
     if has_sentence_routing:
         # Sentence-level mode: Group by event_id to allow multiple Episodes from same chunk
         # Processes BOTH episodic AND atomic sentences (atomic also creates Episodes)
-        
+
         event_to_summaries: Dict[str, List[FragmentDigest]] = {}
         event_topics: Dict[str, str] = {}  # event_id -> suggested_topic
         event_routing_types: Dict[str, str] = {}  # event_id -> "episodic" or "atomic"
-        
+
         for s in summaries_to_process:
             chunk = s.made_from
             classifications = get_sentence_classifications(chunk)
-            
+
             # Group by event_id - now includes BOTH episodic and atomic
             seen_events = set()
             for c in classifications:
                 event_id = c.get("event_id")
                 routing_type = c.get("routing_type", "episodic")
-                
+
                 # All sentences with event_id (both episodic and atomic) are processed
                 if event_id and event_id not in seen_events:
                     seen_events.add(event_id)
                     event_to_summaries.setdefault(event_id, []).append(s)
                     # Store topic for Episode name generation
                     if event_id not in event_topics:
-                        event_topics[event_id] = (
-                            c.get("event_topic") or c.get("suggested_topic") or ""
-                        )
+                        event_topics[event_id] = c.get("event_topic") or c.get("suggested_topic") or ""
                     # Track routing type for potential differentiation
                     if event_id not in event_routing_types:
                         event_routing_types[event_id] = routing_type
-            
+
             # Fallback: if no events found, use document grouping
             if not seen_events:
                 doc = getattr(chunk, "is_part_of", None)
                 doc_id = str(getattr(doc, "id", "")) or "__unknown_doc__"
                 event_to_summaries.setdefault(f"doc_{doc_id}", []).append(s)
-        
+
         by_doc = event_to_summaries
-        
+
         # Log breakdown
         episodic_events = sum(1 for rt in event_routing_types.values() if rt == "episodic")
         atomic_events = sum(1 for rt in event_routing_types.values() if rt == "atomic")
@@ -414,28 +405,26 @@ async def write_episodic_memories(
 
     out: List[Any] = []
     out.append(episodic_nodeset)
-    
+
     # P2 Optimization: Collect procedural compile tasks for parallel execution
     # Tasks are started after concept extraction and run in parallel with Step 2
     _procedural_compile_tasks: List[_asyncio_global.Stage] = []
 
     # Step 2: Ingestion flow logging - batch-level logger
     batch_id = f"B{int(time.time() * 1000) % 100000}" if "time" in dir() else f"B{len(summaries)}"
-    logger.info(
-        f"[{batch_id}] 📥 Episodic ingestion started: {len(summaries)} summaries, {len(by_doc)} docs"
-    )
+    logger.info(f"[{batch_id}] 📥 Episodic ingestion started: {len(summaries)} summaries, {len(by_doc)} docs")
 
     # ============================================================
     # Ingestion-time routing
     # ============================================================
-    
+
     # Pass event_routing_types if available (sentence-level mode)
     # For document mode, this will be empty and routing_type will be determined by other means
     _event_routing_types_for_router = event_routing_types if has_sentence_routing else {}
-    
+
     # Get dataset_id from ContextVar for Episode Routing isolation
     _dataset_id = current_dataset_id.get()
-    
+
     routing_result = await _route_documents_to_episodes(
         by_doc=by_doc,
         graph_engine=graph_engine,
@@ -448,7 +437,7 @@ async def write_episodic_memories(
         target_nodeset_id=str(episodic_nodeset.id),  # Dataset isolation (graph level)
         target_dataset_id=_dataset_id,  # Dataset isolation (vector filter)
     )
-    
+
     # Destructure routing result
     by_episode = routing_result.by_episode
     episode_doc_titles = routing_result.episode_doc_titles
@@ -457,7 +446,7 @@ async def write_episodic_memories(
     routing_decisions = routing_result.routing_decisions
     episode_memory_types = routing_result.episode_memory_types
     episode_source_events = routing_result.episode_source_events  # Event-Level Sections
-    
+
     # Counter for same_entity_as edges (for logging)
     # The actual edges are stored in _pending_same_entity_edges via context_vars
     same_entity_as_edge_count: int = 0
@@ -489,7 +478,7 @@ async def write_episodic_memories(
                 f"[episodic] Deduped doc_summaries: {len(doc_summaries_raw)} → {len(doc_summaries)} "
                 f"(removed {len(doc_summaries_raw) - len(doc_summaries)} duplicate chunk refs)"
             )
-        
+
         # P2 Optimization: Collect procedural candidates for this episode
         # These will be used to start compile tasks after concept extraction
         _current_episode_candidates: List[dict] = []
@@ -505,7 +494,6 @@ async def write_episodic_memories(
 
         # fetch existing episode state
         state = await fetch_episode_state(graph_engine, episode_id_str)
-
 
         # existing facets lines for prompt
         existing_facets_lines = []
@@ -594,14 +582,12 @@ async def write_episodic_memories(
         f"[episodic] Generated {len([x for x in out if isinstance(x, Episode)])} episodes "
         f"from {len(summaries)} summaries"
     )
-    
+
     # [TIME_PROPAGATION_LOG] Batch summary statistics
     # Count Episodes
-    episodes_with_time = sum(
-        1 for x in out if isinstance(x, Episode) and x.mentioned_time_start_ms is not None
-    )
+    episodes_with_time = sum(1 for x in out if isinstance(x, Episode) and x.mentioned_time_start_ms is not None)
     total_episodes = sum(1 for x in out if isinstance(x, Episode))
-    
+
     # Count Facets and Entities - need to extract from Episode's edge relationships
     all_facets = []
     all_entities = []
@@ -617,14 +603,10 @@ async def write_episodic_memories(
                 for _edge, entity in x.involves_entity:  # _edge unused but required for unpacking
                     if isinstance(entity, Entity):
                         all_entities.append(entity)
-    
-    facets_with_time = sum(
-        1 for f in all_facets if getattr(f, "mentioned_time_start_ms", None) is not None
-    )
-    entities_with_time = sum(
-        1 for e in all_entities if getattr(e, "mentioned_time_start_ms", None) is not None
-    )
-    
+
+    facets_with_time = sum(1 for f in all_facets if getattr(f, "mentioned_time_start_ms", None) is not None)
+    entities_with_time = sum(1 for e in all_entities if getattr(e, "mentioned_time_start_ms", None) is not None)
+
     logger.info(
         f"[TIME_PROPAGATION] [STATS] Batch summary: "
         f"Episodes with time: {episodes_with_time}/{total_episodes}, "
@@ -656,10 +638,8 @@ async def write_episodic_memories(
             f"[episodic.procedural_bridge] Waiting for {len(_procedural_compile_tasks)} procedural compile tasks..."
         )
 
-        procedural_results = await _asyncio_global.gather(
-            *_procedural_compile_tasks, return_exceptions=True
-        )
-        
+        procedural_results = await _asyncio_global.gather(*_procedural_compile_tasks, return_exceptions=True)
+
         # Collect successful results
         procedural_success_count = 0
         procedural_fail_count = 0
@@ -670,19 +650,16 @@ async def write_episodic_memories(
             elif result is not None:
                 out.append(result)
                 procedural_success_count += 1
-        
+
         _proc_bridge_wait_elapsed = time.time() - _proc_bridge_wait_start
         logger.info(
             f"[episodic.procedural_bridge] Procedural compile complete: {_proc_bridge_wait_elapsed:.2f}s, "
             f"success={procedural_success_count}, failed={procedural_fail_count}"
         )
-    
+
     # Step 2: Ingestion process log - batch completion summary
-    logger.info(
-        f"[{batch_id}] [OUT] Episodic ingestion complete: "
-        f"episodes={len(by_episode)}, datapoints={len(out)}"
-        )
-    
+    logger.info(f"[{batch_id}] [OUT] Episodic ingestion complete: episodes={len(by_episode)}, datapoints={len(out)}")
+
     return out
 
 
@@ -778,6 +755,7 @@ async def _build_episode_context(
     effective_config = config
     if episode_memory_types.get(episode_id_str) == "atomic" and config.enable_facet_points:
         from dataclasses import replace
+
         effective_config = replace(config, enable_facet_points=False)
 
     return EpisodeContext(
@@ -816,11 +794,11 @@ async def _process_single_episode_pipeline(
     3. Step 1: Time calculation + Facet preparation
     4. Step 2: Parallel entity description + FacetPoint extraction
     5. Step 3-5: Node and edge creation
-    
+
     Args:
         ctx: Episode context with all inputs
         existing_facets_lines: Lines for prompt
-    
+
     Returns:
         Tuple of:
         - Episode object (or None if processing failed)

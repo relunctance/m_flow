@@ -29,17 +29,18 @@ _log = get_logger("persist_memory_nodes")
 
 # ── input validation ──────────────────────────────────────────────────
 
+
 def _validate_input(memory_nodes: object) -> None:
     """Raise when *memory_nodes* is not a list of ``MemoryNode``."""
     if not isinstance(memory_nodes, list):
         raise InvalidMemoryNodesInAddMemoryNodesError("memory_nodes must be a list.")
     for item in memory_nodes:
         if not isinstance(item, MemoryNode):
-            raise InvalidMemoryNodesInAddMemoryNodesError(
-                "memory_nodes: each item must be a MemoryNode."
-            )
+            raise InvalidMemoryNodesInAddMemoryNodesError("memory_nodes: each item must be a MemoryNode.")
+
 
 # ── graph extraction ──────────────────────────────────────────────────
+
 
 async def _extract_subgraphs(
     memory_nodes: List[MemoryNode],
@@ -71,7 +72,9 @@ async def _extract_subgraphs(
 
     return deduplicate_nodes_and_edges(all_nodes, all_edges)
 
+
 # ── persistence ───────────────────────────────────────────────────────
+
 
 async def _commit_to_graph(
     graph_engine,
@@ -121,7 +124,9 @@ async def _commit_to_graph(
 
     return edges
 
+
 # ── triplet helpers ───────────────────────────────────────────────────
+
 
 def _extract_embeddable_text_from_datapoint(memory_node: MemoryNode) -> str:
     """Collect indexable field values from *memory_node* into a single string."""
@@ -135,6 +140,7 @@ def _extract_embeddable_text_from_datapoint(memory_node: MemoryNode) -> str:
     parts = (str(getattr(memory_node, fname, None) or "").strip() for fname in fields_to_embed)
     return " ".join(p for p in parts if p)
 
+
 def _build_node_index(nodes: List[MemoryNode]) -> Dict[str, MemoryNode]:
     """Map node-id → MemoryNode for fast lookup (first occurrence wins)."""
     index: Dict[str, MemoryNode] = {}
@@ -143,6 +149,7 @@ def _build_node_index(nodes: List[MemoryNode]) -> Dict[str, MemoryNode]:
         if nid and nid not in index:
             index[nid] = nd
     return index
+
 
 def _resolve_relationship_label(
     rel_name: Optional[str],
@@ -154,6 +161,7 @@ def _resolve_relationship_label(
         if isinstance(custom, str) and custom.strip():
             return custom.strip()
     return rel_name or ""
+
 
 def _create_triplets_from_graph(
     nodes: List[MemoryNode],
@@ -205,7 +213,9 @@ def _create_triplets_from_graph(
 
     return output
 
+
 # ── public API ────────────────────────────────────────────────────────
+
 
 async def persist_memory_nodes(
     memory_nodes: List[MemoryNode],
@@ -248,4 +258,3 @@ async def persist_memory_nodes(
             _log.info("Created and indexed %d triplets from graph structure", len(triplets))
 
     return memory_nodes
-

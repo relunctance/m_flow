@@ -56,8 +56,7 @@ class CsvChunker(Chunker):
                 # Validate size constraint
                 if chunk_size > self.max_chunk_size:
                     raise ValueError(
-                        f"Row data ({chunk_size} chars) exceeds "
-                        f"maximum chunk size ({self.max_chunk_size})"
+                        f"Row data ({chunk_size} chars) exceeds maximum chunk size ({self.max_chunk_size})"
                     )
 
                 # Build content fragment

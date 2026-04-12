@@ -252,9 +252,7 @@ async def detect_oversized_episodes(
         effective_threshold = max(ep.current_threshold, base_threshold)
 
         # Trigger condition: exceed effective_threshold OR exceed absolute_threshold
-        should_check = (
-            ep.facet_count > effective_threshold or ep.facet_count > config.absolute_threshold
-        )
+        should_check = ep.facet_count > effective_threshold or ep.facet_count > config.absolute_threshold
 
         if should_check:
             oversized.append(ep)
@@ -360,10 +358,7 @@ async def audit_episode(
 
     # 1. Build facet list text (show full search_text, truncate description to 150 chars)
     facet_list = "\n".join(
-        [
-            f"  [{i}]: {_get_facet_search_text(f)} → {_get_facet_description(f)[:150]}..."
-            for i, f in enumerate(facets)
-        ]
+        [f"  [{i}]: {_get_facet_search_text(f)} → {_get_facet_description(f)[:150]}..." for i, f in enumerate(facets)]
     )
 
     # 2. Load and fill prompt
@@ -412,10 +407,7 @@ async def audit_episode(
                 response.splits = validate_splits(response.splits, len(facets))
                 # Validation passed, return response
                 if attempt > 0:
-                    logger.info(
-                        f"[size_check] Retry succeeded for {episode.episode_name} "
-                        f"on attempt {attempt + 1}"
-                    )
+                    logger.info(f"[size_check] Retry succeeded for {episode.episode_name} on attempt {attempt + 1}")
                 return response
             except ValueError as e:
                 last_error = str(e)
@@ -538,9 +530,7 @@ def validate_splits(
 
     # Check all facets assigned
     if set(all_indices) != set(range(total_facets)):
-        raise ValueError(
-            f"Not all facets assigned: expected {total_facets}, got {len(all_indices)}"
-        )
+        raise ValueError(f"Not all facets assigned: expected {total_facets}, got {len(all_indices)}")
 
     return splits
 
@@ -593,43 +583,22 @@ async def execute_split(
             # Section format: 【heading】text
             # Facet: search_text = heading, description = text
             new_summary = " ".join(
-                [
-                    f"【{_get_facet_search_text(f)}】{_get_facet_description(f)}"
-                    for f in assigned_facets
-                ]
+                [f"【{_get_facet_search_text(f)}】{_get_facet_description(f)}" for f in assigned_facets]
             )
 
             # Time field migration (safe null handling)
             # Aggregate from all assigned Facets
-            time_starts = [
-                _get_facet_time_start(f)
-                for f in assigned_facets
-                if _get_facet_time_start(f) is not None
-            ]
-            time_ends = [
-                _get_facet_time_end(f)
-                for f in assigned_facets
-                if _get_facet_time_end(f) is not None
-            ]
+            time_starts = [_get_facet_time_start(f) for f in assigned_facets if _get_facet_time_start(f) is not None]
+            time_ends = [_get_facet_time_end(f) for f in assigned_facets if _get_facet_time_end(f) is not None]
             time_confidences = [
-                _get_facet_time_confidence(f)
-                for f in assigned_facets
-                if _get_facet_time_confidence(f) is not None
+                _get_facet_time_confidence(f) for f in assigned_facets if _get_facet_time_confidence(f) is not None
             ]
-            time_texts = [
-                _get_facet_time_text(f)
-                for f in assigned_facets
-                if _get_facet_time_text(f) is not None
-            ]
+            time_texts = [_get_facet_time_text(f) for f in assigned_facets if _get_facet_time_text(f) is not None]
 
             new_time_start = min(time_starts) if time_starts else None
             new_time_end = max(time_ends) if time_ends else None
             # Use average confidence if multiple facets have time
-            new_time_confidence = (
-                sum(time_confidences) / len(time_confidences)
-                if time_confidences
-                else None
-            )
+            new_time_confidence = sum(time_confidences) / len(time_confidences) if time_confidences else None
             # Concatenate time texts for evidence
             new_time_text = "; ".join(time_texts) if time_texts else None
 
@@ -640,6 +609,7 @@ async def execute_split(
                 props = original_episode.get("properties", {})
                 if isinstance(props, str):
                     import json as _json
+
                     try:
                         props = _json.loads(props)
                     except (ValueError, TypeError):
@@ -692,9 +662,7 @@ async def execute_split(
                 collection_name="Episode_summary",
                 memory_node_ids=[original_episode_id],
             )
-            logger.info(
-                f"[size_check] Deleted vector index for original Episode {original_episode_id}"
-            )
+            logger.info(f"[size_check] Deleted vector index for original Episode {original_episode_id}")
         except Exception as e:
             logger.warning(f"[size_check] Could not delete vector index for original Episode: {e}")
 
@@ -728,19 +696,14 @@ async def execute_split(
             ],
             llm_reasoning=llm_reasoning,
             original_summary_preview=(
-                original_episode.get("summary", "")[:500]
-                if original_episode.get("summary")
-                else None
+                original_episode.get("summary", "")[:500] if original_episode.get("summary") else None
             ),
         )
         await _log_split_history(history_entry)
     except Exception as e:
         logger.warning(f"[size_check] Failed to log split history: {e}")
 
-    logger.info(
-        f"[size_check] Split Episode '{original_episode.get('name')}' into "
-        f"{len(new_episode_ids)} new Episodes"
-    )
+    logger.info(f"[size_check] Split Episode '{original_episode.get('name')}' into {len(new_episode_ids)} new Episodes")
 
     return new_episode_ids
 
@@ -993,8 +956,7 @@ async def _migrate_includes_chunk_edges(
         try:
             await graph_engine.add_edges(edges_to_create)
             logger.debug(
-                f"[size_check] Migrated {len(edges_to_create)} includes_chunk edges "
-                f"to Episode {new_episode_id}"
+                f"[size_check] Migrated {len(edges_to_create)} includes_chunk edges to Episode {new_episode_id}"
             )
         except Exception as e:
             logger.warning(f"[size_check] Failed to create includes_chunk edges: {e}")
@@ -1091,10 +1053,7 @@ async def _create_episode_entity_edges(
     if edges_to_create:
         try:
             await graph_engine.add_edges(edges_to_create)
-            logger.debug(
-                f"[size_check] Created {len(edges_to_create)} Episode→Entity edges "
-                f"for Episode {episode_id}"
-            )
+            logger.debug(f"[size_check] Created {len(edges_to_create)} Episode→Entity edges for Episode {episode_id}")
         except Exception as e:
             logger.warning(f"[size_check] Failed to create Episode→Entity edges: {e}")
 
@@ -1125,9 +1084,7 @@ def _get_facet_time_start(facet: Any) -> Optional[int]:
     if hasattr(facet, "mentioned_time_start"):
         return facet.mentioned_time_start
     if hasattr(facet, "attributes"):
-        return facet.attributes.get("mentioned_time_start_ms") or facet.attributes.get(
-            "mentioned_time_start"
-        )
+        return facet.attributes.get("mentioned_time_start_ms") or facet.attributes.get("mentioned_time_start")
     return None
 
 
@@ -1143,9 +1100,7 @@ def _get_facet_time_end(facet: Any) -> Optional[int]:
     if hasattr(facet, "mentioned_time_end"):
         return facet.mentioned_time_end
     if hasattr(facet, "attributes"):
-        return facet.attributes.get("mentioned_time_end_ms") or facet.attributes.get(
-            "mentioned_time_end"
-        )
+        return facet.attributes.get("mentioned_time_end_ms") or facet.attributes.get("mentioned_time_end")
     return None
 
 
@@ -1191,7 +1146,7 @@ async def adapt_threshold(
     - Episode has 35 facets, judged reasonable
     - New threshold = 35 + 5 = 40
     - Next check only if > 40
-    
+
     The threshold is persisted to SQLite for cross-session retention.
     """
     # Calculate new threshold

@@ -143,25 +143,17 @@ class LiteLLMEmbeddingEngine(EmbeddingEngine):
 
         if "openai" in self.provider.lower():
             try:
-                return TikTokenTokenizer(
-                    model=model_name, max_completion_tokens=self.max_completion_tokens
-                )
+                return TikTokenTokenizer(model=model_name, max_completion_tokens=self.max_completion_tokens)
             except KeyError:
                 # Non-OpenAI model served via OpenAI-compatible API (e.g. BGE-M3, Jina)
-                _log.info(
-                    f"Model '{model_name}' not in tiktoken registry, using cl100k_base fallback"
-                )
-                return TikTokenTokenizer(
-                    model=None, max_completion_tokens=self.max_completion_tokens
-                )
+                _log.info(f"Model '{model_name}' not in tiktoken registry, using cl100k_base fallback")
+                return TikTokenTokenizer(model=None, max_completion_tokens=self.max_completion_tokens)
 
         if "gemini" in self.provider.lower():
             return TikTokenTokenizer(model=None, max_completion_tokens=self.max_completion_tokens)
 
         if "mistral" in self.provider.lower():
-            return MistralTokenizer(
-                model=model_name, max_completion_tokens=self.max_completion_tokens
-            )
+            return MistralTokenizer(model=model_name, max_completion_tokens=self.max_completion_tokens)
 
         # Fallback to HuggingFace tokenizer
         try:

@@ -48,6 +48,7 @@ _logger = get_logger(__name__)
 # Configuration from Environment
 # -----------------------------------------------------------------------------
 
+
 def _env_bool(key: str, default: str = "false") -> bool:
     """Parse boolean from environment variable."""
     return os.getenv(key, default).lower() == "true"
@@ -477,9 +478,7 @@ def get_prune_router() -> APIRouter:
 
         try:
             async with _prune_lock:
-                _logger.warning(
-                    "[prune.data] User %s initiated file storage wipe", user.email
-                )
+                _logger.warning("[prune.data] User %s initiated file storage wipe", user.email)
 
                 try:
                     from m_flow.api.v1.prune import prune
@@ -556,8 +555,7 @@ def get_prune_router() -> APIRouter:
         try:
             async with _prune_lock:
                 _logger.warning(
-                    "[prune.system] User %s initiated system wipe "
-                    "(graph=%s, vector=%s, metadata=%s, cache=%s)",
+                    "[prune.system] User %s initiated system wipe (graph=%s, vector=%s, metadata=%s, cache=%s)",
                     user.email,
                     request.graph,
                     request.vector,
@@ -576,9 +574,7 @@ def get_prune_router() -> APIRouter:
                     )
 
                     _update_last_prune_time()
-                    _logger.info(
-                        "[prune.system] Completed successfully by %s", user.email
-                    )
+                    _logger.info("[prune.system] Completed successfully by %s", user.email)
 
                     return PruneResponse(
                         status="completed",

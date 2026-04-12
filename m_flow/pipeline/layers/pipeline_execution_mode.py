@@ -117,7 +117,7 @@ async def run_pipeline_as_background_process(
         # Import here to avoid circular import
         from m_flow.context_global_variables import current_dataset_id
         from m_flow.shared.logging_utils import get_logger
-        
+
         logger = get_logger("pipeline_executor")
 
         for gen in runs:
@@ -137,13 +137,14 @@ async def run_pipeline_as_background_process(
                         break
                 except StopAsyncIteration:
                     break
-        
+
         # After all background pipelines complete, force checkpoint
         # to persist WAL data to disk (prevents data loss on crash)
         try:
             from m_flow.adapters.graph.get_graph_adapter import get_graph_provider
+
             graph_engine = await get_graph_provider()
-            if hasattr(graph_engine, 'checkpoint'):
+            if hasattr(graph_engine, "checkpoint"):
                 await graph_engine.checkpoint()
                 logger.info("[background] Graph database checkpoint completed")
         except Exception as e:

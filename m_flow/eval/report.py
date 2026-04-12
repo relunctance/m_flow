@@ -108,9 +108,7 @@ class EvalReport:
         # Compare with baseline
         if baseline and baseline.metrics:
             report.baseline_name = baseline.name
-            report.baseline_delta, report.regressions = cls._compare_baseline(
-                report.metrics, baseline.metrics
-            )
+            report.baseline_delta, report.regressions = cls._compare_baseline(report.metrics, baseline.metrics)
 
         return report
 
@@ -248,9 +246,7 @@ class EvalReport:
             "failed_cases": self.failed_cases,
             "metrics": {
                 "overall": asdict(self.metrics.overall) if self.metrics else {},
-                "by_type": {
-                    t: asdict(m) for t, m in (self.metrics.by_type if self.metrics else {}).items()
-                },
+                "by_type": {t: asdict(m) for t, m in (self.metrics.by_type if self.metrics else {}).items()},
             },
             "failures": [
                 {
@@ -312,9 +308,7 @@ class EvalReport:
             lines.append("| Type | n | Recall@1 | Recall@3 | FP Rate |")
             lines.append("|------|---|----------|----------|---------|")
             for t, m in self.metrics.by_type.items():
-                lines.append(
-                    f"| {t} | {m.n} | {m.recall_at_1:.2%} | {m.recall_at_3:.2%} | {m.fp_inject_rate:.2%} |"
-                )
+                lines.append(f"| {t} | {m.n} | {m.recall_at_1:.2%} | {m.recall_at_3:.2%} | {m.fp_inject_rate:.2%} |")
             lines.append("")
 
         # Baseline comparison
@@ -354,9 +348,7 @@ class EvalReport:
             lines.append("|----|------|-------|----------|---------|")
             for f in self.failures[:20]:
                 query = f.query[:40] + "..." if len(f.query) > 40 else f.query
-                lines.append(
-                    f"| {f.id} | {f.type} | {query} | `{f.trace_id}` | {', '.join(f.buckets)} |"
-                )
+                lines.append(f"| {f.id} | {f.type} | {query} | `{f.trace_id}` | {', '.join(f.buckets)} |")
             lines.append("")
 
         with open(path, "w", encoding="utf-8") as f:

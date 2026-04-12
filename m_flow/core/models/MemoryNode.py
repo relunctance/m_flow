@@ -38,9 +38,7 @@ class MemoryNode(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     type: str = Field(default="MemoryNode")
     version: int = 1
-    metadata: Optional[NodeMeta] = Field(
-        default_factory=lambda: {"type": "MemoryNode", "index_fields": []}
-    )
+    metadata: Optional[NodeMeta] = Field(default_factory=lambda: {"type": "MemoryNode", "index_fields": []})
     schema_aligned: bool = False
     graph_depth: Optional[int] = 0
     memory_spaces: Optional[List["MemoryNode"]] = Field(

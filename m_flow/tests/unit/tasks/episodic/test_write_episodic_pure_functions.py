@@ -1016,9 +1016,7 @@ class TestExtractEntitiesFromChunk:
         id1 = new_uuid()
         id2 = new_uuid()
         concept1 = Entity(id=id1, name="Entity", description="Desc")
-        concept2 = Entity(
-            id=id2, name="Entity", description="Different desc"
-        )  # Same name, different ID
+        concept2 = Entity(id=id2, name="Entity", description="Different desc")  # Same name, different ID
 
         chunk = MockContentFragment(contains=[concept1, concept1, concept2])
         entities, freq = _extract_entities_from_chunk(chunk)

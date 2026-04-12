@@ -65,13 +65,9 @@ def validate_node_count(
     actual = type_counts.get(node_type, 0)
 
     if exact:
-        assert actual == min_count, (
-            f"Expected exactly {min_count} {node_type} nodes, found {actual}"
-        )
+        assert actual == min_count, f"Expected exactly {min_count} {node_type} nodes, found {actual}"
     else:
-        assert actual >= min_count, (
-            f"Expected at least {min_count} {node_type} nodes, found {actual}"
-        )
+        assert actual >= min_count, f"Expected at least {min_count} {node_type} nodes, found {actual}"
 
 
 def validate_edge_count(

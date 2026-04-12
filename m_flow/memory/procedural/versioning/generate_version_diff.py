@@ -78,9 +78,9 @@ def generate_version_diff(
     old_ctx = old_proc.get("context_pack") or {}
     new_ctx = new_proc.get("context_pack") or {}
 
-    context_changed = old_ctx.get("when_text") != new_ctx.get("when_text") or old_ctx.get(
+    context_changed = old_ctx.get("when_text") != new_ctx.get("when_text") or old_ctx.get("why_text") != new_ctx.get(
         "why_text"
-    ) != new_ctx.get("why_text")
+    )
 
     boundary_changed = old_ctx.get("boundary_text") != new_ctx.get("boundary_text")
 

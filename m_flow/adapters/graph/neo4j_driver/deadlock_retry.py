@@ -58,8 +58,7 @@ def deadlock_retry(max_retries: int = 10) -> Callable[[_Fn], _Fn]:
 
                     pause = calculate_backoff(current_try)
                     _retry_log.warning(
-                        "Transient Neo4j fault – attempt %d/%d, "
-                        "backing off %.2f s",
+                        "Transient Neo4j fault – attempt %d/%d, backing off %.2f s",
                         current_try,
                         max_retries,
                         pause,
@@ -73,8 +72,7 @@ def deadlock_retry(max_retries: int = 10) -> Callable[[_Fn], _Fn]:
 
                     pause = calculate_backoff(current_try)
                     _retry_log.warning(
-                        "Database unavailable – attempt %d/%d, "
-                        "backing off %.2f s",
+                        "Database unavailable – attempt %d/%d, backing off %.2f s",
                         current_try,
                         max_retries,
                         pause,

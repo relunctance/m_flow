@@ -101,10 +101,7 @@ class ProcedureState(BaseModel):
     @property
     def has_mentioned_time(self) -> bool:
         """Whether has valid event time."""
-        return (
-            self.mentioned_time_start_ms is not None
-            and self.mentioned_time_end_ms is not None
-        )
+        return self.mentioned_time_start_ms is not None and self.mentioned_time_end_ms is not None
 
     @property
     def is_active(self) -> bool:

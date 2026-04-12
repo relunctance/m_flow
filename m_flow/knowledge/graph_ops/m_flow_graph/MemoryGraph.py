@@ -53,9 +53,7 @@ class MemoryGraph(MemoryAbstractGraph):
     def add_node(self, node: Node) -> None:
         existing = self.nodes.get(node.id)
         if existing is not None:
-            raise ConceptAlreadyExistsError(
-                message=f"Duplicate node insertion blocked – id={node.id}"
-            )
+            raise ConceptAlreadyExistsError(message=f"Duplicate node insertion blocked – id={node.id}")
         self.nodes[node.id] = node
 
     def add_edge(self, edge: Edge) -> None:
@@ -73,9 +71,7 @@ class MemoryGraph(MemoryAbstractGraph):
     def get_edges_from_node(self, node_id: str) -> List[Edge]:
         target_node = self.get_node(node_id)
         if target_node is None:
-            raise ConceptNotFoundError(
-                message=f"Cannot retrieve edges – no node with id={node_id}"
-            )
+            raise ConceptNotFoundError(message=f"Cannot retrieve edges – no node with id={node_id}")
         return target_node.skeleton_edges
 
     def get_edges(self) -> List[Edge]:
@@ -119,13 +115,9 @@ class MemoryGraph(MemoryAbstractGraph):
 
             _log.info("ID-constrained nodeset empty; falling back to full nodeset query.")
 
-        vertex_rows, link_rows = await adapter.extract_typed_subgraph(
-            node_type=node_type, node_name=node_name
-        )
+        vertex_rows, link_rows = await adapter.extract_typed_subgraph(node_type=node_type, node_name=node_name)
         if not vertex_rows or not link_rows:
-            raise ConceptNotFoundError(
-                message="Nodeset query returned no data – the set may not exist in the store."
-            )
+            raise ConceptNotFoundError(message="Nodeset query returned no data – the set may not exist in the store.")
         return vertex_rows, link_rows
 
     async def _get_full_or_id_filtered_graph(
@@ -138,15 +130,11 @@ class MemoryGraph(MemoryAbstractGraph):
             _log.info("Loading complete graph from persistence layer.")
             vertex_rows, link_rows = await adapter.get_graph_data()
             if not vertex_rows or not link_rows:
-                raise ConceptNotFoundError(
-                    message="Persistence layer returned an empty graph."
-                )
+                raise ConceptNotFoundError(message="Persistence layer returned an empty graph.")
             return vertex_rows, link_rows
 
         id_query_fn = getattr(adapter, "get_id_filtered_graph_data", adapter.get_graph_data)
-        adapter_supports_id_filter = getattr(
-            adapter.__class__, "get_id_filtered_graph_data", None
-        ) is not None
+        adapter_supports_id_filter = getattr(adapter.__class__, "get_id_filtered_graph_data", None) is not None
 
         if adapter_supports_id_filter:
             _log.info("Requesting id-filtered projection from adapter.")
@@ -170,13 +158,9 @@ class MemoryGraph(MemoryAbstractGraph):
     ):
         """Retrieve a sub-graph constrained by attribute predicates."""
         _log.info("Applying attribute-based filter for graph retrieval.")
-        vertex_rows, link_rows = await adapter.query_by_attributes(
-            attribute_filters=memory_fragment_filter
-        )
+        vertex_rows, link_rows = await adapter.query_by_attributes(attribute_filters=memory_fragment_filter)
         if not vertex_rows or not link_rows:
-            raise ConceptNotFoundError(
-                message="Attribute-filtered projection returned no data."
-            )
+            raise ConceptNotFoundError(message="Attribute-filtered projection returned no data.")
         return vertex_rows, link_rows
 
     # ------------------------------------------------------------------
@@ -221,21 +205,15 @@ class MemoryGraph(MemoryAbstractGraph):
                     strict_nodeset_filtering=strict_nodeset_filtering,
                 )
             elif len(memory_fragment_filter) == 0:
-                vertex_rows, link_rows = await self._get_full_or_id_filtered_graph(
-                    adapter, relevant_ids_to_filter
-                )
+                vertex_rows, link_rows = await self._get_full_or_id_filtered_graph(adapter, relevant_ids_to_filter)
             else:
-                vertex_rows, link_rows = await self._get_filtered_graph(
-                    adapter, memory_fragment_filter
-                )
+                vertex_rows, link_rows = await self._get_filtered_graph(adapter, memory_fragment_filter)
 
             t_start = time.monotonic()
 
             # --- hydrate nodes ---
             for vid, props in vertex_rows:
-                projected_attrs = {
-                    attr_key: props.get(attr_key) for attr_key in node_properties_to_project
-                }
+                projected_attrs = {attr_key: props.get(attr_key) for attr_key in node_properties_to_project}
                 self.add_node(
                     Node(
                         str(vid),
@@ -251,14 +229,9 @@ class MemoryGraph(MemoryAbstractGraph):
                 dst_vertex = self.get_node(str(dst_id))
                 if src_vertex is None or dst_vertex is None:
                     raise ConceptNotFoundError(
-                        message=(
-                            f"Link ({src_id} -> {dst_id}) references a vertex "
-                            "absent from the projection"
-                        )
+                        message=(f"Link ({src_id} -> {dst_id}) references a vertex absent from the projection")
                     )
-                link_attrs = {
-                    attr_key: props.get(attr_key) for attr_key in edge_properties_to_project
-                }
+                link_attrs = {attr_key: props.get(attr_key) for attr_key in edge_properties_to_project}
                 link_attrs["relationship_type"] = rel_type
 
                 self.add_edge(
@@ -305,14 +278,10 @@ class MemoryGraph(MemoryAbstractGraph):
             if edge_distances is None:
                 return
 
-            score_lookup = {
-                entry.payload["text"]: entry.score for entry in edge_distances
-            }
+            score_lookup = {entry.payload["text"]: entry.score for entry in edge_distances}
 
             for link in self.edges:
-                descriptor = link.attributes.get("edge_text") or link.attributes.get(
-                    "relationship_type"
-                )
+                descriptor = link.attributes.get("edge_text") or link.attributes.get("relationship_type")
                 matched_score = score_lookup.get(descriptor)
                 if matched_score is not None:
                     link.attributes["vector_distance"] = matched_score

@@ -75,9 +75,7 @@ class DecisionResponse(BaseModel):
     """LLM response model for incremental update decision."""
 
     action: str = Field(..., description="create_new | patch | new_version | skip")
-    match_procedure_id: Optional[str] = Field(
-        None, description="ID of matching procedure"
-    )
+    match_procedure_id: Optional[str] = Field(None, description="ID of matching procedure")
     confidence: float = Field(1.0, ge=0.0, le=1.0)
     reason: str = Field("", description="Brief explanation")
 
@@ -106,9 +104,7 @@ async def make_decision(
     """
     # Short-circuit: no similar procedures found
     if not existing_procedures:
-        logger.debug(
-            "[procedural.incremental.decision] No similar procedures found, create_new"
-        )
+        logger.debug("[procedural.incremental.decision] No similar procedures found, create_new")
         return IncrementalDecision(
             action=MergeAction.create_new,
             confidence=1.0,
@@ -161,10 +157,7 @@ async def make_decision(
         )
 
     except Exception as e:
-        logger.warning(
-            f"[procedural.incremental.decision] Decision LLM failed: {e}, "
-            f"defaulting to create_new"
-        )
+        logger.warning(f"[procedural.incremental.decision] Decision LLM failed: {e}, defaulting to create_new")
         return IncrementalDecision(
             action=MergeAction.create_new,
             confidence=0.5,

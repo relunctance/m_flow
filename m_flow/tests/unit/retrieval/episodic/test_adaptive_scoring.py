@@ -179,9 +179,7 @@ class TestComputeConfidence:
 
         for raw, baseline, gap in test_cases:
             conf, ratio = compute_confidence(raw, baseline, gap, config)
-            assert 0 <= conf <= 1, (
-                f"Confidence out of range for raw={raw}, baseline={baseline}, gap={gap}"
-            )
+            assert 0 <= conf <= 1, f"Confidence out of range for raw={raw}, baseline={baseline}, gap={gap}"
 
 
 class TestComputeCollectionStats:
@@ -209,9 +207,7 @@ class TestComputeCollectionStats:
                 ),
             ],
             "Entity_name": [
-                MockScoredResult(
-                    str(uuid4()), 0.0, {}, raw_distance=0.40, collection_name="Entity_name"
-                ),
+                MockScoredResult(str(uuid4()), 0.0, {}, raw_distance=0.40, collection_name="Entity_name"),
             ],
         }
 

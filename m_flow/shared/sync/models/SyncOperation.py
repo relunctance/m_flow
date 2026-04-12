@@ -223,8 +223,6 @@ class SyncOperation(Base):
         """
         if dataset_id is not None:
             ds_hashes = self.hashes_for_dataset(dataset_id)
-            return content_hash in ds_hashes.get("uploaded", []) or content_hash in ds_hashes.get(
-                "downloaded", []
-            )
+            return content_hash in ds_hashes.get("uploaded", []) or content_hash in ds_hashes.get("downloaded", [])
 
         return content_hash in self.collect_all_hashes()

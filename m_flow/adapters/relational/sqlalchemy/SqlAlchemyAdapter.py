@@ -158,9 +158,7 @@ class SQLAlchemyAdapter:
 
         async with self.engine.begin() as conn:
             await conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema_name};"))
-            await conn.execute(
-                text(f'CREATE TABLE IF NOT EXISTS {schema_name}."{table_name}" ({fields});')
-            )
+            await conn.execute(text(f'CREATE TABLE IF NOT EXISTS {schema_name}."{table_name}" ({fields});'))
 
     async def delete_table(
         self,
@@ -172,9 +170,7 @@ class SQLAlchemyAdapter:
             if self.engine.dialect.name == "sqlite":
                 await conn.execute(text(f'DROP TABLE IF EXISTS "{table_name}";'))
             else:
-                await conn.execute(
-                    text(f'DROP TABLE IF EXISTS {schema_name}."{table_name}" CASCADE;')
-                )
+                await conn.execute(text(f'DROP TABLE IF EXISTS {schema_name}."{table_name}" CASCADE;'))
 
     async def insert_data(
         self,
@@ -257,11 +253,7 @@ class SQLAlchemyAdapter:
 
             # Check for other references to same file
             refs = (
-                await sess.execute(
-                    select(Data.processed_path).where(
-                        Data.processed_path == entity.processed_path
-                    )
-                )
+                await sess.execute(select(Data.processed_path).where(Data.processed_path == entity.processed_path))
             ).all()
 
             if len(refs) == 1:
@@ -329,9 +321,7 @@ class SQLAlchemyAdapter:
             query = f'SELECT * FROM "{table_name}"'
             if filters:
                 conditions = " AND ".join(
-                    f"{k} IN ({', '.join(f':{k}{i}' for i in range(len(v)))})"
-                    if isinstance(v, list)
-                    else f"{k} = :{k}"
+                    f"{k} IN ({', '.join(f':{k}{i}' for i in range(len(v)))})" if isinstance(v, list) else f"{k} = :{k}"
                     for k, v in filters.items()
                 )
                 query += f" WHERE {conditions};"
@@ -399,14 +389,15 @@ class SQLAlchemyAdapter:
                 filename = path.basename(self.db_path)
                 storage = get_file_storage(directory)
                 await storage.remove(filename)
-                
+
                 # Clear the LRU cache to force recreation of the engine
                 from m_flow.adapters.relational.create_relational_engine import (
                     create_relational_engine,
                 )
+
                 create_relational_engine.cache_clear()
                 logger.info("Relational engine cache cleared")
-                
+
                 # Reinitialize the engine and recreate tables
                 await self._reinitialize_sqlite(directory, filename)
             else:
@@ -415,9 +406,7 @@ class SQLAlchemyAdapter:
                         meta = MetaData()
                         await conn.run_sync(meta.reflect, schema=schema)
                         for tbl in meta.sorted_tables:
-                            await conn.execute(
-                                text(f'DROP TABLE IF EXISTS {schema}."{tbl.name}" CASCADE')
-                            )
+                            await conn.execute(text(f'DROP TABLE IF EXISTS {schema}."{tbl.name}" CASCADE'))
                         meta.clear()
                 # Recreate tables for PostgreSQL
                 await self.create_database()
@@ -431,7 +420,7 @@ class SQLAlchemyAdapter:
         """Reinitialize SQLite database after deletion."""
         conn_str = f"sqlite+aiosqlite:///{directory}/{filename}"
         self.db_path = path.join(directory, filename)
-        
+
         # Create new engine
         self.engine = create_async_engine(
             conn_str,
@@ -440,15 +429,15 @@ class SQLAlchemyAdapter:
         )
         # CRITICAL: Update sessionmaker (used by get_async_session and get_session)
         self.sessionmaker = async_sessionmaker(bind=self.engine, expire_on_commit=False)
-        
+
         # Ensure directory exists and create tables
         storage = get_file_storage(directory)
         await storage.ensure_directory_exists()
-        
+
         async with self.engine.begin() as conn:
             if Base.metadata.tables:
                 await conn.run_sync(Base.metadata.create_all)
-        
+
         logger.info("SQLite database reinitialized with fresh schema")
 
     async def extract_schema(self):

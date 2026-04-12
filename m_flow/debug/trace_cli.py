@@ -146,9 +146,7 @@ def print_events(events: List[Dict[str, Any]], tail: int = 100) -> None:
 def main():
     ap = argparse.ArgumentParser(description="Mflow Trace CLI")
     ap.add_argument("--trace_id", help="Trace ID to view")
-    ap.add_argument(
-        "--dir", default=os.getenv("MFLOW_TRACE_DIR", ".m_flow_traces"), help="Trace directory"
-    )
+    ap.add_argument("--dir", default=os.getenv("MFLOW_TRACE_DIR", ".m_flow_traces"), help="Trace directory")
     ap.add_argument("--tail", type=int, default=100, help="Number of events to show")
     ap.add_argument("--list", action="store_true", help="List recent traces")
     ap.add_argument("--summary", action="store_true", help="Show summary only")

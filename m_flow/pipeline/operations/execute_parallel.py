@@ -13,25 +13,28 @@ from ..tasks import Stage
 
 logger = get_logger("run_parallel")
 
+
 async def _update_parallel_step(context: Optional[dict], step_name: str) -> None:
     """Update current step for parallel execution (fire-and-forget)."""
     if not context:
         return
-    
+
     run_id_str = context.get("workflow_run_id")
     if not run_id_str:
         return
-    
+
     try:
         from m_flow.pipeline.operations.update_pipeline_progress import (
             update_pipeline_progress,
         )
+
         await update_pipeline_progress(
             UUID(run_id_str),
             current_step=step_name,
         )
     except Exception as e:
         logger.debug(f"Failed to update step: {e}")
+
 
 def execute_parallel(
     tasks: List[Stage],
@@ -67,14 +70,14 @@ def execute_parallel(
     async def parallel_run(data, context: Optional[dict] = None):
         # Context is passed as a positional argument by execute_pipeline_tasks
         # when the function signature includes 'context' parameter
-        
+
         # Get task names for step display
         task_names = [getattr(t.executable, "__name__", f"task_{i}") for i, t in enumerate(tasks)]
         step_name = f"Parallel: {', '.join(task_names)}"
-        
+
         # Update progress with parallel step name
         asyncio.create_task(_update_parallel_step(context, step_name))
-        
+
         logger.info(f"[parallel] Starting {len(tasks)} parallel tasks")
 
         # Create all tasks - pass data and context to each
@@ -96,18 +99,15 @@ def execute_parallel(
                 valid_results.append(result)
 
         # Log result statistics
-        logger.info(
-            f"[parallel] Completed: {len(valid_results)} succeeded, {len(exceptions)} failed"
-        )
-        
+        logger.info(f"[parallel] Completed: {len(valid_results)} succeeded, {len(exceptions)} failed")
+
         # Update progress to show completion
         asyncio.create_task(_update_parallel_step(context, "Parallel tasks completed"))
 
         # If exceptions exist, log warning but continue processing valid results
         if exceptions:
             logger.warning(
-                f"[parallel] {len(exceptions)} tasks failed, "
-                f"processing {len(valid_results)} successful results"
+                f"[parallel] {len(exceptions)} tasks failed, processing {len(valid_results)} successful results"
             )
 
         if merge_results:
@@ -137,14 +137,11 @@ def execute_parallel(
                     merged.append(result)
 
             # Calculate deduplication count
-            total_items_before_dedup = sum(
-                len(r) if isinstance(r, list) else 1 for r in valid_results
-            )
+            total_items_before_dedup = sum(len(r) if isinstance(r, list) else 1 for r in valid_results)
             removed_count = total_items_before_dedup - len(merged) if deduplicate else 0
 
             logger.info(
-                f"[parallel] Merged {len(merged)} items "
-                f"(deduplicated: {deduplicate}, removed: {removed_count})"
+                f"[parallel] Merged {len(merged)} items (deduplicated: {deduplicate}, removed: {removed_count})"
             )
 
             # If exceptions exist, raise first exception after returning results
@@ -159,5 +156,6 @@ def execute_parallel(
             return valid_results[-1] if valid_results else []
 
     return Stage(parallel_run)
+
 
 # Backward-compatible alias

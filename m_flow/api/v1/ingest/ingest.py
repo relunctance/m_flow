@@ -58,7 +58,7 @@ def _get_param_sets() -> Tuple[Set[str], Set[str]]:
     """
     add_params = set(inspect.signature(add).parameters.keys()) - {"data", "dataset_name"}
     memorize_params = set(inspect.signature(memorize).parameters.keys()) - {"datasets", "kwargs"}
-    
+
     # Add dynamic kwargs params that memorize() accepts via **kwargs
     # These are feature toggles that override environment variables
     memorize_kwargs_params = {
@@ -82,7 +82,7 @@ def _get_param_sets() -> Tuple[Set[str], Set[str]]:
         "memorize_incremental_loading",
     }
     memorize_params = memorize_params | memorize_kwargs_params
-    
+
     return add_params, memorize_params
 
 
@@ -208,27 +208,28 @@ async def ingest(
     # Content Type Validation
     # ---------------------------------------------------------------------------
     # When enable_content_routing=True (default), content_type must be declared
-    
+
     def _env_bool(env_var: str, default: bool) -> bool:
         """Parse environment variable as boolean (consistent with memorize.py)."""
         val = os.getenv(env_var, str(default).lower()).lower()
         return val in ("1", "true", "yes", "y", "on")
-    
+
     # Only validate if memorize will be executed
     if not skip_memorize:
         # Determine if content_routing is enabled
         enable_content_routing = kwargs.get("enable_content_routing")
         if enable_content_routing is None:
             enable_content_routing = _env_bool("MFLOW_CONTENT_ROUTING", True)
-        
+
         content_type = kwargs.get("content_type")
-        
+
         if enable_content_routing and content_type is None:
             # Default to TEXT when content_type is not specified
             from m_flow.shared.enums import ContentType as CT
+
             content_type = CT.TEXT
             kwargs["content_type"] = content_type
-    
+
     # Use default dataset_name
     if not dataset_name:
         dataset_name = "main_dataset"
@@ -243,8 +244,7 @@ async def ingest(
     if invalid_params:
         logger.warning(f"[ingest] Invalid parameters detected: {invalid_params}")
         raise TypeError(
-            f"ingest() got unexpected keyword argument(s): {invalid_params}. "
-            f"Valid params: {sorted(all_valid_params)}"
+            f"ingest() got unexpected keyword argument(s): {invalid_params}. Valid params: {sorted(all_valid_params)}"
         )
 
     # Warning: datasets parameter is ignored
@@ -280,9 +280,7 @@ async def ingest(
         raise ValueError("No data was ingested. Check if data is empty or already processed.")
 
     if skip_memorize:
-        logger.info(
-            f"[ingest] Skipping memorize (skip_memorize=True), dataset_id={add_result.dataset_id}"
-        )
+        logger.info(f"[ingest] Skipping memorize (skip_memorize=True), dataset_id={add_result.dataset_id}")
         return IngestResult(
             dataset_id=add_result.dataset_id,
             dataset_name=add_result.dataset_name,
@@ -317,9 +315,7 @@ async def ingest(
     # Determine completion status
     final_status = IngestStatus.BACKGROUND_STARTED if run_in_background else IngestStatus.COMPLETED
 
-    logger.info(
-        f"[ingest] Completed with status={final_status.value}, dataset_id={add_result.dataset_id}"
-    )
+    logger.info(f"[ingest] Completed with status={final_status.value}, dataset_id={add_result.dataset_id}")
 
     return IngestResult(
         dataset_id=add_result.dataset_id,
@@ -336,9 +332,7 @@ def _extract_memorize_run_id(
 ) -> Optional[UUID]:
     """Extract run_id from memorize() return value."""
     if not isinstance(memorize_result, dict):
-        logger.debug(
-            f"[ingest] memorize returned unexpected type: {type(memorize_result).__name__}"
-        )
+        logger.debug(f"[ingest] memorize returned unexpected type: {type(memorize_result).__name__}")
         return None
 
     if not memorize_result:

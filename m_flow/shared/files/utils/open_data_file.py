@@ -36,8 +36,7 @@ async def open_data_file(
 
     if not basename or basename in (".", ".."):
         raise ValueError(
-            f"Cannot derive a valid filename from '{file_path}' "
-            f"(resolved: '{resolved}', basename: '{basename}')"
+            f"Cannot derive a valid filename from '{file_path}' (resolved: '{resolved}', basename: '{basename}')"
         )
 
     if file_path.startswith("s3://"):

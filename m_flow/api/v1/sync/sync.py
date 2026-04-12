@@ -186,9 +186,7 @@ async def _background_sync(run_id: str, datasets: list[Dataset], user: User) -> 
 
         dl, ul, db, ub, hashes = result
         elapsed = (datetime.now(timezone.utc) - t0).total_seconds()
-        _log.info(
-            "Sync %s complete: ↓%d/%d bytes ↑%d/%d bytes in %.1fs", run_id, dl, db, ul, ub, elapsed
-        )
+        _log.info("Sync %s complete: ↓%d/%d bytes ↑%d/%d bytes in %.1fs", run_id, dl, db, ul, ub, elapsed)
 
         await mark_sync_completed(run_id, dl, ul, db, ub, hashes)
 
@@ -250,9 +248,7 @@ async def _execute_cloud_sync(
         except Exception as exc:
             done += 1
             _log.error("Dataset sync failed: %s", exc)
-            await _update_progress(
-                run_id, "file_sync", progress_percentage=int(done / len(datasets) * 80)
-            )
+            await _update_progress(run_id, "file_sync", progress_percentage=int(done / len(datasets) * 80))
 
     # Remote memorize if uploads occurred
     await _update_progress(run_id, "memorize", progress_percentage=90)
@@ -303,9 +299,7 @@ async def _sync_one_dataset(
     local_hashes = [f.content_hash for f in local_files]
     diff = await _check_diff(base_url, token, dataset, local_hashes, run_id)
 
-    bytes_up = await _upload_files(
-        base_url, token, dataset, local_files, diff.missing_on_remote, run_id
-    )
+    bytes_up = await _upload_files(base_url, token, dataset, local_files, diff.missing_on_remote, run_id)
     bytes_down = await _download_files(base_url, token, dataset, diff.missing_on_local, user)
 
     return DatasetSyncResult(

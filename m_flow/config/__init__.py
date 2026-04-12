@@ -67,6 +67,7 @@ _LAZY_ATTRS = {
 def __getattr__(name: str):
     if name in _LAZY_ATTRS:
         from m_flow.api.v1.config.config import config as _config_class
+
         return getattr(_config_class, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 

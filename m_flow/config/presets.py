@@ -156,9 +156,7 @@ class ConfigPreset:
         for category, overrides in self.config_overrides.items():
             _apply_config_by_category(category, overrides)
 
-        logger.info(
-            f"Applied preset '{self.name}': {len(self.env_vars)} env vars, {cleared} caches cleared"
-        )
+        logger.info(f"Applied preset '{self.name}': {len(self.env_vars)} env vars, {cleared} caches cleared")
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to serializable dictionary."""

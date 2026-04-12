@@ -46,9 +46,7 @@ async def validate_local_file_cleanup(text_content: str, external_file_path: str
     async with db_engine.get_async_session() as db_session:
         content_hash = hashlib.md5(text_content.encode("utf-8")).hexdigest()
 
-        query_result = await db_session.scalars(
-            select(Data).where(Data.content_hash == content_hash)
-        )
+        query_result = await db_session.scalars(select(Data).where(Data.content_hash == content_hash))
         data_record = query_result.one()
 
         file_path = data_record.processed_path.replace("file://", "")
@@ -56,15 +54,11 @@ async def validate_local_file_cleanup(text_content: str, external_file_path: str
 
         await db_engine.delete_data_entity(data_record.id)
 
-        assert not os.path.exists(file_path), (
-            f"File should be deleted: {data_record.processed_path}"
-        )
+        assert not os.path.exists(file_path), f"File should be deleted: {data_record.processed_path}"
 
     # Scenario 2: External files should remain untouched
     async with db_engine.get_async_session() as db_session:
-        query_result = await db_session.scalars(
-            select(Data).where(Data.processed_path == external_file_path)
-        )
+        query_result = await db_session.scalars(select(Data).where(Data.processed_path == external_file_path))
         data_record = query_result.one()
 
         file_path = data_record.processed_path.replace("file://", "")
@@ -72,9 +66,7 @@ async def validate_local_file_cleanup(text_content: str, external_file_path: str
 
         await db_engine.delete_data_entity(data_record.id)
 
-        assert os.path.exists(file_path), (
-            f"External file should NOT be deleted: {data_record.processed_path}"
-        )
+        assert os.path.exists(file_path), f"External file should NOT be deleted: {data_record.processed_path}"
 
 
 async def validate_document_retrieval(target_dataset: str):
@@ -127,9 +119,7 @@ async def validate_unlimited_vector_search():
     )
 
     # Verify no hidden limits were applied (common defaults: 5, 10, 15)
-    assert len(unlimited_results) > 15, (
-        f"Unlimited search returned only {len(unlimited_results)} results"
-    )
+    assert len(unlimited_results) > 15, f"Unlimited search returned only {len(unlimited_results)} results"
 
 
 async def main():
@@ -214,15 +204,11 @@ async def main():
     # Cleanup and verify
     await m_flow.prune.prune_data()
     storage_config = get_storage_config()
-    assert not os.path.isdir(storage_config["data_root_directory"]), (
-        "Data directory should be deleted after prune"
-    )
+    assert not os.path.isdir(storage_config["data_root_directory"]), "Data directory should be deleted after prune"
 
     await m_flow.prune.prune_system(metadata=True)
     remaining_collections = await vec_engine.get_collection_names()
-    assert len(remaining_collections) == 0, (
-        f"ChromaDB should be empty, found {len(remaining_collections)} collections"
-    )
+    assert len(remaining_collections) == 0, f"ChromaDB should be empty, found {len(remaining_collections)} collections"
 
     # Run unlimited search validation
     await validate_unlimited_vector_search()

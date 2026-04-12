@@ -24,9 +24,8 @@ from m_flow.knowledge.summarization.models import FragmentDigest
 
 _log = structlog.get_logger("m_flow.summarization")
 
-async def compress_text(
-    data_chunks: list[ContentFragment], summarization_model: Type[BaseModel] = None
-):
+
+async def compress_text(data_chunks: list[ContentFragment], summarization_model: Type[BaseModel] = None):
     """
     Build :class:`FragmentDigest` wrappers around every supplied fragment.
 
@@ -76,21 +75,18 @@ async def compress_text(
     )
     return digest_items
 
+
 # ------------------------------------------------------------------
 # Internal helpers
 # ------------------------------------------------------------------
 
+
 def _validate_input(chunks: object) -> None:
     """Raise early on obviously invalid arguments."""
     if not isinstance(chunks, list):
-        raise InvalidSummaryInputsError(
-            "Expected a list of ContentFragment instances, "
-            f"got {type(chunks).__name__}."
-        )
+        raise InvalidSummaryInputsError(f"Expected a list of ContentFragment instances, got {type(chunks).__name__}.")
     for idx, item in enumerate(chunks):
         if not hasattr(item, "text"):
             raise InvalidSummaryInputsError(
-                f"Item at position {idx} has no 'text' attribute – "
-                "all elements must be ContentFragment-like."
+                f"Item at position {idx} has no 'text' attribute – all elements must be ContentFragment-like."
             )
-

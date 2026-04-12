@@ -108,6 +108,7 @@ def _format_episode_time(attrs: dict, label_created_at: bool = True) -> Optional
 
     return None
 
+
 from m_flow.adapters.graph import get_graph_provider
 from m_flow.knowledge.graph_ops.m_flow_graph.MemoryGraphElements import Edge
 from m_flow.knowledge.graph_ops.utils.resolve_edges_to_text import resolve_edges_to_text
@@ -199,22 +200,22 @@ class EpisodicRetriever(BaseGraphRetriever):
             return []
 
         triplets = await self.get_triplets(query)
-        
+
         # Apply display_mode filtering for summary modes
         display_mode = getattr(self.config, "display_mode", "summary")
-        
+
         if display_mode == "summary":
             summaries = _extract_episode_summaries(triplets)
             if summaries:
                 return "\n\n---\n\n".join(summaries)
             logger.warning("No Episode summaries found, falling back to full context")
-        
+
         if display_mode == "highly_related_summary":
             summaries = _extract_filtered_summaries(triplets)
             if summaries:
                 return "\n\n---\n\n".join(summaries)
             logger.warning("No filtered summaries found, falling back to full context")
-        
+
         # "detail" mode or fallback: return raw triplets
         return triplets
 
@@ -420,10 +421,7 @@ def _inject_text_for_episodic_nodes(triplets: List[Edge]) -> None:
                 continue
 
             if node_type == "Episode":
-                display = (
-                    node.attributes.get("display_only")
-                    or node.attributes.get("summary")
-                )
+                display = node.attributes.get("display_only") or node.attributes.get("summary")
                 if display:
                     time_str = _format_episode_time(node.attributes)
                     if time_str:

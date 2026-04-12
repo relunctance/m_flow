@@ -45,9 +45,7 @@ class VectorConfig(MflowSettings):
         # Empty -> default LanceDB location
         elif not url:
             base = get_base_config()
-            self.vector_db_url = os.path.join(
-                base.system_root_directory, "databases", "m_flow.lancedb"
-            )
+            self.vector_db_url = os.path.join(base.system_root_directory, "databases", "m_flow.lancedb")
 
         return self
 

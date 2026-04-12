@@ -40,7 +40,7 @@ class VectorDBSettingsOut(OutDTO, VectorConfig):
 
 class EmbeddingSettingsOut(OutDTO):
     """Embedding configuration output wrapper."""
-    
+
     embedding_provider: Optional[str] = Field(default=None, description="Embedding provider")
     embedding_model: Optional[str] = Field(default=None, description="Embedding model name")
     embedding_dimensions: Optional[int] = Field(default=None, description="Vector dimensions")
@@ -138,7 +138,7 @@ def get_settings_router() -> APIRouter:
         from m_flow.adapters.vector.embeddings import get_embedding_config
 
         base_settings = get_settings()
-        
+
         # Add embedding config
         emb_cfg = get_embedding_config()
         embedding_out = EmbeddingSettingsOut(
@@ -147,14 +147,16 @@ def get_settings_router() -> APIRouter:
             embedding_dimensions=emb_cfg.embedding_dimensions,
             embedding_endpoint=emb_cfg.embedding_endpoint,
         )
-        
+
         # Convert Pydantic models to dicts for compatibility
         llm_dict = base_settings.llm.model_dump()
         vector_dict = base_settings.vector_db.model_dump()
-        
+
         return SystemSettingsOut(
             llm=LLMSettingsOut(**{k: v for k, v in llm_dict.items() if k in LLMSettingsOut.model_fields}),
-            vector_db=VectorDBSettingsOut(**{k: v for k, v in vector_dict.items() if k in VectorDBSettingsOut.model_fields}),
+            vector_db=VectorDBSettingsOut(
+                **{k: v for k, v in vector_dict.items() if k in VectorDBSettingsOut.model_fields}
+            ),
             embedding=embedding_out,
         )
 
@@ -177,7 +179,7 @@ def get_settings_router() -> APIRouter:
 
         if payload.vector_db is not None:
             await save_vector_db_config(payload.vector_db)
-        
+
         if payload.embedding is not None:
             emb_dto = EmbeddingConfigDTO(
                 provider=payload.embedding.provider,

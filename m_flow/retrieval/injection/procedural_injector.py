@@ -115,18 +115,14 @@ class ProceduralInjector:
         if not triggered:
             if top1.score < self.strong_threshold:
                 selected.append(top1)
-                reason = (
-                    f"no_trigger_but_strong_match(score={top1.score:.3f}<{self.strong_threshold})"
-                )
+                reason = f"no_trigger_but_strong_match(score={top1.score:.3f}<{self.strong_threshold})"
 
                 # Check if top2 should also be injected
                 if top2 and (top2.score - top1.score) < self.gap_threshold:
                     selected.append(top2)
                     reason += f"+top2_close(gap={top2.score - top1.score:.3f})"
             else:
-                reason = (
-                    f"no_trigger_and_weak_match(score={top1.score:.3f}>={self.strong_threshold})"
-                )
+                reason = f"no_trigger_and_weak_match(score={top1.score:.3f}>={self.strong_threshold})"
 
         # Strategy 2: Trigger triggered
         else:

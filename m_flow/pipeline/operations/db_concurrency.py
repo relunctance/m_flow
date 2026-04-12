@@ -109,9 +109,7 @@ def get_pipeline_concurrency_limit() -> int:
                     "to avoid 'database is locked' errors"
                 )
             elif provider in ("postgres", "postgresql"):
-                logger.info(
-                    f"[db_concurrency] PostgreSQL detected - using high concurrency (limit={limit})"
-                )
+                logger.info(f"[db_concurrency] PostgreSQL detected - using high concurrency (limit={limit})")
             else:
                 logger.warning(
                     f"[db_concurrency] Unknown database provider '{provider}' - "

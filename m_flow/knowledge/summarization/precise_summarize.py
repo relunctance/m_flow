@@ -27,12 +27,18 @@ logger = structlog.get_logger("precise_summarize")
 # ── Anchor extraction patterns ────────────────────────────────────────
 
 _ANCHOR_PATTERNS: List[Tuple[str, str]] = [
-    (r"(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+(?:st|nd|rd|th)?", "date"),
+    (
+        r"(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+(?:st|nd|rd|th)?",
+        "date",
+    ),
     (r"\d{4}/\d{2}/\d{2}", "date"),
     (r"\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?", "time"),
     (r"\$\d[\d,]*(?:\.\d+)?", "money"),
     (r"\d{1,3}(?:,\d{3})+", "number"),
-    (r"\d+(?:\.\d+)?\s*(?:miles?\s*per\s*gallon|mpg|mph|%|hours?|minutes?|months?|days?|years?|weeks?|km|miles?|lbs?|kg|oz|feet|ft)", "measure"),
+    (
+        r"\d+(?:\.\d+)?\s*(?:miles?\s*per\s*gallon|mpg|mph|%|hours?|minutes?|months?|days?|years?|weeks?|km|miles?|lbs?|kg|oz|feet|ft)",
+        "measure",
+    ),
     (r"every\s+\d+-\d+\s+\w+", "frequency"),
     (r"\d+(?:st|nd|rd|th)", "ordinal"),
 ]
@@ -60,12 +66,14 @@ def extract_anchors(sentences: List[str]) -> List[Anchor]:
                 seen.add(key)
                 start = max(0, m.start() - 40)
                 end = min(len(sent), m.end() + 40)
-                anchors.append(Anchor(
-                    text=text,
-                    atype=atype,
-                    sentence_idx=idx,
-                    context=sent[start:end],
-                ))
+                anchors.append(
+                    Anchor(
+                        text=text,
+                        atype=atype,
+                        sentence_idx=idx,
+                        context=sent[start:end],
+                    )
+                )
     return anchors
 
 
@@ -134,7 +142,7 @@ async def step1_route_sections(
         "Group the numbered sentences into topic sections. Return JSON:\n"
         '{"sections": [{"title": "name", "sentence_indices": [0,1]}]}\n\n'
         "Rules:\n"
-        f"- Every index 0-{len(sentences)-1} must appear exactly once\n"
+        f"- Every index 0-{len(sentences) - 1} must appear exactly once\n"
         "- Do NOT group by speaker role. A question and its answer belong to the SAME section\n"
         "- Group by semantic focus or topic\n"
         "- Titles: short, specific, anchored to a named entity"
@@ -162,13 +170,12 @@ async def step1_route_sections(
     if not sections:
         sections = [{"title": "Content", "sentence_indices": list(range(len(sentences)))}]
 
-    logger.info(
-        f"[precise] Step1 routed {len(sentences)} sentences into {len(sections)} sections"
-    )
+    logger.info(f"[precise] Step1 routed {len(sentences)} sentences into {len(sections)} sections")
     return sections
 
 
 # ── Step 2: Per-section compression ───────────────────────────────────
+
 
 async def step2_compress_section(
     section_text: str,
@@ -187,6 +194,7 @@ async def step2_compress_section(
 
 
 # ── Anchor verification & recovery ────────────────────────────────────
+
 
 def verify_and_recover(
     output: str,
@@ -225,6 +233,7 @@ def verify_and_recover(
 
 
 # ── Main entry point ──────────────────────────────────────────────────
+
 
 async def precise_summarize_by_event(
     event_sentences: List[str],
@@ -269,9 +278,7 @@ async def precise_summarize_by_event(
 
         compressed = await step2_compress_section(assembled)
 
-        patched, recovered = verify_and_recover(
-            compressed, set(valid_idxs), event_sentences, anchors
-        )
+        patched, recovered = verify_and_recover(compressed, set(valid_idxs), event_sentences, anchors)
         if recovered:
             logger.info(f"[precise] Recovered {len(recovered)} anchors in [{title}]: {recovered}")
 

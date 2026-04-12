@@ -17,6 +17,7 @@ from m_flow.core import MemoryNode
 # Indexing configuration – the label is the searchable field
 _ENTITY_TYPE_INDEX: Dict[str, Any] = {"index_fields": ["name"]}
 
+
 class EntityType(MemoryNode):
     """
     Categorical label that classifies entities within the knowledge graph.
@@ -43,5 +44,6 @@ class EntityType(MemoryNode):
 
     # Declares which fields are forwarded to the vector-search index
     metadata: dict = Field(default_factory=lambda: dict(_ENTITY_TYPE_INDEX))
+
 
 # Backward compatibility alias

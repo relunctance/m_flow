@@ -69,11 +69,7 @@ class TestLlmSelectEntities:
             facet_entities=[
                 FacetConceptMapping(
                     facet_search_text="test facet",
-                    entities=[
-                        ConceptContextInfo(
-                            name="TestEntity", context_description="Test description"
-                        )
-                    ],
+                    entities=[ConceptContextInfo(name="TestEntity", context_description="Test description")],
                 )
             ]
         )
@@ -184,12 +180,8 @@ class TestLlmWriteEntityDescriptions:
 
         mock_result = ConceptDescriptionResult(
             descriptions=[
-                ConceptDescription(
-                    name="Entity1", description="Description of Entity1", entity_type="Person"
-                ),
-                ConceptDescription(
-                    name="Entity2", description="Description of Entity2", entity_type="Organization"
-                ),
+                ConceptDescription(name="Entity1", description="Description of Entity1", entity_type="Person"),
+                ConceptDescription(name="Entity2", description="Description of Entity2", entity_type="Organization"),
             ]
         )
         mock_gateway.extract_structured = AsyncMock(return_value=mock_result)
@@ -239,9 +231,7 @@ class TestLlmExtractFacetPoints:
                     aliases=["alias1"],
                     description="Description of point 1",
                 ),
-                FacetPointDraft(
-                    search_text="Point 2 text", aliases=[], description="Description of point 2"
-                ),
+                FacetPointDraft(search_text="Point 2 text", aliases=[], description="Description of point 2"),
             ],
         )
         mock_gateway.extract_structured = AsyncMock(return_value=mock_result)
@@ -267,11 +257,7 @@ class TestLlmExtractFacetPoints:
 
         mock_result = FacetPointExtractionResult(
             facet_search_text="test facet",
-            points=[
-                FacetPointDraft(
-                    search_text="New point", aliases=[], description="New point description"
-                )
-            ],
+            points=[FacetPointDraft(search_text="New point", aliases=[], description="New point description")],
         )
         mock_gateway.extract_structured = AsyncMock(return_value=mock_result)
 

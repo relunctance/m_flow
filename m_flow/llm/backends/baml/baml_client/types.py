@@ -17,7 +17,6 @@ import typing_extensions
 from pydantic import BaseModel, ConfigDict
 
 
-
 CheckT = typing_extensions.TypeVar("CheckT")
 CheckName = typing_extensions.TypeVar("CheckName", bound=str)
 

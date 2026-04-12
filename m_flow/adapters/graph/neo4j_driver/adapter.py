@@ -142,9 +142,7 @@ class Neo4jAdapter(GraphProvider):
 
     async def initialize(self) -> None:
         """Create uniqueness constraint on node IDs."""
-        constraint_cypher = (
-            f"CREATE CONSTRAINT IF NOT EXISTS FOR (n:`{_BASE_NODE_LABEL}`) REQUIRE n.id IS UNIQUE;"
-        )
+        constraint_cypher = f"CREATE CONSTRAINT IF NOT EXISTS FOR (n:`{_BASE_NODE_LABEL}`) REQUIRE n.id IS UNIQUE;"
         await self.query(constraint_cypher)
 
     @asynccontextmanager
@@ -160,9 +158,7 @@ class Neo4jAdapter(GraphProvider):
         return not result[0]["has_nodes"] if result else True
 
     @deadlock_retry()
-    async def query(
-        self, query: str, params: Optional[Dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+    async def query(self, query: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         Execute Cypher query with automatic deadlock retry.
 
@@ -504,9 +500,7 @@ class Neo4jAdapter(GraphProvider):
 
         return connections
 
-    async def remove_connection_to_predecessors_of(
-        self, node_ids: list[str], edge_label: str
-    ) -> None:
+    async def remove_connection_to_predecessors_of(self, node_ids: list[str], edge_label: str) -> None:
         """Delete outgoing edges with given label from nodes."""
         cypher = f"""
         UNWIND $ids AS nid
@@ -515,9 +509,7 @@ class Neo4jAdapter(GraphProvider):
         """
         return await self.query(cypher, {"ids": node_ids})
 
-    async def remove_connection_to_successors_of(
-        self, node_ids: list[str], edge_label: str
-    ) -> None:
+    async def remove_connection_to_successors_of(self, node_ids: list[str], edge_label: str) -> None:
         """Delete incoming edges with given label to nodes."""
         cypher = f"""
         UNWIND $ids AS nid
@@ -603,9 +595,7 @@ class Neo4jAdapter(GraphProvider):
         t0 = time.time()
 
         try:
-            node_cypher = (
-                "MATCH (n) RETURN ID(n) AS id, labels(n) AS labels, properties(n) AS props"
-            )
+            node_cypher = "MATCH (n) RETURN ID(n) AS id, labels(n) AS labels, properties(n) AS props"
             node_results = await self.query(node_cypher)
 
             nodes = [(r["props"]["id"], r["props"]) for r in node_results]
@@ -626,9 +616,7 @@ class Neo4jAdapter(GraphProvider):
                 for r in edge_results
             ]
 
-            _log.info(
-                f"Retrieved {len(nodes)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s"
-            )
+            _log.info(f"Retrieved {len(nodes)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s")
             return (nodes, edges)
 
         except Exception as err:
@@ -675,9 +663,7 @@ class Neo4jAdapter(GraphProvider):
                     )
                 )
 
-            _log.info(
-                f"ID-filtered: {len(nodes_map)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s"
-            )
+            _log.info(f"ID-filtered: {len(nodes_map)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s")
             return list(nodes_map.values()), edges
 
         except Exception as err:
@@ -728,9 +714,7 @@ class Neo4jAdapter(GraphProvider):
                 for r in raw_rels
             ]
 
-            _log.info(
-                f"Subgraph [{label}]: {len(nodes)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s"
-            )
+            _log.info(f"Subgraph [{label}]: {len(nodes)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s")
             return nodes, edges
 
         except Exception as err:
@@ -846,9 +830,7 @@ class Neo4jAdapter(GraphProvider):
             "mean_degree": (2 * num_edges / num_nodes) if num_nodes else None,
             "edge_density": await get_edge_density(self),
             "num_connected_components": await get_num_connected_components(self, projection_name),
-            "sizes_of_connected_components": await get_size_of_connected_components(
-                self, projection_name
-            ),
+            "sizes_of_connected_components": await get_size_of_connected_components(self, projection_name),
         }
 
         if extended:
@@ -857,9 +839,7 @@ class Neo4jAdapter(GraphProvider):
                 {
                     "num_selfloops": await count_self_loops(self),
                     "diameter": max(path_lengths) if path_lengths else -1,
-                    "avg_shortest_path_length": (
-                        sum(path_lengths) / len(path_lengths) if path_lengths else -1
-                    ),
+                    "avg_shortest_path_length": (sum(path_lengths) / len(path_lengths) if path_lengths else -1),
                     "avg_clustering": await get_avg_clustering(self, projection_name),
                 }
             )

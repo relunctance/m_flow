@@ -71,9 +71,7 @@ _VECTOR_PROVIDERS: list[dict[str, str]] = [
     {"value": "pgvector", "label": "PGVector"},
 ]
 
-_LLM_PROVIDERS: list[dict[str, str]] = [
-    {"value": p.value, "label": p.value.capitalize()} for p in SupportedProvider
-]
+_LLM_PROVIDERS: list[dict[str, str]] = [{"value": p.value, "label": p.value.capitalize()} for p in SupportedProvider]
 
 _MODEL_CATALOG: dict[str, list[dict[str, str]]] = {
     # Model catalog simplified - frontend uses manual input

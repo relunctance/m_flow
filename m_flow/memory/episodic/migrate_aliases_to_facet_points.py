@@ -275,11 +275,7 @@ async def migrate_aliases_to_facet_points(
             if _is_bad_search_text(alias):
                 stats.points_skipped_bad += 1
                 # Keep as synonym if short
-                if (
-                    len(alias) < 50
-                    and keep_synonyms
-                    and len(synonyms_to_keep) < max_synonyms_to_keep
-                ):
+                if len(alias) < 50 and keep_synonyms and len(synonyms_to_keep) < max_synonyms_to_keep:
                     synonyms_to_keep.append(alias)
                     stats.aliases_retained += 1
                 else:
@@ -343,9 +339,7 @@ async def migrate_aliases_to_facet_points(
             print()
             print(f"[WARN] Found {len(points_to_add)} FacetPoints to migrate.")
             print("   Recommended: Re-run memorize with MFLOW_EPISODIC_ENABLE_FACET_POINTS=true")
-            print(
-                "   The new Stage2 write pipeline will automatically extract FacetPoints from Facet.description."
-            )
+            print("   The new Stage2 write pipeline will automatically extract FacetPoints from Facet.description.")
             print()
             print("   Alternatively, you can manually trigger migration by:")
             print("   1. Delete and re-add your documents")
@@ -355,9 +349,7 @@ async def migrate_aliases_to_facet_points(
         # For now, we don't perform the actual write
         # This is because FacetPoint edges need to be attached to Facet MemoryNodes
         # for persist_memory_nodes to correctly generate the graph structure
-        logger.info(
-            f"Migration identified {len(points_to_add)} FacetPoints from aliases. Re-memorize to apply."
-        )
+        logger.info(f"Migration identified {len(points_to_add)} FacetPoints from aliases. Re-memorize to apply.")
 
     # Summary
     if verbose:
@@ -383,12 +375,8 @@ async def main():
 
     parser = argparse.ArgumentParser(description="Migrate Facet.aliases to FacetPoints")
     parser.add_argument("--dry-run", action="store_true", help="Only report, don't make changes")
-    parser.add_argument(
-        "--no-keep-synonyms", action="store_true", help="Don't keep any synonyms in aliases"
-    )
-    parser.add_argument(
-        "--max-synonyms", type=int, default=3, help="Max synonyms to keep per Facet"
-    )
+    parser.add_argument("--no-keep-synonyms", action="store_true", help="Don't keep any synonyms in aliases")
+    parser.add_argument("--max-synonyms", type=int, default=3, help="Max synonyms to keep per Facet")
     parser.add_argument("--quiet", action="store_true", help="Suppress progress output")
     args = parser.parse_args()
 

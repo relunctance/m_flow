@@ -96,9 +96,7 @@ async def main():
     # Cleanup and verify data storage
     await m_flow.prune.prune_data()
     storage_cfg = get_storage_config()
-    assert not os.path.isdir(storage_cfg["data_root_directory"]), (
-        "Local data directory persists after prune"
-    )
+    assert not os.path.isdir(storage_cfg["data_root_directory"]), "Local data directory persists after prune"
 
     # Cleanup and verify system storage
     await m_flow.prune.prune_system(metadata=True)
@@ -124,13 +122,9 @@ async def main():
     graph_cfg = get_graph_config()
 
     if graph_cfg.graph_database_provider.lower() == "kuzu":
-        assert not os.path.exists(graph_cfg.graph_file_path), (
-            "Kuzu database file persists after cleanup"
-        )
+        assert not os.path.exists(graph_cfg.graph_file_path), "Kuzu database file persists after cleanup"
     else:
-        db_empty = not os.path.exists(graph_cfg.graph_file_path) or not os.listdir(
-            graph_cfg.graph_file_path
-        )
+        db_empty = not os.path.exists(graph_cfg.graph_file_path) or not os.listdir(graph_cfg.graph_file_path)
         assert db_empty, "Graph database directory not empty"
 
     _logger.info("S3 file storage integration test completed")

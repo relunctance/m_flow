@@ -30,6 +30,7 @@ NodeTuple = Tuple[str, NodeProps]  # (node_id, props)
 # Decorator for ledger tracking
 # ---------------------------------------------------------------------------
 
+
 def _track_changes(fn):
     """Record node/edge mutations in the relationship ledger."""
 
@@ -93,6 +94,7 @@ def _track_changes(fn):
 
     return _inner
 
+
 def _resolve_caller() -> str:
     """Walk the call stack to find the first non-wrapper caller."""
     frame = inspect.currentframe()
@@ -107,12 +109,14 @@ def _resolve_caller() -> str:
         frame = parent
     return "unknown"
 
+
 # Alias
 record_graph_changes = _track_changes
 
 # ---------------------------------------------------------------------------
 # Abstract base class
 # ---------------------------------------------------------------------------
+
 
 class GraphProvider(ABC):
     """
@@ -273,16 +277,15 @@ class GraphProvider(ABC):
     async def checkpoint(self) -> None:
         """
         Force durability checkpoint for databases using Write-Ahead Logging (WAL).
-        
+
         Some embedded databases (e.g., Kuzu, SQLite in WAL mode) buffer writes
         in a WAL file before persisting to the main database. This method forces
         a checkpoint to ensure all data is durably stored.
-        
+
         This is a no-op by default for backends that don't require explicit
         checkpointing (e.g., Neo4j, cloud-hosted graph databases).
-        
+
         Should be called after critical write operations (e.g., after memorize)
         to prevent data loss on abnormal shutdown.
         """
         pass  # Default: no-op for databases that auto-checkpoint
-

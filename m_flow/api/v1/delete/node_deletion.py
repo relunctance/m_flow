@@ -35,7 +35,7 @@ async def _verify_dataset_access(dataset_id: UUID, user: User) -> None:
     authorized = await get_authorized_existing_datasets([dataset_id], "delete", user)
     if not authorized:
         raise PermissionDeniedError(f"No delete permission on dataset: {dataset_id}")
-    
+
     target_dataset = authorized[0]
     await set_db_context(target_dataset.id, target_dataset.owner_id)
 
@@ -47,38 +47,35 @@ async def preview_deletion(
 ) -> Dict:
     """
     Preview deletion impact (does not execute deletion).
-    
+
     Returns node info, edge count, associated node types, etc.
     """
     if user is None:
         user = await get_seed_user()
-    
+
     await _verify_dataset_access(dataset_id, user)
-    
+
     graph = await get_graph_provider()
-    
+
     node = await graph.get_node(node_id)
     if not node:
         raise NodeNotFoundError(f"Node not found: {node_id}")
-    
+
     node_dataset_id = node.get("dataset_id")
     if node_dataset_id and str(node_dataset_id) != str(dataset_id):
-        raise PermissionDeniedError(
-            f"Node {node_id} belongs to dataset {node_dataset_id}, "
-            f"not {dataset_id}"
-        )
-    
+        raise PermissionDeniedError(f"Node {node_id} belongs to dataset {node_dataset_id}, not {dataset_id}")
+
     edges = await graph.get_edges(node_id)
     neighbor_types = set()
     for src_props, rel_name, dst_props in edges:
         if isinstance(dst_props, dict):
             neighbor_types.add(dst_props.get("type", "Unknown"))
-    
+
     node_type = node.get("type", "Unknown")
-    
+
     all_collections = _discover_vector_collections()
     vector_collections = [c for c in all_collections if c.startswith(f"{node_type}_")]
-    
+
     # Build warning message
     if node_type in ["Entity", "Entity"]:
         # Shared node: cannot delete directly
@@ -89,9 +86,11 @@ async def preview_deletion(
         can_delete = False
     else:
         # Regular node: can delete
-        warning = f"Deleting this node will disconnect {len(edges)} edges" if edges else "This node has no associated edges"
+        warning = (
+            f"Deleting this node will disconnect {len(edges)} edges" if edges else "This node has no associated edges"
+        )
         can_delete = True
-    
+
     return {
         "node_id": node_id,
         "node_type": node_type,
@@ -107,14 +106,14 @@ async def preview_deletion(
 async def _update_ledger_deleted_at(node_ids: List[UUID]) -> None:
     """
     Update deletion timestamp in audit log.
-    
+
     Note: Caller must first convert string IDs to UUID using _convert_to_uuid().
     """
     if not node_ids:
         return
-    
+
     db = get_db_adapter()
-    
+
     async with db.get_async_session() as sess:
         ledger_update = (
             update(GraphRelationshipLedger)
@@ -128,7 +127,7 @@ async def _update_ledger_deleted_at(node_ids: List[UUID]) -> None:
         )
         await sess.execute(ledger_update)
         await sess.commit()
-    
+
     _log.info(f"[delete] Updated ledger deleted_at for {len(node_ids)} nodes")
 
 
@@ -140,7 +139,7 @@ async def delete_node_by_id(
 ) -> Dict:
     """
     Generic node deletion.
-    
+
     Complete deletion flow:
     1. Verify node exists and belongs to specified dataset
     2. Delete from graph database (DETACH DELETE)
@@ -151,36 +150,33 @@ async def delete_node_by_id(
     """
     if user is None:
         user = await get_seed_user()
-    
+
     await _verify_dataset_access(dataset_id, user)
-    
+
     graph = await get_graph_provider()
-    
+
     node = await graph.get_node(node_id)
     if not node:
         raise NodeNotFoundError(f"Node not found: {node_id}")
-    
+
     node_dataset_id = node.get("dataset_id")
     node_type = node.get("type", "")
-    
+
     if node_dataset_id:
         if str(node_dataset_id) != str(dataset_id):
-            raise PermissionDeniedError(
-                f"Node {node_id} belongs to dataset {node_dataset_id}, "
-                f"not {dataset_id}"
-            )
+            raise PermissionDeniedError(f"Node {node_id} belongs to dataset {node_dataset_id}, not {dataset_id}")
     else:
         if node_type in ["Entity", "Entity"]:
             raise PermissionDeniedError(
                 f"Cannot directly delete shared {node_type} node. "
                 f"Use hard mode to clean up orphan nodes after deleting Episodes."
             )
-    
+
     deleted_ids = [node_id]
-    
+
     await graph.delete_node(node_id)
     _log.info(f"[delete] Deleted {node_type} node: {node_id}")
-    
+
     if cascade:
         if node_type == "Episode":
             # Safety: only clean up degree-0 orphan Facets under current dataset
@@ -194,7 +190,7 @@ async def delete_node_by_id(
             RETURN f.id as id
             """
             orphan_result = await graph.query(orphan_facet_query)
-            for row in (orphan_result or []):
+            for row in orphan_result or []:
                 fid = row[0] if row else None
                 if fid:
                     # Python-layer filtering of dataset_id (extracted from properties JSON)
@@ -209,7 +205,7 @@ async def delete_node_by_id(
                     await graph.delete_node(fid)
                     deleted_ids.append(fid)
                     _log.info(f"[delete] Cascade deleted orphan Facet: {fid}")
-            
+
             orphan_point_query = """
             MATCH (fp:Node {type: "FacetPoint"})
             WITH fp, COUNT { MATCH (fp)--() } as degree
@@ -217,13 +213,13 @@ async def delete_node_by_id(
             RETURN fp.id as id
             """
             orphan_fp_result = await graph.query(orphan_point_query)
-            for row in (orphan_fp_result or []):
+            for row in orphan_fp_result or []:
                 fpid = row[0] if row else None
                 if fpid:
                     await graph.delete_node(fpid)
                     deleted_ids.append(fpid)
                     _log.info(f"[delete] Cascade deleted orphan FacetPoint: {fpid}")
-            
+
             for entity_type in ["Entity", "Entity"]:
                 orphan_entity_query = f"""
                 MATCH (e:Node {{type: "{entity_type}"}})
@@ -232,13 +228,13 @@ async def delete_node_by_id(
                 RETURN e.id as id
                 """
                 orphan_entity_result = await graph.query(orphan_entity_query)
-                for row in (orphan_entity_result or []):
+                for row in orphan_entity_result or []:
                     eid = row[0] if row else None
                     if eid:
                         await graph.delete_node(eid)
                         deleted_ids.append(eid)
                         _log.info(f"[delete] Cascade deleted orphan {entity_type}: {eid}")
-        
+
         elif node_type == "Facet":
             # FacetPoints don't have dataset_id, but only become orphaned after associated Facet is deleted
             # For safety, only clean up FacetPoints that were associated with current dataset's Facets
@@ -250,30 +246,30 @@ async def delete_node_by_id(
             RETURN fp.id as id
             """
             orphan_result = await graph.query(orphan_point_query)
-            for row in (orphan_result or []):
+            for row in orphan_result or []:
                 fpid = row[0] if row else None
                 if fpid:
                     await graph.delete_node(fpid)
                     deleted_ids.append(fpid)
                     _log.info(f"[delete] Cascade deleted orphan FacetPoint: {fpid}")
-    
+
     uuid_list: list[UUID] = []
     for nid in deleted_ids:
         converted = _convert_to_uuid(nid)
         if converted:
             uuid_list.append(converted)
-    
+
     if uuid_list:
         try:
             await _purge_from_vector_store(uuid_list)
         except Exception as e:
             _log.warning(f"[delete] Vector cleanup failed (non-blocking): {e}")
-    
+
     try:
         await _update_ledger_deleted_at(uuid_list)
     except Exception as e:
         _log.warning(f"[delete] Ledger update failed (non-blocking): {e}")
-    
+
     return {
         "status": "success",
         "node_id": node_id,
@@ -292,10 +288,10 @@ async def delete_episode(
 ) -> Dict:
     """
     Delete Episode node.
-    
+
     Note: Uses DETACH DELETE, does not delete associated Facet/Entity
     (they may be shared by other Episodes).
-    
+
     Args:
         episode_id: Episode node ID.
         dataset_id: Dataset ID.

@@ -48,17 +48,11 @@ async def get_pipeline_runs_by_dataset(dataset_id: UUID) -> list[WorkflowRun]:
             .label("_recency_rank")
         )
 
-        windowed_subquery = (
-            select(WorkflowRun, recency_rank)
-            .where(WorkflowRun.dataset_id == dataset_id)
-            .subquery()
-        )
+        windowed_subquery = select(WorkflowRun, recency_rank).where(WorkflowRun.dataset_id == dataset_id).subquery()
 
         run_alias = aliased(WorkflowRun, windowed_subquery)
 
-        top_runs_stmt = select(run_alias).where(
-            windowed_subquery.c._recency_rank == 1
-        )
+        top_runs_stmt = select(run_alias).where(windowed_subquery.c._recency_rank == 1)
 
         cursor = await db_session.execute(top_runs_stmt)
         latest_runs = list(cursor.scalars().all())

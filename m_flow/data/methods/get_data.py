@@ -47,8 +47,6 @@ async def get_data(user_id: UUID, data_id: UUID) -> Optional[Data]:
 
         # Check ownership if record exists
         if data_record is not None and data_record.owner_id != user_id:
-            raise UnauthorizedDataAccessError(
-                message=f"User {user_id} is not authorized to access data {data_id}"
-            )
+            raise UnauthorizedDataAccessError(message=f"User {user_id} is not authorized to access data {data_id}")
 
         return data_record

@@ -303,9 +303,7 @@ def compute_episode_bundles(
 
 def get_edge_relationship(edge: Edge) -> str:
     """Get edge relationship name"""
-    return (
-        edge.attributes.get("relationship_name") or edge.attributes.get("relationship_type") or ""
-    )
+    return edge.attributes.get("relationship_name") or edge.attributes.get("relationship_type") or ""
 
 
 # Backward compatibility alias

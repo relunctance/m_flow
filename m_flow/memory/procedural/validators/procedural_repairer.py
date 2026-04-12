@@ -148,9 +148,7 @@ def _repair_issue(
 
     if code == "STEPS_PACK_HAS_SEARCH_TEXT":
         if bundle.steps_pack:
-            bundle.steps_pack["search_text"] = _extract_search_text(
-                bundle.steps_pack.get("anchor_text") or bundle.name
-            )
+            bundle.steps_pack["search_text"] = _extract_search_text(bundle.steps_pack.get("anchor_text") or bundle.name)
             return {"action": RepairAction.REBUILD, "detail": "generated search_text from anchor"}
 
     if code == "STEPS_PACK_HAS_ANCHOR_TEXT":

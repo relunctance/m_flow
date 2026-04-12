@@ -18,6 +18,7 @@ from .supported_databases import supported_databases
 # Public async factory
 # ---------------------------------------------------------------------------
 
+
 async def get_graph_provider() -> GraphProvider:
     """
     Resolve configuration and return an initialised graph adapter.
@@ -33,9 +34,11 @@ async def get_graph_provider() -> GraphProvider:
 
     return adapter
 
+
 # ---------------------------------------------------------------------------
 # Cached sync builder
 # ---------------------------------------------------------------------------
+
 
 @lru_cache(maxsize=8)
 def _build_adapter(
@@ -125,21 +128,23 @@ def _build_adapter(
         "neptune",
         "neptune_analytics",
     ]
-    raise EnvironmentError(
-        f"Unknown graph provider '{graph_database_provider}'. Supported: {', '.join(known)}"
-    )
+    raise EnvironmentError(f"Unknown graph provider '{graph_database_provider}'. Supported: {', '.join(known)}")
+
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _require(val: Optional[str], label: str) -> None:
     if not val:
         raise EnvironmentError(f"Missing required configuration: {label}")
 
+
 def _validate_prefix(url: str, prefix: str) -> None:
     if not url.startswith(prefix):
         raise ValueError(f"URL must start with '{prefix}'")
+
 
 def _ensure_langchain_aws() -> None:
     try:
@@ -148,5 +153,6 @@ def _ensure_langchain_aws() -> None:
         raise ImportError(
             "langchain_aws is required for Neptune support. Install with: pip install langchain_aws"
         ) from exc
+
 
 # Backward-compatible aliases (deprecated)

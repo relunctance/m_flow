@@ -31,9 +31,7 @@ class BamlCallOptions(typing.TypedDict, total=False):
         typing.Union[baml_py.baml_py.Collector, typing.List[baml_py.baml_py.Collector]]
     ]
     abort_controller: typing_extensions.NotRequired[baml_py.baml_py.AbortController]
-    on_tick: typing_extensions.NotRequired[
-        typing.Callable[[str, baml_py.baml_py.FunctionLog], None]
-    ]
+    on_tick: typing_extensions.NotRequired[typing.Callable[[str, baml_py.baml_py.FunctionLog], None]]
 
 
 class _ResolvedBamlOptions:
@@ -81,13 +79,7 @@ class DoNotUseDirectlyCallManager:
             baml_tb = None
         client_registry = self.__baml_options.get("client_registry")
         collector = self.__baml_options.get("collector")
-        collectors_as_list = (
-            collector
-            if isinstance(collector, list)
-            else [collector]
-            if collector is not None
-            else []
-        )
+        collectors_as_list = collector if isinstance(collector, list) else [collector] if collector is not None else []
         env_vars = os.environ.copy()
         for k, v in self.__baml_options.get("env", {}).items():
             if v is not None:
@@ -127,10 +119,7 @@ class DoNotUseDirectlyCallManager:
         resolved_options = self.__resolve()
 
         # Check if already aborted
-        if (
-            resolved_options.abort_controller is not None
-            and resolved_options.abort_controller.aborted
-        ):
+        if resolved_options.abort_controller is not None and resolved_options.abort_controller.aborted:
             raise Exception("BamlAbortError: Operation was aborted")
 
         return await __runtime__.call_function(
@@ -156,10 +145,7 @@ class DoNotUseDirectlyCallManager:
         resolved_options = self.__resolve()
 
         # Check if already aborted
-        if (
-            resolved_options.abort_controller is not None
-            and resolved_options.abort_controller.aborted
-        ):
+        if resolved_options.abort_controller is not None and resolved_options.abort_controller.aborted:
             raise Exception("BamlAbortError: Operation was aborted")
 
         ctx = __ctx__manager__.get()
@@ -214,14 +200,10 @@ class DoNotUseDirectlyCallManager:
         *,
         function_name: str,
         args: typing.Dict[str, typing.Any],
-    ) -> typing.Tuple[
-        baml_py.baml_py.RuntimeContextManager, baml_py.baml_py.SyncFunctionResultStream
-    ]:
+    ) -> typing.Tuple[baml_py.baml_py.RuntimeContextManager, baml_py.baml_py.SyncFunctionResultStream]:
         resolved_options = self.__resolve()
         if resolved_options.on_tick is not None:
-            raise ValueError(
-                "on_tick is not supported for sync streams. Please use async streams instead."
-            )
+            raise ValueError("on_tick is not supported for sync streams. Please use async streams instead.")
         ctx = __ctx__manager__.get()
         result = __runtime__.stream_function_sync(
             function_name,

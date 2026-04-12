@@ -9,6 +9,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
 
+
 class VectorSearchHit(BaseModel):
     """
     Single hit returned by a vector similarity search.
@@ -45,5 +46,6 @@ class VectorSearchHit(BaseModel):
             f"raw={self.raw_distance}, "
             f"coll={self.collection_name})"
         )
+
 
 # Backward-compatible alias

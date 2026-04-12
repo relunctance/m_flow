@@ -20,45 +20,136 @@ from m_flow.shared.enums import ContentType
 
 
 # Known non-dialog prefixes that look like "Label: content"
-_NON_DIALOG_PREFIXES = frozenset([
-    # Code/documentation labels
-    'note', 'warning', 'error', 'todo', 'fixme', 'hack', 'xxx',
-    'tip', 'hint', 'example', 'usage', 'syntax', 'output', 'input',
-    'step', 'result', 'conclusion', 'introduction', 'method', 'abstract',
-    'summary', 'description', 'definition', 'explanation', 'answer', 'question',
-    # Config/data keys
-    'key', 'value', 'name', 'type', 'id', 'url', 'path', 'file', 'host', 'port',
-    'database', 'server', 'client', 'user', 'password', 'config', 'setting',
-    'version', 'date', 'time', 'status', 'state', 'mode', 'level', 'priority',
-    'category', 'tag', 'label', 'title', 'author', 'source', 'target', 'from', 'to',
-    # Programming/API docs
-    'returns', 'return', 'param', 'params', 'args', 'kwargs', 'raises', 'yields',
-    # Programming languages and tech terms (often used as "Python: description")
-    'python', 'java', 'javascript', 'typescript', 'rust', 'go', 'ruby', 'php',
-    'swift', 'kotlin', 'scala', 'perl', 'bash', 'shell', 'sql', 'html', 'css',
-    'react', 'vue', 'angular', 'node', 'django', 'flask', 'spring', 'docker',
-    'kubernetes', 'aws', 'azure', 'gcp', 'linux', 'windows', 'macos', 'android', 'ios',
-])
+_NON_DIALOG_PREFIXES = frozenset(
+    [
+        # Code/documentation labels
+        "note",
+        "warning",
+        "error",
+        "todo",
+        "fixme",
+        "hack",
+        "xxx",
+        "tip",
+        "hint",
+        "example",
+        "usage",
+        "syntax",
+        "output",
+        "input",
+        "step",
+        "result",
+        "conclusion",
+        "introduction",
+        "method",
+        "abstract",
+        "summary",
+        "description",
+        "definition",
+        "explanation",
+        "answer",
+        "question",
+        # Config/data keys
+        "key",
+        "value",
+        "name",
+        "type",
+        "id",
+        "url",
+        "path",
+        "file",
+        "host",
+        "port",
+        "database",
+        "server",
+        "client",
+        "user",
+        "password",
+        "config",
+        "setting",
+        "version",
+        "date",
+        "time",
+        "status",
+        "state",
+        "mode",
+        "level",
+        "priority",
+        "category",
+        "tag",
+        "label",
+        "title",
+        "author",
+        "source",
+        "target",
+        "from",
+        "to",
+        # Programming/API docs
+        "returns",
+        "return",
+        "param",
+        "params",
+        "args",
+        "kwargs",
+        "raises",
+        "yields",
+        # Programming languages and tech terms (often used as "Python: description")
+        "python",
+        "java",
+        "javascript",
+        "typescript",
+        "rust",
+        "go",
+        "ruby",
+        "php",
+        "swift",
+        "kotlin",
+        "scala",
+        "perl",
+        "bash",
+        "shell",
+        "sql",
+        "html",
+        "css",
+        "react",
+        "vue",
+        "angular",
+        "node",
+        "django",
+        "flask",
+        "spring",
+        "docker",
+        "kubernetes",
+        "aws",
+        "azure",
+        "gcp",
+        "linux",
+        "windows",
+        "macos",
+        "android",
+        "ios",
+    ]
+)
 
 # Dialog line pattern - stricter matching for conversation format
 # Requires: [timestamp] SpeakerName: message (with proper name capitalization)
 _DIALOG_WITH_TIMESTAMP = re.compile(
-    r'^\s*'                           # Optional leading whitespace
-    r'\[.+?\]\s*'                     # Required timestamp in brackets
-    r'[A-Z][a-zA-Z\'\-]*'             # Speaker name (capitalized, letters only)
-    r'(?:\s+[A-Z][a-zA-Z\'\-]*)*'     # Optional additional name parts
-    r'\s*:\s*'                        # Colon separator
-    r'.{10,}',                        # Message content (at least 10 chars)
-    re.MULTILINE
+    r"^\s*"  # Optional leading whitespace
+    r"\[.+?\]\s*"  # Required timestamp in brackets
+    r"[A-Z][a-zA-Z\'\-]*"  # Speaker name (capitalized, letters only)
+    r"(?:\s+[A-Z][a-zA-Z\'\-]*)*"  # Optional additional name parts
+    r"\s*:\s*"  # Colon separator
+    r".{10,}",  # Message content (at least 10 chars)
+    re.MULTILINE,
 )
 
 # Simple dialog: "SpeakerName: message" without timestamp
 _DIALOG_SIMPLE = re.compile(
-    r'^\s*'                           # Optional leading whitespace
-    r'[A-Z][a-zA-Z\'\-]{1,15}'        # Speaker name (capitalized, 2-16 chars)
-    r'\s*:\s*'                        # Colon separator
-    r'.{10,}',                        # Message content (at least 10 chars)
-    re.MULTILINE
+    r"^\s*"  # Optional leading whitespace
+    r"[A-Z][a-zA-Z\'\-]{1,15}"  # Speaker name (capitalized, 2-16 chars)
+    r"\s*:\s*"  # Colon separator
+    r".{10,}",  # Message content (at least 10 chars)
+    re.MULTILINE,
 )
 
 
@@ -70,7 +161,7 @@ def _is_dialog_line(line: str) -> bool:
     # Check simple format
     if _DIALOG_SIMPLE.match(line):
         # Verify it's not a known non-dialog prefix
-        match = re.match(r'^\s*([A-Z][a-zA-Z\'\-]{1,15})\s*:', line)
+        match = re.match(r"^\s*([A-Z][a-zA-Z\'\-]{1,15})\s*:", line)
         if match and match.group(1).lower() not in _NON_DIALOG_PREFIXES:
             return True
     return False
@@ -79,30 +170,30 @@ def _is_dialog_line(line: str) -> bool:
 def _split_dialog(text: str) -> List[str]:
     """
     Split dialog text by speaker utterances.
-    
+
     Each speaker's complete utterance (even if containing multiple sentences)
     is kept as one unit to preserve speaker attribution.
-    
+
     Args:
         text: Dialog text
-        
+
     Returns:
         List of utterances (one per speaker turn)
     """
-    lines = text.split('\n')
+    lines = text.split("\n")
     utterances = []
     current_utterance = []
-    
+
     for line in lines:
         stripped = line.strip()
         if not stripped:
             continue
-            
+
         # Check if this line starts a new speaker's turn
         if _is_dialog_line(stripped):
             # Save previous utterance if exists
             if current_utterance:
-                utterances.append(' '.join(current_utterance))
+                utterances.append(" ".join(current_utterance))
             current_utterance = [stripped]
         else:
             # Continuation of current speaker's utterance
@@ -112,11 +203,11 @@ def _split_dialog(text: str) -> List[str]:
             else:
                 # Orphan line without speaker, treat as standalone
                 utterances.append(stripped)
-    
+
     # Don't forget the last utterance
     if current_utterance:
-        utterances.append(' '.join(current_utterance))
-    
+        utterances.append(" ".join(current_utterance))
+
     return utterances
 
 
@@ -143,13 +234,13 @@ def smart_split_sentences(
 
         >>> smart_split_sentences("你好世界。这是测试。")
         ['你好世界。', '这是测试。']
-        
+
         >>> smart_split_sentences(
         ...     "[10:00] Alice: Hi! How are you?\\n[10:01] Bob: I'm good!",
         ...     content_type=ContentType.DIALOG
         ... )
         ['[10:00] Alice: Hi! How are you?', "[10:01] Bob: I'm good!"]
-    
+
     Note:
         When enable_content_routing=True (default), content_type must be
         explicitly declared in ingest()/memorize() calls.

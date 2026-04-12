@@ -127,7 +127,7 @@ async def _search_collection(
     where_filter: Optional[str] = None,
 ):
     """Safe search with collection not found handling.
-    
+
     Args:
         vector_engine: Vector database engine
         collection: Collection name to search
@@ -381,9 +381,7 @@ async def route_episode_id_for_doc(
     """
     # Deprecation warning for removed parameters
     if top_entity_ids or top_entity_names:
-        logger.debug(
-            "[route_episode_id_for_doc] top_entity_ids/top_entity_names are deprecated and ignored"
-        )
+        logger.debug("[route_episode_id_for_doc] top_entity_ids/top_entity_names are deprecated and ignored")
 
     # Enable switch
     if not _as_bool_env("MFLOW_EPISODIC_ENABLE_ROUTING", True):
@@ -397,9 +395,7 @@ async def route_episode_id_for_doc(
     # Config defaults
     episode_summary_k = episode_summary_k or _as_int_env("MFLOW_EPISODIC_ROUTING_SUMMARY_K", 25)
     facet_k = facet_k or _as_int_env("MFLOW_EPISODIC_ROUTING_FACET_K", 35)
-    max_candidates_for_llm = max_candidates_for_llm or _as_int_env(
-        "MFLOW_EPISODIC_ROUTING_MAX_CANDIDATES", 5
-    )
+    max_candidates_for_llm = max_candidates_for_llm or _as_int_env("MFLOW_EPISODIC_ROUTING_MAX_CANDIDATES", 5)
     if use_llm is None:
         use_llm = _as_bool_env("MFLOW_EPISODIC_ROUTING_USE_LLM", True)
 
@@ -436,9 +432,9 @@ async def route_episode_id_for_doc(
     async def _safe_search(coll):
         if coll not in existing_collections:
             return []
-        return await _search_collection(vector_engine, coll, query_vector,
-                                        episode_summary_k if coll == "Episode_summary" else facet_k,
-                                        where_filter)
+        return await _search_collection(
+            vector_engine, coll, query_vector, episode_summary_k if coll == "Episode_summary" else facet_k, where_filter
+        )
 
     episode_res, facet_res, anchor_res = await asyncio.gather(
         _safe_search("Episode_summary"),
@@ -465,9 +461,7 @@ async def route_episode_id_for_doc(
     # 3) Facet -> Episode
     facet_ids = [str(getattr(r, "id", "") or "") for r in (facet_res or [])]
     facet_ids = [x for x in facet_ids if x][: min(12, facet_k)]
-    facet_maps = await asyncio.gather(
-        *[_neighbor_episode_ids(graph_engine, fid, "has_facet") for fid in facet_ids]
-    )
+    facet_maps = await asyncio.gather(*[_neighbor_episode_ids(graph_engine, fid, "has_facet") for fid in facet_ids])
     for rank, eps in enumerate(facet_maps):
         for ep_id in eps:
             c = get(ep_id)
@@ -477,9 +471,7 @@ async def route_episode_id_for_doc(
     # 4) Anchor facet -> Episode
     anchor_ids = [str(getattr(r, "id", "") or "") for r in (anchor_res or [])]
     anchor_ids = [x for x in anchor_ids if x][: min(12, facet_k)]
-    anchor_maps = await asyncio.gather(
-        *[_neighbor_episode_ids(graph_engine, fid, "has_facet") for fid in anchor_ids]
-    )
+    anchor_maps = await asyncio.gather(*[_neighbor_episode_ids(graph_engine, fid, "has_facet") for fid in anchor_ids])
     for rank, eps in enumerate(anchor_maps):
         for ep_id in eps:
             c = get(ep_id)
@@ -499,17 +491,13 @@ async def route_episode_id_for_doc(
         }
 
     # Sort by combined signal strength (lower rank is better)
-    valid_candidates.sort(
-        key=lambda x: min(x.summary_rank, x.facet_rank, x.anchor_rank)
-    )
+    valid_candidates.sort(key=lambda x: min(x.summary_rank, x.facet_rank, x.anchor_rank))
 
     # Take top candidates for LLM
     top_candidates = valid_candidates[:max_candidates_for_llm]
 
     # 6) Fetch detailed info for top candidates
-    details_list = await asyncio.gather(
-        *[_fetch_episode_details(graph_engine, c.episode_id) for c in top_candidates]
-    )
+    details_list = await asyncio.gather(*[_fetch_episode_details(graph_engine, c.episode_id) for c in top_candidates])
     for c, details in zip(top_candidates, details_list, strict=True):
         c.episode_name = details.get("name") or ""
         c.episode_summary = details.get("summary") or ""
@@ -528,14 +516,14 @@ async def route_episode_id_for_doc(
             candidate_nodeset_id = details.get("nodeset_id")
             if candidate_nodeset_id == target_nodeset_id:
                 filtered_candidates.append(c)
-        
+
         if len(filtered_candidates) < len(top_candidates):
             logger.info(
                 f"[router] Filtered {len(top_candidates) - len(filtered_candidates)} candidates "
                 f"by nodeset, {len(filtered_candidates)} remaining"
             )
         top_candidates = filtered_candidates
-        
+
         if not top_candidates:
             return default_episode_id, {
                 "reason": "no_candidates_in_nodeset",
@@ -573,9 +561,7 @@ async def route_episode_id_for_doc(
                     "routing_text_preview": routing_text[:400],
                 }
             else:
-                logger.warning(
-                    f"[router] LLM returned invalid target_episode_id: {decision.target_episode_id}"
-                )
+                logger.warning(f"[router] LLM returned invalid target_episode_id: {decision.target_episode_id}")
 
         # CREATE_NEW or invalid merge target
         return default_episode_id, {

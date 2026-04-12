@@ -127,10 +127,10 @@ def _build_has_facet_edges(
             doc_created_at = None
             if hasattr(ch, "is_part_of") and ch.is_part_of:
                 doc_created_at = getattr(ch.is_part_of, "created_at", None)
-            
+
             # Priority 2: Fall back to ContentFragment.created_at
             ch_created_at = doc_created_at or getattr(ch, "created_at", None)
-            
+
             if ch_created_at is not None:
                 if earliest_chunk_created_at is None or ch_created_at < earliest_chunk_created_at:
                     earliest_chunk_created_at = ch_created_at
@@ -210,8 +210,7 @@ def _build_has_facet_edges(
                 if is_bad_alias(stp, max_len=0):
                     _debug_filtered_reasons["bad_alias"] += 1
                     logger.warning(
-                        f"[episodic] FacetPoint filtered (bad_alias): len={len(stp)}, "
-                        f"text='{stp[:80]}...'"
+                        f"[episodic] FacetPoint filtered (bad_alias): len={len(stp)}, text='{stp[:80]}...'"
                         if len(stp) > 80
                         else f"[episodic] FacetPoint filtered (bad_alias): len={len(stp)}, text='{stp}'"
                     )
@@ -224,9 +223,7 @@ def _build_has_facet_edges(
 
                 if k == normalize_for_compare(upd.search_text):
                     _debug_filtered_reasons["same_as_facet"] += 1
-                    logger.debug(
-                        f"[episodic] FacetPoint filtered (same_as_facet): '{stp}' == '{upd.search_text}'"
-                    )
+                    logger.debug(f"[episodic] FacetPoint filtered (same_as_facet): '{stp}' == '{upd.search_text}'")
                     continue
 
                 seen_norm.add(k)
@@ -249,8 +246,7 @@ def _build_has_facet_edges(
 
                 if point_time_fields and point_time_fields.get("mentioned_time_start_ms"):
                     logger.debug(
-                        f"[TIME_PROPAGATION] Step 3: FacetPoint created point={point_id[:12]}..., "
-                        f"has_time=True"
+                        f"[TIME_PROPAGATION] Step 3: FacetPoint created point={point_id[:12]}..., has_time=True"
                     )
 
                 if has_point_edges is None:
@@ -499,8 +495,7 @@ def _queue_facet_entity_edges(
                 edges_queued += 1
 
         logger.debug(
-            f"[episodic] Matched {len(entity_to_facets)} entities to facets, "
-            f"queued {edges_queued} Facet-Entity edges"
+            f"[episodic] Matched {len(entity_to_facets)} entities to facets, queued {edges_queued} Facet-Entity edges"
         )
 
     return edges_queued
@@ -658,12 +653,10 @@ def _create_episode(
         dataset_id=dataset_id,
         mentioned_time_start_ms=merged_time.get("mentioned_time_start_ms") if merged_time else None,
         mentioned_time_end_ms=merged_time.get("mentioned_time_end_ms") if merged_time else None,
-        mentioned_time_confidence=merged_time.get("mentioned_time_confidence")
-        if merged_time
-        else None,
+        mentioned_time_confidence=merged_time.get("mentioned_time_confidence") if merged_time else None,
         mentioned_time_text=merged_time.get("mentioned_time_text") if merged_time else None,
     )
-    
+
     # Set created_at from source content (preserves historical timestamp)
     if created_at is not None:
         episode_dp.created_at = created_at

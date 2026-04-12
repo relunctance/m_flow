@@ -23,6 +23,7 @@ from m_flow.ingestion.documents.exceptions import (
     InvalidChunkerError,
 )
 
+
 async def update_document_token_count(document_id: UUID, token_count: int) -> None:
     """
     Update the token count for a document in the database.
@@ -51,6 +52,7 @@ async def update_document_token_count(document_id: UUID, token_count: int) -> No
         doc_record.token_count = token_count
         await session.merge(doc_record)
         await session.commit()
+
 
 async def segment_documents(
     documents: list[Document],
@@ -119,4 +121,3 @@ async def segment_documents(
 
         # Persist token count
         await update_document_token_count(doc.id, total_tokens)
-

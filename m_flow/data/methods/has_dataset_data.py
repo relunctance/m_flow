@@ -33,11 +33,7 @@ async def has_dataset_data(dataset_id: UUID) -> bool:
     relational_adapter = get_db_adapter()
 
     async with relational_adapter.get_async_session() as db_session:
-        existence_clause = (
-            select(
-                exists().where(DatasetEntry.dataset_id == dataset_id)
-            )
-        )
+        existence_clause = select(exists().where(DatasetEntry.dataset_id == dataset_id))
 
         outcome = await db_session.execute(existence_clause)
         data_present = outcome.scalar_one()

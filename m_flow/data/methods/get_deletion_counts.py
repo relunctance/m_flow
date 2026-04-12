@@ -70,9 +70,7 @@ async def _count_dataset_deletion(session, name: str, counts) -> DeletionCountsP
         raise CliCommandException(f"Dataset not found: {name}", error_code=1)
 
     entry_count = (
-        await session.execute(
-            select(func.count()).select_from(DatasetEntry).where(DatasetEntry.dataset_id == ds.id)
-        )
+        await session.execute(select(func.count()).select_from(DatasetEntry).where(DatasetEntry.dataset_id == ds.id))
     ).scalar_one()
 
     counts.users = 1
@@ -83,13 +81,9 @@ async def _count_dataset_deletion(session, name: str, counts) -> DeletionCountsP
 
 async def _count_all_deletion(session, counts) -> DeletionCountsPreview:
     """Count all items in system."""
-    counts.datasets = (
-        await session.execute(select(func.count()).select_from(Dataset))
-    ).scalar_one()
+    counts.datasets = (await session.execute(select(func.count()).select_from(Dataset))).scalar_one()
 
-    counts.data_entries = (
-        await session.execute(select(func.count()).select_from(Data))
-    ).scalar_one()
+    counts.data_entries = (await session.execute(select(func.count()).select_from(Data))).scalar_one()
 
     counts.users = (await session.execute(select(func.count()).select_from(User))).scalar_one()
 
@@ -106,9 +100,7 @@ async def _count_user_deletion(session, user_id_str: str, counts) -> DeletionCou
 
     counts.users = 1
 
-    datasets = (
-        (await session.execute(select(Dataset).where(Dataset.owner_id == user.id))).scalars().all()
-    )
+    datasets = (await session.execute(select(Dataset).where(Dataset.owner_id == user.id))).scalars().all()
 
     counts.datasets = len(datasets)
 
@@ -116,9 +108,7 @@ async def _count_user_deletion(session, user_id_str: str, counts) -> DeletionCou
         ds_ids = [d.id for d in datasets]
         counts.data_entries = (
             await session.execute(
-                select(func.count())
-                .select_from(DatasetEntry)
-                .where(DatasetEntry.dataset_id.in_(ds_ids))
+                select(func.count()).select_from(DatasetEntry).where(DatasetEntry.dataset_id.in_(ds_ids))
             )
         ).scalar_one()
     else:

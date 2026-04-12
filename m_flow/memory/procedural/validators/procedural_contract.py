@@ -125,12 +125,7 @@ class ProcedureContract:
     def _check_context_has_boundary(p: dict) -> bool:
         ctx = p.get("context_pack") or {}
         desc = (ctx.get("description") or ctx.get("anchor_text") or "").lower()
-        return (
-            "boundary:" in desc
-            or "boundary：" in desc
-            or "边界" in desc
-            or ctx.get("boundary_text")
-        )
+        return "boundary:" in desc or "boundary：" in desc or "边界" in desc or ctx.get("boundary_text")
 
     CONTEXT_RULES = {
         "CONTEXT_HAS_WHEN": {

@@ -80,12 +80,8 @@ class OrchestratorConfig:
             atomic_top_k=int(os.getenv("MFLOW_ATOMIC_TOP_K", "6")),
             episodic_top_k=int(os.getenv("MFLOW_EPISODIC_TOP_K", "4")),
             procedural_top_k=int(os.getenv("MFLOW_PROCEDURAL_TOP_K", "2")),
-            procedural_intent_procedural_top_k=int(
-                os.getenv("MFLOW_PROCEDURAL_INTENT_PROCEDURAL_TOP_K", "5")
-            ),
-            procedural_intent_episodic_top_k=int(
-                os.getenv("MFLOW_PROCEDURAL_INTENT_EPISODIC_TOP_K", "3")
-            ),
+            procedural_intent_procedural_top_k=int(os.getenv("MFLOW_PROCEDURAL_INTENT_PROCEDURAL_TOP_K", "5")),
+            procedural_intent_episodic_top_k=int(os.getenv("MFLOW_PROCEDURAL_INTENT_EPISODIC_TOP_K", "3")),
             enable_atomic=os.getenv("MFLOW_ENABLE_ATOMIC", "true").lower() == "true",
             enable_episodic=os.getenv("MFLOW_ENABLE_EPISODIC", "true").lower() == "true",
             enable_procedural=os.getenv("MFLOW_ENABLE_PROCEDURAL", "true").lower() == "true",
@@ -287,9 +283,7 @@ class MemoryOrchestrator:
                 "procedural_count": len(result.procedural_edges),
                 "merged_count": len(result.merged_edges),
                 "procedure_hits": len(result.procedure_hits),
-                "injected": result.injection_result.should_inject
-                if result.injection_result
-                else False,
+                "injected": result.injection_result.should_inject if result.injection_result else False,
             },
         )
         TraceManager.end("ok")
@@ -533,7 +527,7 @@ def generate_procedural_suggestion(
     top_card = result.procedure_cards[0]
 
     suggestion_lines = [
-        f"[TIP] **Suggestion**: I can follow the \"{top_card.title}\" procedure:",
+        f'[TIP] **Suggestion**: I can follow the "{top_card.title}" procedure:',
     ]
 
     # Extract step summary

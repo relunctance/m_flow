@@ -96,9 +96,7 @@ def get_prune_procedural_router() -> APIRouter:
                     continue
 
                 del_edges_q = (
-                    f"MATCH (n:Node)-[r]->(m:Node) "
-                    f"WHERE n.type IN [{types_in}] OR m.type IN [{types_in}] "
-                    f"DELETE r"
+                    f"MATCH (n:Node)-[r]->(m:Node) WHERE n.type IN [{types_in}] OR m.type IN [{types_in}] DELETE r"
                 )
                 await engine.query(del_edges_q)
 

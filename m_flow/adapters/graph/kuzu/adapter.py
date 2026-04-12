@@ -78,13 +78,13 @@ def _parse_props_json(raw: str) -> dict:
 
 def _merge_node_props(data: Dict[str, Any]) -> Dict[str, Any]:
     """Merge nested properties field into top-level dict, preserving column fields.
-    
+
     Column values (created_at, updated_at) take priority over properties JSON values.
     Datetime values from Kuzu are converted to millisecond timestamps for API compatibility.
     """
     col_created_at = data.pop("created_at", None)
     col_updated_at = data.pop("updated_at", None)
-    
+
     if "properties" in data and data["properties"]:
         try:
             nested = json.loads(data["properties"])
@@ -92,7 +92,7 @@ def _merge_node_props(data: Dict[str, Any]) -> Dict[str, Any]:
             data.update(nested)
         except (json.JSONDecodeError, TypeError):
             _log.warning(f"Failed parsing node properties for {data.get('id')}")
-    
+
     if col_created_at is not None:
         if isinstance(col_created_at, datetime):
             data["created_at"] = _datetime_to_ms(col_created_at)
@@ -103,7 +103,7 @@ def _merge_node_props(data: Dict[str, Any]) -> Dict[str, Any]:
             data["updated_at"] = _datetime_to_ms(col_updated_at)
         else:
             data["updated_at"] = col_updated_at
-    
+
     return data
 
 
@@ -244,7 +244,7 @@ class KuzuAdapter(GraphProvider):
 
     def _handle_local_init(self) -> None:
         """Initialize local database.
-        
+
         auto_checkpoint is disabled to avoid excessive WAL flushes during
         sequential add+memorize loops. Callers (e.g. memorize()) invoke
         checkpoint() explicitly when needed.
@@ -258,10 +258,10 @@ class KuzuAdapter(GraphProvider):
 
         _buffer_pool_mb = int(os.getenv("KUZU_BUFFER_POOL_MB", "4096"))
         _max_db_mb = int(os.getenv("KUZU_MAX_DB_MB", "32768"))
-        
+
         # Proactively clean stale locks before attempting to open
         self._cleanup_stale_locks()
-        
+
         try:
             self._db = Database(
                 self._path,
@@ -295,47 +295,53 @@ class KuzuAdapter(GraphProvider):
 
     def _cleanup_stale_locks(self, aggressive: bool = False) -> None:
         """Remove stale lock files from Kuzu database directory.
-        
+
         Kuzu uses file locks that may persist after abnormal process termination.
         This method removes these locks to allow the database to be reopened.
-        
+
         Kuzu lock file locations:
         - Inside db directory: .lock*, *.lock, .wal, wal/
         - Outside db directory (parent): {db_name}.wal, {db_name}.lock
-        
+
         Args:
             aggressive: If True, also removes WAL files and other recovery files.
         """
         import glob
         import shutil
-        
+
         lock_patterns = []
-        
+
         # Patterns inside database directory (if it exists)
         if os.path.isdir(self._path):
-            lock_patterns.extend([
-                os.path.join(self._path, ".lock*"),
-                os.path.join(self._path, "*.lock"),
-                os.path.join(self._path, ".wal"),
-            ])
+            lock_patterns.extend(
+                [
+                    os.path.join(self._path, ".lock*"),
+                    os.path.join(self._path, "*.lock"),
+                    os.path.join(self._path, ".wal"),
+                ]
+            )
             if aggressive:
-                lock_patterns.extend([
-                    os.path.join(self._path, "wal"),
-                    os.path.join(self._path, ".tmp*"),
-                    os.path.join(self._path, "*.tmp"),
-                ])
-        
+                lock_patterns.extend(
+                    [
+                        os.path.join(self._path, "wal"),
+                        os.path.join(self._path, ".tmp*"),
+                        os.path.join(self._path, "*.tmp"),
+                    ]
+                )
+
         # Patterns outside database directory (sibling files)
         # Kuzu creates {db_path}.wal and {db_path}.lock in parent directory
         parent_dir = os.path.dirname(self._path)
         db_name = os.path.basename(self._path)
         if parent_dir and os.path.isdir(parent_dir):
-            lock_patterns.extend([
-                os.path.join(parent_dir, f"{db_name}.wal"),
-                os.path.join(parent_dir, f"{db_name}.lock"),
-                os.path.join(parent_dir, f"{db_name}.lock*"),
-            ])
-        
+            lock_patterns.extend(
+                [
+                    os.path.join(parent_dir, f"{db_name}.wal"),
+                    os.path.join(parent_dir, f"{db_name}.lock"),
+                    os.path.join(parent_dir, f"{db_name}.lock*"),
+                ]
+            )
+
         for pattern in lock_patterns:
             for lock_file in glob.glob(pattern):
                 try:
@@ -423,11 +429,11 @@ class KuzuAdapter(GraphProvider):
 
     async def checkpoint(self) -> None:
         """Force WAL checkpoint to persist data to disk.
-        
+
         Kuzu uses Write-Ahead Logging (WAL) by default. Data written to WAL
         may not be immediately persisted to the main database file. This method
         forces a checkpoint to ensure all data is durably stored.
-        
+
         Should be called after critical write operations (e.g., after memorize)
         to prevent data loss on abnormal shutdown.
         """
@@ -436,8 +442,7 @@ class KuzuAdapter(GraphProvider):
                 async with self._query_lock:
                     loop = asyncio.get_running_loop()
                     await loop.run_in_executor(
-                        getattr(self, "_executor", None),
-                        lambda: self._conn.execute("CHECKPOINT;")
+                        getattr(self, "_executor", None), lambda: self._conn.execute("CHECKPOINT;")
                     )
                 _log.info("Kuzu checkpoint completed - data persisted to disk")
         except Exception as err:
@@ -554,9 +559,7 @@ class KuzuAdapter(GraphProvider):
 
     async def has_node(self, node_id: str) -> bool:
         """Check if node exists."""
-        result = await self.query(
-            "MATCH (n:Node) WHERE n.id = $id RETURN COUNT(n) > 0", {"id": node_id}
-        )
+        result = await self.query("MATCH (n:Node) WHERE n.id = $id RETURN COUNT(n) > 0", {"id": node_id})
         return result[0][0] if result else False
 
     async def add_node(self, node: MemoryNode) -> None:
@@ -637,10 +640,7 @@ class KuzuAdapter(GraphProvider):
         items = list(items_by_id.values())
 
         if len(items) < len(nodes):
-            _log.info(
-                f"add_nodes: deduped {len(nodes)} → {len(items)} "
-                f"({len(nodes) - len(items)} duplicates removed)"
-            )
+            _log.info(f"add_nodes: deduped {len(nodes)} → {len(items)} ({len(nodes) - len(items)} duplicates removed)")
 
         cypher_bulk = """
         UNWIND $items AS item
@@ -663,16 +663,12 @@ class KuzuAdapter(GraphProvider):
             _log.debug(f"Processed {len(items)} nodes")
         except RuntimeError as err:
             err_str = str(err).lower()
-            is_recoverable = (
-                "write-write conflict" in err_str
-                or ("duplicat" in err_str and "key" in err_str)
-            )
+            is_recoverable = "write-write conflict" in err_str or ("duplicat" in err_str and "key" in err_str)
             if not is_recoverable:
                 _log.error(f"add_nodes batch failed: {err}")
                 raise
             _log.warning(
-                f"add_nodes: batch conflict on bulk MERGE ({len(items)} nodes), "
-                f"falling back to sequential writes"
+                f"add_nodes: batch conflict on bulk MERGE ({len(items)} nodes), falling back to sequential writes"
             )
             cypher_single = """
             MERGE (n:Node {id: $id})
@@ -696,13 +692,9 @@ class KuzuAdapter(GraphProvider):
                     failed += 1
                     _log.warning(f"add_nodes sequential write failed for {item['id'][:20]}: {e2}")
             if failed:
-                _log.warning(
-                    f"add_nodes: {failed}/{len(items)} nodes failed in sequential fallback"
-                )
+                _log.warning(f"add_nodes: {failed}/{len(items)} nodes failed in sequential fallback")
             else:
-                _log.info(
-                    f"add_nodes: sequential fallback completed successfully ({len(items)} nodes)"
-                )
+                _log.info(f"add_nodes: sequential fallback completed successfully ({len(items)} nodes)")
 
     async def delete_node(self, node_id: str) -> None:
         """Remove node and its edges."""
@@ -889,8 +881,7 @@ class KuzuAdapter(GraphProvider):
 
         if len(deduped) < len(edges):
             _log.info(
-                f"add_edges: deduped {len(edges)} → {len(deduped)} "
-                f"({len(edges) - len(deduped)} duplicates removed)"
+                f"add_edges: deduped {len(edges)} → {len(deduped)} ({len(edges) - len(deduped)} duplicates removed)"
             )
         edges = deduped
 
@@ -912,10 +903,7 @@ class KuzuAdapter(GraphProvider):
         """
 
         if len(partitions) > 1:
-            _log.debug(
-                f"add_edges: {len(edges)} edges split into {len(partitions)} "
-                f"endpoint-partitioned batches"
-            )
+            _log.debug(f"add_edges: {len(edges)} edges split into {len(partitions)} endpoint-partitioned batches")
 
         for batch_idx, batch in enumerate(partitions):
             items = [
@@ -932,10 +920,7 @@ class KuzuAdapter(GraphProvider):
                 await self.query(cypher_bulk, {"items": items})
             except RuntimeError as err:
                 err_str = str(err).lower()
-                is_recoverable = (
-                    "write-write conflict" in err_str
-                    or ("duplicat" in err_str and "key" in err_str)
-                )
+                is_recoverable = "write-write conflict" in err_str or ("duplicat" in err_str and "key" in err_str)
                 if not is_recoverable:
                     _log.error(f"add_edges batch {batch_idx} failed: {err}")
                     raise
@@ -1023,9 +1008,7 @@ class KuzuAdapter(GraphProvider):
             _log.error(f"get_predecessors failed for {node_id}: {err}")
             return []
 
-    async def get_successors(
-        self, node_id: Union[str, UUID], edge_label: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+    async def get_successors(self, node_id: Union[str, UUID], edge_label: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get nodes this node points to."""
         try:
             if edge_label:
@@ -1045,9 +1028,7 @@ class KuzuAdapter(GraphProvider):
             _log.error(f"get_successors failed for {node_id}: {err}")
             return []
 
-    async def get_triplets(
-        self, node_id: str
-    ) -> List[Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]]:
+    async def get_triplets(self, node_id: str) -> List[Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]]:
         """Get all connected node-edge-node tuples."""
         cypher = """
         MATCH (n:Node)-[r:EDGE]-(m:Node) WHERE n.id = $id
@@ -1079,9 +1060,7 @@ class KuzuAdapter(GraphProvider):
         result = await self.query(cypher)
         return [str(row[0]) for row in result]
 
-    async def remove_connection_to_predecessors_of(
-        self, node_ids: List[str], edge_label: str
-    ) -> None:
+    async def remove_connection_to_predecessors_of(self, node_ids: List[str], edge_label: str) -> None:
         """Remove incoming edges with given label."""
         cypher = """
         MATCH (n)<-[r:EDGE]-(m)
@@ -1090,9 +1069,7 @@ class KuzuAdapter(GraphProvider):
         """
         await self.query(cypher, {"ids": node_ids, "lbl": edge_label})
 
-    async def remove_connection_to_successors_of(
-        self, node_ids: List[str], edge_label: str
-    ) -> None:
+    async def remove_connection_to_successors_of(self, node_ids: List[str], edge_label: str) -> None:
         """Remove outgoing edges with given label."""
         cypher = """
         MATCH (n)-[r:EDGE]->(m)
@@ -1146,13 +1123,9 @@ class KuzuAdapter(GraphProvider):
             if nodes and not edges:
                 _log.debug("No edges found, adding self-references")
                 for nid, _ in nodes:
-                    edges.append(
-                        (nid, nid, "SELF", {"relationship_name": "SELF", "vector_distance": 0.0})
-                    )
+                    edges.append((nid, nid, "SELF", {"relationship_name": "SELF", "vector_distance": 0.0}))
 
-            _log.info(
-                f"Retrieved {len(nodes)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s"
-            )
+            _log.info(f"Retrieved {len(nodes)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s")
             return nodes, edges
 
         except Exception as err:
@@ -1206,18 +1179,14 @@ class KuzuAdapter(GraphProvider):
                 tgt = edge_props.get("target_node_id", m_id)
                 edges.append((src, tgt, rel, edge_props))
 
-            _log.info(
-                f"ID-filtered: {len(nodes_map)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s"
-            )
+            _log.info(f"ID-filtered: {len(nodes_map)} nodes, {len(edges)} edges in {time.time() - t0:.2f}s")
             return list(nodes_map.values()), edges
 
         except Exception as err:
             _log.error(f"ID-filtered retrieval failed: {err}")
             raise
 
-    async def query_by_attributes(
-        self, attribute_filters: List[Dict[str, List[Union[str, int]]]]
-    ):
+    async def query_by_attributes(self, attribute_filters: List[Dict[str, List[Union[str, int]]]]):
         """Get nodes/edges filtered by attributes."""
         where_parts = []
         params = {}
@@ -1303,9 +1272,13 @@ class KuzuAdapter(GraphProvider):
             data = {"id": nid, "name": name, "type": typ}
             data.update(_parse_props_json(props_raw))
             if col_created_at is not None:
-                data["created_at"] = _datetime_to_ms(col_created_at) if isinstance(col_created_at, datetime) else col_created_at
+                data["created_at"] = (
+                    _datetime_to_ms(col_created_at) if isinstance(col_created_at, datetime) else col_created_at
+                )
             if col_updated_at is not None:
-                data["updated_at"] = _datetime_to_ms(col_updated_at) if isinstance(col_updated_at, datetime) else col_updated_at
+                data["updated_at"] = (
+                    _datetime_to_ms(col_updated_at) if isinstance(col_updated_at, datetime) else col_updated_at
+                )
             nodes.append((nid, data))
 
         # Get edges
@@ -1397,26 +1370,45 @@ class KuzuAdapter(GraphProvider):
 
         for row in all_rows:
             (
-                a_id, a_name, a_type, a_props, a_created_at, a_updated_at,
-                b_id, b_name, b_type, b_props, b_created_at, b_updated_at,
-                rel, rel_props
+                a_id,
+                a_name,
+                a_type,
+                a_props,
+                a_created_at,
+                a_updated_at,
+                b_id,
+                b_name,
+                b_type,
+                b_props,
+                b_created_at,
+                b_updated_at,
+                rel,
+                rel_props,
             ) = row
 
             if a_id in member_ids and b_id in member_ids:
                 a_data = {"id": a_id, "name": a_name, "type": a_type}
                 a_data.update(_parse_props_json(a_props))
                 if a_created_at is not None:
-                    a_data["created_at"] = _datetime_to_ms(a_created_at) if isinstance(a_created_at, datetime) else a_created_at
+                    a_data["created_at"] = (
+                        _datetime_to_ms(a_created_at) if isinstance(a_created_at, datetime) else a_created_at
+                    )
                 if a_updated_at is not None:
-                    a_data["updated_at"] = _datetime_to_ms(a_updated_at) if isinstance(a_updated_at, datetime) else a_updated_at
+                    a_data["updated_at"] = (
+                        _datetime_to_ms(a_updated_at) if isinstance(a_updated_at, datetime) else a_updated_at
+                    )
                 nodes_map[a_id] = (a_id, a_data)
 
                 b_data = {"id": b_id, "name": b_name, "type": b_type}
                 b_data.update(_parse_props_json(b_props))
                 if b_created_at is not None:
-                    b_data["created_at"] = _datetime_to_ms(b_created_at) if isinstance(b_created_at, datetime) else b_created_at
+                    b_data["created_at"] = (
+                        _datetime_to_ms(b_created_at) if isinstance(b_created_at, datetime) else b_created_at
+                    )
                 if b_updated_at is not None:
-                    b_data["updated_at"] = _datetime_to_ms(b_updated_at) if isinstance(b_updated_at, datetime) else b_updated_at
+                    b_data["updated_at"] = (
+                        _datetime_to_ms(b_updated_at) if isinstance(b_updated_at, datetime) else b_updated_at
+                    )
                 nodes_map[b_id] = (b_id, b_data)
 
                 edges.append((a_id, b_id, rel, _parse_props_json(rel_props)))
@@ -1555,9 +1547,7 @@ class KuzuAdapter(GraphProvider):
                 "num_nodes": actual_nodes,
                 "num_edges": actual_edges,
                 "mean_degree": (2 * actual_edges / actual_nodes) if actual_nodes else None,
-                "edge_density": (
-                    actual_edges / (actual_nodes * (actual_nodes - 1)) if actual_nodes > 1 else 0
-                ),
+                "edge_density": (actual_edges / (actual_nodes * (actual_nodes - 1)) if actual_nodes > 1 else 0),
                 "num_connected_components": await self._count_components(),
                 "sizes_of_connected_components": await self._component_sizes(),
             }
@@ -1707,9 +1697,7 @@ class KuzuAdapter(GraphProvider):
                     triplet["start_node"] = _merge_node_props(triplet["start_node"].copy())
 
                 # Parse relationship
-                if "relationship_properties" in triplet and isinstance(
-                    triplet["relationship_properties"], dict
-                ):
+                if "relationship_properties" in triplet and isinstance(triplet["relationship_properties"], dict):
                     rel = triplet["relationship_properties"].copy()
                     rel_name = rel.get("relationship_name", "")
                     rel.update(_parse_props_json(rel.get("properties")))

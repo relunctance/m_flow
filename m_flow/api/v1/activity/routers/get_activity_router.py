@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 class ActivityDTO(OutDTO):
     """Activity item for dashboard display."""
-    
+
     id: str = Field(..., description="Activity unique identifier")
     type: str = Field(..., description="Activity type: search, ingest, create, delete, config")
     title: str = Field(..., description="Human-readable activity title")
@@ -56,12 +56,12 @@ def _auth_dep():
 def get_activity_router() -> APIRouter:
     """
     Build and return the activity API router.
-    
+
     Endpoints:
         GET / - Retrieve recent activities
     """
     router = APIRouter()
-    
+
     @router.get("", response_model=List[ActivityDTO])
     async def list_activities(
         user: "User" = Depends(_auth_dep()),
@@ -69,20 +69,20 @@ def get_activity_router() -> APIRouter:
     ):
         """
         Get recent activities aggregated from multiple sources.
-        
+
         Activities are sourced from:
         - Search queries (queries table)
         - Ingest operations (pipeline_runs table)
-        
+
         Returns activities sorted by creation time (newest first).
         """
         from m_flow.data.methods import get_recent_activities
-        
+
         activities = await get_recent_activities(
             user_id=user.id,
             limit=limit,
         )
-        
+
         return [
             ActivityDTO(
                 id=a["id"],
@@ -94,5 +94,5 @@ def get_activity_router() -> APIRouter:
             )
             for a in activities
         ]
-    
+
     return router

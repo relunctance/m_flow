@@ -40,9 +40,7 @@ async def give_default_permission_to_role(role_id: UUID, permission_name: str) -
 
         # Assign permission to role
         try:
-            await session.execute(
-                insert(RoleDefaultPermissions).values(role_id=role.id, permission_id=perm.id)
-            )
+            await session.execute(insert(RoleDefaultPermissions).values(role_id=role.id, permission_id=perm.id))
         except IntegrityError:
             raise ConceptAlreadyExistsError(message="Role permission already exists.")
 

@@ -296,10 +296,7 @@ class IdentityNormalizer:
                 return existing
 
             # Containment relationship (candidate is substring of existing or vice versa)
-            if (
-                candidate_normalized in existing_normalized
-                or existing_normalized in candidate_normalized
-            ):
+            if candidate_normalized in existing_normalized or existing_normalized in candidate_normalized:
                 # Return the shorter one
                 if len(existing) <= len(candidate):
                     return existing

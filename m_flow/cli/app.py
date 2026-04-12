@@ -39,8 +39,9 @@ class _ToggleDebug(argparse.Action):
     """Enable verbose / debug output globally."""
 
     def __init__(self, option_strings: Sequence[str], **kw: Any) -> None:
-        super().__init__(option_strings=option_strings, nargs=0,
-                         dest=argparse.SUPPRESS, default=argparse.SUPPRESS, **kw)
+        super().__init__(
+            option_strings=option_strings, nargs=0, dest=argparse.SUPPRESS, default=argparse.SUPPRESS, **kw
+        )
 
     def __call__(self, *_a: Any, **_kw: Any) -> None:
         _debug.enable_debug()
@@ -51,11 +52,11 @@ class _LaunchUi(argparse.Action):
     """Mark that the user requested the web UI."""
 
     def __init__(self, option_strings: Sequence[str], **kw: Any) -> None:
-        super().__init__(option_strings=option_strings, nargs=0,
-                         dest=argparse.SUPPRESS, default=argparse.SUPPRESS, **kw)
+        super().__init__(
+            option_strings=option_strings, nargs=0, dest=argparse.SUPPRESS, default=argparse.SUPPRESS, **kw
+        )
 
-    def __call__(self, parser: argparse.ArgumentParser,
-                 namespace: argparse.Namespace, *_a: Any, **_kw: Any) -> None:
+    def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, *_a: Any, **_kw: Any) -> None:
         global _action_taken
         _action_taken = True
         namespace.launch_ui = True
@@ -91,9 +92,11 @@ def _load_commands() -> List[Type[SupportsCliCommand]]:
 # Parser construction
 # ---------------------------------------------------------------------------
 
+
 def _version_string() -> str:
     try:
         from m_flow.version import get_version
+
         return f"m_flow {get_version()}"
     except Exception:
         return "m_flow (version unknown)"
@@ -117,10 +120,8 @@ def _build_parser() -> tuple[argparse.ArgumentParser, Dict[str, SupportsCliComma
         description=f"{CLI_DESCRIPTION} Documentation: {DEFAULT_DOCS_URL}",
     )
     root.add_argument("--version", action="version", version=_version_string())
-    root.add_argument("--debug", action=_ToggleDebug,
-                       help="Show full stack traces on errors")
-    root.add_argument("-ui", action=_LaunchUi,
-                       help="Launch the M-Flow web interface")
+    root.add_argument("--debug", action=_ToggleDebug, help="Show full stack traces on errors")
+    root.add_argument("-ui", action=_LaunchUi, help="Launch the M-Flow web interface")
 
     subs = root.add_subparsers(title="Commands", dest="command")
 
@@ -144,6 +145,7 @@ def _build_parser() -> tuple[argparse.ArgumentParser, Dict[str, SupportsCliComma
 # ---------------------------------------------------------------------------
 # UI server lifecycle
 # ---------------------------------------------------------------------------
+
 
 def _run_ui() -> int:
     """Start backend + frontend + MCP and block until interrupted."""
@@ -169,19 +171,16 @@ def _run_ui() -> int:
 
         if container_id:
             try:
-                subprocess.run(["docker", "stop", container_id],
-                               capture_output=True, timeout=10, check=False)
+                subprocess.run(["docker", "stop", container_id], capture_output=True, timeout=10, check=False)
             except Exception:
-                subprocess.run(["docker", "rm", "-f", container_id],
-                               capture_output=True, check=False)
+                subprocess.run(["docker", "rm", "-f", container_id], capture_output=True, check=False)
 
         for pid in child_pids:
             try:
                 if hasattr(os, "killpg"):
                     os.killpg(os.getpgid(pid), signal.SIGTERM)
                 else:
-                    subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)],
-                                   capture_output=True, check=False)
+                    subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)], capture_output=True, check=False)
             except OSError:
                 pass
         sys.exit(0)
@@ -225,6 +224,7 @@ def _run_ui() -> int:
 # ---------------------------------------------------------------------------
 # Entry points
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     parser, commands = _build_parser()

@@ -223,13 +223,12 @@ async def add(
     auth_user, auth_dataset = await _prepare_pipeline_context(dataset_name, dataset_id, user)
 
     # Build task pipeline
-    tasks = _build_ingestion_tasks(
-        dataset_name, auth_user, graph_scope, dataset_id, loader_cfg, created_at_ms
-    )
+    tasks = _build_ingestion_tasks(dataset_name, auth_user, graph_scope, dataset_id, loader_cfg, created_at_ms)
 
     # Execute ingestion pipeline
     result: "RunEvent" | None = None
     from m_flow.pipeline.operations.pipeline import WorkflowConfig
+
     async for run_detail in execute_workflow(
         tasks=tasks,
         datasets=[auth_dataset.id],

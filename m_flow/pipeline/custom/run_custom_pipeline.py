@@ -74,6 +74,7 @@ async def run_custom_pipeline(
     dispatch_fn = get_pipeline_executor(run_in_background=run_in_background)
 
     from m_flow.pipeline.operations.pipeline import WorkflowConfig
+
     pipeline_kwargs = dict(
         pipeline=execute_workflow,
         tasks=resolved_tasks,

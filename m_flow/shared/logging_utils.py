@@ -224,18 +224,12 @@ class PlainFileHandler(logging.handlers.RotatingFileHandler):
     def _write_structured(self, record: logging.LogRecord) -> None:
         payload: Dict[str, Any] = record.msg  # type: ignore[assignment]
         event_text = payload.get("event", "")
-        extras = {
-            k: v
-            for k, v in payload.items()
-            if k not in {"event", "logger", "level", "timestamp", "exc_info"}
-        }
+        extras = {k: v for k, v in payload.items() if k not in {"event", "logger", "level", "timestamp", "exc_info"}}
         extra_segment = (" " + " ".join(f"{k}={v}" for k, v in extras.items())) if extras else ""
         origin = payload.get("logger", record.name)
         ts = datetime.now().strftime(_pick_timestamp_fmt())
 
-        self.stream.write(
-            f"{ts} [{record.levelname.ljust(8)}] {event_text}{extra_segment} [{origin}]\n"
-        )
+        self.stream.write(f"{ts} [{record.levelname.ljust(8)}] {event_text}{extra_segment} [{origin}]\n")
         self.flush()
         self._maybe_write_traceback(record, payload)
 
@@ -263,10 +257,7 @@ class PlainFileHandler(logging.handlers.RotatingFileHandler):
             self.flush()
         elif exc_in_payload and hasattr(exc_in_payload, "__traceback__"):
             exc_obj = exc_in_payload
-            self.stream.write(
-                "".join(_tb_mod.format_exception(type(exc_obj), exc_obj, exc_obj.__traceback__))
-                + "\n"
-            )
+            self.stream.write("".join(_tb_mod.format_exception(type(exc_obj), exc_obj, exc_obj.__traceback__)) + "\n")
             self.flush()
 
 
@@ -320,7 +311,8 @@ def _prune_stale_logs(directory: Path, keep: int) -> None:
 
 
 # Keep the old name available for any in-tree callers.
-cleanup_old_logs = lambda logs_dir, max_files: _prune_stale_logs(logs_dir, max_files)
+def cleanup_old_logs(logs_dir, max_files):
+    return _prune_stale_logs(logs_dir, max_files)
 
 
 # ===================================================================

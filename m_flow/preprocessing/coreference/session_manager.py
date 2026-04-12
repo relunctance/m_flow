@@ -183,10 +183,7 @@ class SessionManager:
         self._sessions[session_id] = session
         self._session_order.append(session_id)
 
-        logger.debug(
-            f"Created session {session_id[:8]}... (lang={language}, "
-            f"total={len(self._sessions)})"
-        )
+        logger.debug(f"Created session {session_id[:8]}... (lang={language}, total={len(self._sessions)})")
         return session
 
     def _create_stream_session(self, language: str) -> Any:
@@ -207,6 +204,7 @@ class SessionManager:
                 CoreferenceResolver as EnResolver,
                 StreamCorefSession as EnStreamSession,
             )
+
             resolver = EnResolver(max_history=self._max_history)
             return EnStreamSession(resolver)
         else:
@@ -214,6 +212,7 @@ class SessionManager:
                 CoreferenceResolver,
                 StreamCorefSession,
             )
+
             resolver = CoreferenceResolver(max_history=self._max_history)
             return StreamCorefSession(resolver)
 
@@ -281,10 +280,7 @@ class SessionManager:
             if session:
                 # Security: Verify ownership if user_id provided
                 if user_id is not None and session.user_id != user_id:
-                    logger.warning(
-                        f"Reset denied for session {session_id[:8]}...: "
-                        f"user_id mismatch"
-                    )
+                    logger.warning(f"Reset denied for session {session_id[:8]}...: user_id mismatch")
                     return False
 
                 session.stream_session.reset()
@@ -301,10 +297,7 @@ class SessionManager:
         Returns:
             Number of sessions removed.
         """
-        expired = [
-            sid for sid, session in self._sessions.items()
-            if session.is_expired(self._ttl)
-        ]
+        expired = [sid for sid, session in self._sessions.items() if session.is_expired(self._ttl)]
         for sid in expired:
             del self._sessions[sid]
             if sid in self._session_order:
@@ -360,10 +353,7 @@ class SessionManager:
         with self._lock:
             # Filter sessions by user if specified
             if filter_user_id is not None:
-                filtered_sessions = {
-                    sid: s for sid, s in self._sessions.items()
-                    if s.user_id == filter_user_id
-                }
+                filtered_sessions = {sid: s for sid, s in self._sessions.items() if s.user_id == filter_user_id}
                 active_count = len(filtered_sessions)
             else:
                 filtered_sessions = self._sessions
@@ -381,13 +371,15 @@ class SessionManager:
                 for i, (sid, session) in enumerate(filtered_sessions.items()):
                     if i >= limit:
                         break
-                    sessions_list.append({
-                        "session_id": sid,
-                        "user_id": session.user_id[:8] + "...",  # Truncate for privacy
-                        "turn_count": session.turn_count,
-                        "last_active": session.last_active.isoformat(),
-                        "language": session.language,
-                    })
+                    sessions_list.append(
+                        {
+                            "session_id": sid,
+                            "user_id": session.user_id[:8] + "...",  # Truncate for privacy
+                            "turn_count": session.turn_count,
+                            "last_active": session.last_active.isoformat(),
+                            "language": session.language,
+                        }
+                    )
                 stats["sessions"] = sessions_list
 
             return stats

@@ -67,13 +67,9 @@ async def check_episode_sizes(
     config = EpisodeSizeCheckConfig(
         enabled=enabled if enabled is not None else base_config.enabled,
         base_threshold=base_threshold if base_threshold is not None else base_config.base_threshold,
-        absolute_threshold=absolute_threshold
-        if absolute_threshold is not None
-        else base_config.absolute_threshold,
+        absolute_threshold=absolute_threshold if absolute_threshold is not None else base_config.absolute_threshold,
         max_threshold=max_threshold if max_threshold is not None else base_config.max_threshold,
-        min_facets_to_check=min_facets_to_check
-        if min_facets_to_check is not None
-        else base_config.min_facets_to_check,
+        min_facets_to_check=min_facets_to_check if min_facets_to_check is not None else base_config.min_facets_to_check,
         min_episodes_for_distribution=base_config.min_episodes_for_distribution,
         iqr_multiplier=base_config.iqr_multiplier,
         adaptive_increment=base_config.adaptive_increment,

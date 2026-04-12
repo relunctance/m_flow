@@ -73,9 +73,7 @@ class PyPdfLoader(LoaderInterface):
         try:
             from pypdf import PdfReader
         except ImportError as err:
-            raise ImportError(
-                "The pypdf library is required. Install with: pip install pypdf"
-            ) from err
+            raise ImportError("The pypdf library is required. Install with: pip install pypdf") from err
 
         _log.info("Processing PDF: %s", file_path)
 

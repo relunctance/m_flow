@@ -50,9 +50,7 @@ async def get_specific_user_permission_datasets(
 
         # Verify complete access
         if len(filtered) != len(dataset_ids):
-            raise PermissionDeniedError(
-                f"Missing {permission_type} permission for some requested datasets"
-            )
+            raise PermissionDeniedError(f"Missing {permission_type} permission for some requested datasets")
 
         return filtered
 

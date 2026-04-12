@@ -208,25 +208,17 @@ class ProceduralRecaller:
                     # Merge edges and query_kinds
                     old_hit = key_to_best[pkey]
                     hit.edges = hit.edges + [
-                        e
-                        for e in old_hit.edges
-                        if self._edge_key(e) not in {self._edge_key(x) for x in hit.edges}
+                        e for e in old_hit.edges if self._edge_key(e) not in {self._edge_key(x) for x in hit.edges}
                     ]
-                    hit.from_query_kinds = list(
-                        set(hit.from_query_kinds + old_hit.from_query_kinds)
-                    )
+                    hit.from_query_kinds = list(set(hit.from_query_kinds + old_hit.from_query_kinds))
                     key_to_best[pkey] = hit
                 else:
                     # Merge edges and query_kinds into existing
                     existing = key_to_best[pkey]
                     existing.edges = existing.edges + [
-                        e
-                        for e in hit.edges
-                        if self._edge_key(e) not in {self._edge_key(x) for x in existing.edges}
+                        e for e in hit.edges if self._edge_key(e) not in {self._edge_key(x) for x in existing.edges}
                     ]
-                    existing.from_query_kinds = list(
-                        set(existing.from_query_kinds + hit.from_query_kinds)
-                    )
+                    existing.from_query_kinds = list(set(existing.from_query_kinds + hit.from_query_kinds))
             else:
                 key_to_best[pkey] = hit
 

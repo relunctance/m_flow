@@ -31,24 +31,31 @@ _BACKOFF_MAX = 120
 # Backend resolution
 # ---------------------------------------------------------------------------
 
+
 def _is_baml_backend() -> bool:
     return get_llm_config().backends.upper() == "BAML"
+
 
 def _get_instructor_client():
     from m_flow.llm.backends.litellm_instructor.llm.get_llm_client import (
         create_llm_backend,
     )
+
     return create_llm_backend()
+
 
 def _get_baml_extractor():
     from m_flow.llm.backends.baml.baml_src.extraction import (
         extract_structured as _baml_extract,
     )
+
     return _baml_extract
+
 
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 class LLMService:
     """
@@ -135,7 +142,9 @@ class LLMService:
 
             _log.debug(
                 "text_completion request  model=%s  sys_len=%d  user_len=%d",
-                cfg.llm_model, len(instructions), len(source_text),
+                cfg.llm_model,
+                len(instructions),
+                len(source_text),
             )
 
             response = await litellm.acompletion(
@@ -150,4 +159,3 @@ class LLMService:
             reply = response.choices[0].message.content or ""
             _log.debug("text_completion response  len=%d", len(reply))
             return reply
-

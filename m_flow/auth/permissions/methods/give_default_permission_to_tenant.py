@@ -40,9 +40,7 @@ async def give_default_permission_to_tenant(tenant_id: UUID, permission_name: st
 
         # Assign permission to tenant
         try:
-            await session.execute(
-                insert(TenantDefaultPermissions).values(tenant_id=tenant.id, permission_id=perm.id)
-            )
+            await session.execute(insert(TenantDefaultPermissions).values(tenant_id=tenant.id, permission_id=perm.id))
         except IntegrityError:
             raise ConceptAlreadyExistsError(message="Tenant permission already exists.")
 

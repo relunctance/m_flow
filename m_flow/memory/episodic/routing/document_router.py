@@ -71,10 +71,7 @@ def _is_all_atomic_events(
     Returns:
         True if all events are atomic, False otherwise
     """
-    return all(
-        evt.startswith("atomic_") or event_routing_types.get(evt) == "atomic"
-        for evt in source_events
-    )
+    return all(evt.startswith("atomic_") or event_routing_types.get(evt) == "atomic" for evt in source_events)
 
 
 def _extract_event_topic(
@@ -175,9 +172,7 @@ async def route_documents_to_episodes(
             f"creating {len(by_doc)} independent episodes (no routing LLM calls)"
         )
         for doc_id, doc_summaries_raw in by_doc.items():
-            doc_summaries_sorted = sorted(
-                doc_summaries_raw, key=lambda x: getattr(x.made_from, "chunk_index", 0)
-            )
+            doc_summaries_sorted = sorted(doc_summaries_raw, key=lambda x: getattr(x.made_from, "chunk_index", 0))
             first_chunk = doc_summaries_sorted[0].made_from
             doc = getattr(first_chunk, "is_part_of", None)
             doc_title = str(getattr(doc, "name", None) or getattr(doc, "title", None) or "Document")
@@ -223,9 +218,7 @@ async def route_documents_to_episodes(
     doc_meta: Dict[str, Tuple[str, List[str], List["FragmentDigest"], bool]] = {}
     for doc_id, doc_summaries_raw in by_doc.items():
         # Sort for determinism
-        doc_summaries_sorted = sorted(
-            doc_summaries_raw, key=lambda x: getattr(x.made_from, "chunk_index", 0)
-        )
+        doc_summaries_sorted = sorted(doc_summaries_raw, key=lambda x: getattr(x.made_from, "chunk_index", 0))
 
         first_chunk = doc_summaries_sorted[0].made_from
         doc = getattr(first_chunk, "is_part_of", None)
@@ -267,9 +260,7 @@ async def route_documents_to_episodes(
             # V2 mode: Extract ONLY sentences belonging to this event_id
             for ts in doc_summaries_sorted:
                 chunk = ts.made_from
-                classifications = getattr(chunk, "metadata", {}).get(
-                    "sentence_classifications", []
-                )
+                classifications = getattr(chunk, "metadata", {}).get("sentence_classifications", [])
                 for c in classifications:
                     if c.get("event_id") == doc_id:
                         text = c.get("text", "").strip()
@@ -363,8 +354,7 @@ async def route_documents_to_episodes(
             decision = "new"
 
         logger.info(
-            f"[routing] doc={doc_id[:20]}... -> episode={chosen_episode_id[:20]}... "
-            f"reason={reason} decision={decision}"
+            f"[routing] doc={doc_id[:20]}... -> episode={chosen_episode_id[:20]}... reason={reason} decision={decision}"
         )
 
         return (doc_id, chosen_episode_id, decision, doc_title, doc_summaries_sorted)
@@ -372,10 +362,7 @@ async def route_documents_to_episodes(
     # ============================================================
     # Step 1: PARALLEL execution of entity extraction AND routing
     # ============================================================
-    logger.info(
-        f"[routing] Parallel phase: {len(by_doc)} docs "
-        f"(entity extraction + routing concurrent)"
-    )
+    logger.info(f"[routing] Parallel phase: {len(by_doc)} docs (entity extraction + routing concurrent)")
 
     entity_tasks = [_extract_entities_task(doc_id) for doc_id in by_doc]
     routing_tasks = [_route_doc_task(doc_id) for doc_id in by_doc]

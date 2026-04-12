@@ -154,9 +154,7 @@ async def _purge_from_relational(
         await sess.execute(ledger_update)
 
         # Get data record
-        data_record = (
-            await sess.execute(select(Data).filter(Data.id == UUID(data_id)))
-        ).scalar_one_or_none()
+        data_record = (await sess.execute(select(Data).filter(Data.id == UUID(data_id)))).scalar_one_or_none()
 
         if data_record is None:
             raise DocumentNotFoundError(f"Document not found in relational DB: {data_id}")
@@ -164,9 +162,7 @@ async def _purge_from_relational(
         doc_uuid = data_record.id
 
         # Verify dataset exists
-        ds = (
-            await sess.execute(select(Dataset).filter(Dataset.id == dataset_id))
-        ).scalar_one_or_none()
+        ds = (await sess.execute(select(Dataset).filter(Dataset.id == dataset_id))).scalar_one_or_none()
 
         if ds is None:
             raise DatasetNotFoundError(f"Dataset not found: {dataset_id}")

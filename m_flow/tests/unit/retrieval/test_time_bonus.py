@@ -84,6 +84,7 @@ def _make_candidate(
 @dataclass
 class _MockResult:
     """Minimal result object with a score attribute (for apply_time_bonus_to_results)."""
+
     score: float
     payload: dict
 
@@ -91,6 +92,7 @@ class _MockResult:
 # ===========================================================================
 # 1. _compute_overlap_score
 # ===========================================================================
+
 
 class TestComputeOverlapScore:
     """Tests for the internal _compute_overlap_score helper."""
@@ -157,6 +159,7 @@ class TestComputeOverlapScore:
 # 2. compute_time_match
 # ===========================================================================
 
+
 class TestComputeTimeMatch:
     """Tests for compute_time_match."""
 
@@ -214,7 +217,8 @@ class TestComputeTimeMatch:
         qt = _make_query_time(1000, 2000)
         # mentioned_time matches, created_at is outside range
         cand = _make_candidate(
-            mentioned_start=1000, mentioned_end=2000,
+            mentioned_start=1000,
+            mentioned_end=2000,
             created_at=9999999,
         )
         result = compute_time_match(cand, qt, cfg)
@@ -324,7 +328,13 @@ class TestComputeTimeMatch:
         """Standard {'payload': {...}} structure is handled correctly."""
         cfg = TimeBonusConfig()
         qt = _make_query_time(0, _DAY_MS)
-        cand = {"payload": {"mentioned_time_start_ms": 0, "mentioned_time_end_ms": _DAY_MS, "mentioned_time_confidence": 0.9}}
+        cand = {
+            "payload": {
+                "mentioned_time_start_ms": 0,
+                "mentioned_time_end_ms": _DAY_MS,
+                "mentioned_time_confidence": 0.9,
+            }
+        }
         result = compute_time_match(cand, qt, cfg)
         assert result.bonus > 0.0
 
@@ -340,6 +350,7 @@ class TestComputeTimeMatch:
 # ===========================================================================
 # 3. apply_time_bonus_to_results
 # ===========================================================================
+
 
 class TestApplyTimeBonusToResults:
     """Tests for batch apply_time_bonus_to_results."""
@@ -368,7 +379,11 @@ class TestApplyTimeBonusToResults:
         results = [
             _MockResult(
                 score=original_score,
-                payload={"mentioned_time_start_ms": 0, "mentioned_time_end_ms": _DAY_MS, "mentioned_time_confidence": 0.9},
+                payload={
+                    "mentioned_time_start_ms": 0,
+                    "mentioned_time_end_ms": _DAY_MS,
+                    "mentioned_time_confidence": 0.9,
+                },
             )
         ]
         stats = apply_time_bonus_to_results(results, qt, cfg)
@@ -382,7 +397,11 @@ class TestApplyTimeBonusToResults:
         results = [
             _MockResult(
                 score=0.15,  # Very low score, bonus would push below floor
-                payload={"mentioned_time_start_ms": 0, "mentioned_time_end_ms": _DAY_MS, "mentioned_time_confidence": 1.0},
+                payload={
+                    "mentioned_time_start_ms": 0,
+                    "mentioned_time_end_ms": _DAY_MS,
+                    "mentioned_time_confidence": 1.0,
+                },
             )
         ]
         apply_time_bonus_to_results(results, qt, cfg)
@@ -407,8 +426,22 @@ class TestApplyTimeBonusToResults:
         cfg = TimeBonusConfig(bonus_max=0.06)
         qt = _make_query_time(0, _DAY_MS)
         results = [
-            _MockResult(score=0.5, payload={"mentioned_time_start_ms": 0, "mentioned_time_end_ms": _DAY_MS, "mentioned_time_confidence": 0.9}),
-            _MockResult(score=0.4, payload={"mentioned_time_start_ms": 0, "mentioned_time_end_ms": _DAY_MS, "mentioned_time_confidence": 0.9}),
+            _MockResult(
+                score=0.5,
+                payload={
+                    "mentioned_time_start_ms": 0,
+                    "mentioned_time_end_ms": _DAY_MS,
+                    "mentioned_time_confidence": 0.9,
+                },
+            ),
+            _MockResult(
+                score=0.4,
+                payload={
+                    "mentioned_time_start_ms": 0,
+                    "mentioned_time_end_ms": _DAY_MS,
+                    "mentioned_time_confidence": 0.9,
+                },
+            ),
         ]
         stats = apply_time_bonus_to_results(results, qt, cfg)
         assert stats["time_matched"] == 2
@@ -429,8 +462,17 @@ class TestApplyTimeBonusToResults:
         cfg = TimeBonusConfig(bonus_max=0.06)
         qt = _make_query_time(0, _DAY_MS)
         results = [
-            _MockResult(score=0.5, payload={"mentioned_time_start_ms": 0, "mentioned_time_end_ms": _DAY_MS, "mentioned_time_confidence": 0.9}),
-            _MockResult(score=0.5, payload={"mentioned_time_start_ms": 100 * _DAY_MS, "mentioned_time_end_ms": 101 * _DAY_MS}),
+            _MockResult(
+                score=0.5,
+                payload={
+                    "mentioned_time_start_ms": 0,
+                    "mentioned_time_end_ms": _DAY_MS,
+                    "mentioned_time_confidence": 0.9,
+                },
+            ),
+            _MockResult(
+                score=0.5, payload={"mentioned_time_start_ms": 100 * _DAY_MS, "mentioned_time_end_ms": 101 * _DAY_MS}
+            ),
         ]
         stats = apply_time_bonus_to_results(results, qt, cfg)
         assert stats["time_matched"] == 1
@@ -441,6 +483,7 @@ class TestApplyTimeBonusToResults:
 # ===========================================================================
 # 4. compute_edge_time_bonus
 # ===========================================================================
+
 
 class TestComputeEdgeTimeBonus:
     """Tests for compute_edge_time_bonus."""
@@ -492,6 +535,7 @@ class TestComputeEdgeTimeBonus:
 # ===========================================================================
 # 5. TimeBonus and TimeBonusConfig dataclass sanity checks
 # ===========================================================================
+
 
 class TestDataclassSanity:
     """Sanity checks for dataclass defaults."""

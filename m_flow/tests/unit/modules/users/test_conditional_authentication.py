@@ -20,9 +20,7 @@ _gau_mod = importlib.import_module("m_flow.auth.methods.get_authenticated_user")
 
 def _user():
     """创建模拟用户"""
-    return User(
-        id=uuid4(), email="u@test.com", hashed_password="x", is_active=True, is_verified=True
-    )
+    return User(id=uuid4(), email="u@test.com", hashed_password="x", is_active=True, is_verified=True)
 
 
 def _default_user():

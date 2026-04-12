@@ -53,7 +53,7 @@ class GraphDTO(OutDTO):
 
 class EpisodeOverviewDTO(OutDTO):
     """Episode summary for Layer 0 overview (Phase 0.4)."""
-    
+
     id: str
     name: str
     summary: Optional[str] = None
@@ -65,7 +65,7 @@ class EpisodeOverviewDTO(OutDTO):
 
 class EpisodesOverviewDTO(OutDTO):
     """Episodes overview response (Phase 0.4)."""
-    
+
     episodes: list[EpisodeOverviewDTO]
     total: int
     limit: int
@@ -74,7 +74,7 @@ class EpisodesOverviewDTO(OutDTO):
 
 class EntityNetworkNodeDTO(OutDTO):
     """Entity network node (Phase 0.5)."""
-    
+
     id: str
     name: str
     type: str
@@ -84,7 +84,7 @@ class EntityNetworkNodeDTO(OutDTO):
 
 class EntityNetworkDTO(OutDTO):
     """Entity network response (Phase 0.5)."""
-    
+
     entity_id: str
     entity_name: str
     entity_type: str
@@ -117,8 +117,8 @@ def _register_get_global_graph(router: APIRouter) -> None:
     @router.get("", response_model=GraphDTO)
     async def get_global_graph(
         dataset_id: Optional[UUID] = Query(
-            default=None, 
-            description="Filter by specific dataset UUID. If not provided, returns graph from all accessible datasets."
+            default=None,
+            description="Filter by specific dataset UUID. If not provided, returns graph from all accessible datasets.",
         ),
         user: "User" = Depends(_get_auth_user()),
     ):
@@ -143,7 +143,7 @@ def _register_get_global_graph(router: APIRouter) -> None:
         try:
             # Get datasets to query
             all_datasets = await get_all_user_permission_datasets(user, "read")
-            
+
             # Filter by dataset_id if provided
             if dataset_id:
                 datasets = [ds for ds in all_datasets if ds.id == dataset_id]
@@ -159,7 +159,7 @@ def _register_get_global_graph(router: APIRouter) -> None:
             all_edges = []
             seen_node_ids = set()
             seen_edge_keys = set()
-            
+
             # When access control is disabled, all datasets share the same database.
             # Query once to avoid redundant database reads.
             if not backend_access_control_enabled():
@@ -212,12 +212,10 @@ def _register_get_episode_subgraph(router: APIRouter) -> None:
     async def get_episode_subgraph(
         episode_id: str,
         dataset_id: Optional[UUID] = Query(
-            default=None,
-            description="Dataset UUID. Required in multi-user mode, optional in single-user mode."
+            default=None, description="Dataset UUID. Required in multi-user mode, optional in single-user mode."
         ),
         include_procedural: bool = Query(
-            default=False,
-            description="If True, also include Procedure nodes derived from this episode."
+            default=False, description="If True, also include Procedure nodes derived from this episode."
         ),
         user: "User" = Depends(_get_auth_user()),
     ):
@@ -226,7 +224,7 @@ def _register_get_episode_subgraph(router: APIRouter) -> None:
 
         Returns nodes and edges related to the specified episode ID,
         including Facets and Entities directly connected to the episode.
-        
+
         Key features:
         - Supports dataset_id parameter for multi-tenant isolation
         - Permission checking in multi-user mode
@@ -249,21 +247,19 @@ def _register_get_episode_subgraph(router: APIRouter) -> None:
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="dataset_id is required in multi-user mode",
                     )
-                
+
                 # Validate user permissions
                 all_datasets = await get_all_user_permission_datasets(user, "read")
-                authorized_dataset = next(
-                    (ds for ds in all_datasets if ds.id == dataset_id), None
-                )
+                authorized_dataset = next((ds for ds in all_datasets if ds.id == dataset_id), None)
                 if not authorized_dataset:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail=f"Dataset {dataset_id} not found or not accessible",
                     )
-                
+
                 # Set dataset context for database operations
                 await set_db_context(dataset_id, authorized_dataset.owner_id)
-            
+
             engine = await get_graph_provider()
 
             # Single query: fetch episode node + all connected edges in one lock acquisition
@@ -304,13 +300,15 @@ def _register_get_episode_subgraph(router: APIRouter) -> None:
 
             ds_id_str = str(dataset_id) if dataset_id else None
 
-            nodes.append({
-                "id": episode_id,
-                "name": episode_props.get("name", f"Episode_{episode_id}"),
-                "type": "Episode",
-                "properties": episode_props,
-                "dataset_id": ds_id_str,
-            })
+            nodes.append(
+                {
+                    "id": episode_id,
+                    "name": episode_props.get("name", f"Episode_{episode_id}"),
+                    "type": "Episode",
+                    "properties": episode_props,
+                    "dataset_id": ds_id_str,
+                }
+            )
             seen_node_ids.add(episode_id)
 
             for row in raw:
@@ -330,19 +328,23 @@ def _register_get_episode_subgraph(router: APIRouter) -> None:
 
                 if neighbor_id and neighbor_id not in seen_node_ids:
                     seen_node_ids.add(neighbor_id)
-                    nodes.append({
-                        "id": neighbor_id,
-                        "name": neighbor.get("name", f"Node_{neighbor_id}"),
-                        "type": neighbor.get("type", "Unknown"),
-                        "properties": neighbor,
-                        "dataset_id": ds_id_str,
-                    })
+                    nodes.append(
+                        {
+                            "id": neighbor_id,
+                            "name": neighbor.get("name", f"Node_{neighbor_id}"),
+                            "type": neighbor.get("type", "Unknown"),
+                            "properties": neighbor,
+                            "dataset_id": ds_id_str,
+                        }
+                    )
 
-                result_edges.append({
-                    "source": episode_id,
-                    "target": neighbor_id,
-                    "relationship": relationship_name,
-                })
+                result_edges.append(
+                    {
+                        "source": episode_id,
+                        "target": neighbor_id,
+                        "relationship": relationship_name,
+                    }
+                )
 
             return {"nodes": nodes, "edges": result_edges}
 
@@ -366,8 +368,7 @@ def _register_get_facet_subgraph(router: APIRouter) -> None:
     async def get_facet_subgraph(
         facet_id: str,
         dataset_id: Optional[UUID] = Query(
-            default=None,
-            description="Dataset UUID. Required in multi-user mode, optional in single-user mode."
+            default=None, description="Dataset UUID. Required in multi-user mode, optional in single-user mode."
         ),
         user: "User" = Depends(_get_auth_user()),
     ):
@@ -376,7 +377,7 @@ def _register_get_facet_subgraph(router: APIRouter) -> None:
 
         Returns nodes and edges related to the specified facet ID,
         including FacetPoints and Entities directly connected to the facet.
-        
+
         Key features:
         - Supports dataset_id parameter for multi-tenant isolation
         - Permission checking in multi-user mode
@@ -399,21 +400,19 @@ def _register_get_facet_subgraph(router: APIRouter) -> None:
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="dataset_id is required in multi-user mode",
                     )
-                
+
                 # Validate user permissions
                 all_datasets = await get_all_user_permission_datasets(user, "read")
-                authorized_dataset = next(
-                    (ds for ds in all_datasets if ds.id == dataset_id), None
-                )
+                authorized_dataset = next((ds for ds in all_datasets if ds.id == dataset_id), None)
                 if not authorized_dataset:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail=f"Dataset {dataset_id} not found or not accessible",
                     )
-                
+
                 # Set dataset context for database operations
                 await set_db_context(dataset_id, authorized_dataset.owner_id)
-            
+
             engine = await get_graph_provider()
 
             # Single query: fetch facet node + all connected edges in one lock acquisition
@@ -454,13 +453,15 @@ def _register_get_facet_subgraph(router: APIRouter) -> None:
             result_edges = []
             seen_node_ids = set()
 
-            nodes.append({
-                "id": facet_id,
-                "name": facet_props.get("name", f"Facet_{facet_id}"),
-                "type": "Facet",
-                "properties": facet_props,
-                "dataset_id": ds_id_str,
-            })
+            nodes.append(
+                {
+                    "id": facet_id,
+                    "name": facet_props.get("name", f"Facet_{facet_id}"),
+                    "type": "Facet",
+                    "properties": facet_props,
+                    "dataset_id": ds_id_str,
+                }
+            )
             seen_node_ids.add(facet_id)
 
             for row in raw:
@@ -477,19 +478,23 @@ def _register_get_facet_subgraph(router: APIRouter) -> None:
 
                 if neighbor_id and neighbor_id not in seen_node_ids:
                     seen_node_ids.add(neighbor_id)
-                    nodes.append({
-                        "id": neighbor_id,
-                        "name": neighbor.get("name", f"Node_{neighbor_id}"),
-                        "type": neighbor.get("type", "Unknown"),
-                        "properties": neighbor,
-                        "dataset_id": ds_id_str,
-                    })
+                    nodes.append(
+                        {
+                            "id": neighbor_id,
+                            "name": neighbor.get("name", f"Node_{neighbor_id}"),
+                            "type": neighbor.get("type", "Unknown"),
+                            "properties": neighbor,
+                            "dataset_id": ds_id_str,
+                        }
+                    )
 
-                result_edges.append({
-                    "source": facet_id,
-                    "target": neighbor_id,
-                    "relationship": relationship_name,
-                })
+                result_edges.append(
+                    {
+                        "source": facet_id,
+                        "target": neighbor_id,
+                        "relationship": relationship_name,
+                    }
+                )
 
             return {"nodes": nodes, "edges": result_edges}
 
@@ -509,19 +514,20 @@ def _register_get_episodes_overview(router: APIRouter) -> None:
     @router.get("/episodes", response_model=EpisodesOverviewDTO)
     async def get_episodes_overview(
         dataset_id: Optional[UUID] = Query(
-            default=None,
-            description="Dataset UUID. If not provided, returns episodes from all accessible datasets."
+            default=None, description="Dataset UUID. If not provided, returns episodes from all accessible datasets."
         ),
-        limit: int = Query(default=10000, ge=1, description="Maximum number of episodes to return. Set high to get all."),
+        limit: int = Query(
+            default=10000, ge=1, description="Maximum number of episodes to return. Set high to get all."
+        ),
         offset: int = Query(default=0, ge=0, description="Number of episodes to skip"),
         user: "User" = Depends(_get_auth_user()),
     ):
         """
         Retrieve episodes overview for Layer 0 navigation.
-        
+
         Returns all Episodes with aggregated information (facet_count, entity_count).
         Supports pagination via limit and offset parameters.
-        
+
         Key features:
         - Returns episode list with aggregated counts
         - Supports pagination (limit/offset)
@@ -537,7 +543,7 @@ def _register_get_episodes_overview(router: APIRouter) -> None:
         try:
             # Get datasets the user has read access to
             all_datasets = await get_all_user_permission_datasets(user, "read")
-            
+
             if dataset_id:
                 datasets = [ds for ds in all_datasets if ds.id == dataset_id]
                 if not datasets:
@@ -550,17 +556,17 @@ def _register_get_episodes_overview(router: APIRouter) -> None:
 
             all_episodes = []
             seen_episode_ids: set = set()
-            
+
             # When access control is disabled, all datasets share the same database.
             # Query once to avoid returning duplicate episodes.
             if not backend_access_control_enabled():
                 datasets = datasets[:1] if datasets else []
-            
+
             for dataset in datasets:
                 try:
                     await set_db_context(dataset.id, dataset.owner_id)
                     engine = await get_graph_provider()
-                    
+
                     # Query all Episode nodes with aggregated counts
                     # Use WITH clauses to ensure proper aggregation across multiple OPTIONAL MATCHes
                     cypher = """
@@ -571,59 +577,63 @@ def _register_get_episodes_overview(router: APIRouter) -> None:
                     WHERE e.type IN ['Entity', 'Entity']
                     RETURN ep.id, ep.name, ep.properties, ep.created_at, facet_count, count(DISTINCT e) as entity_count
                     """
-                    
+
                     results = await engine.query(cypher, {})
-                    
+
                     for row in results:
                         if row and len(row) >= 6:
                             ep_id, ep_name, ep_props, col_created_at, facet_count, entity_count = row
                             ep_id_str = str(ep_id)
-                            
+
                             # Skip duplicate episodes (same ID already processed)
                             if ep_id_str in seen_episode_ids:
                                 continue
                             seen_episode_ids.add(ep_id_str)
-                            
+
                             # Handle properties - may be dict, JSON string, or None
                             props = ep_props or {}
                             if isinstance(props, str):
                                 try:
                                     import json
+
                                     props = json.loads(props)
                                 except (json.JSONDecodeError, TypeError):
                                     props = {}
-                            
+
                             # Prioritize column created_at over properties created_at
                             created_at = None
                             if col_created_at is not None:
                                 from datetime import datetime
+
                                 if isinstance(col_created_at, datetime):
                                     created_at = str(int(col_created_at.timestamp() * 1000))
                                 else:
                                     created_at = str(col_created_at)
                             elif isinstance(props, dict) and props.get("created_at") is not None:
                                 created_at = str(props.get("created_at"))
-                            
+
                             # Extract dataset_id from episode properties if available
                             ep_dataset_id = props.get("dataset_id") if isinstance(props, dict) else None
-                            
-                            all_episodes.append({
-                                "id": ep_id_str,
-                                "name": ep_name or f"Episode_{ep_id}",
-                                "summary": props.get("summary") if isinstance(props, dict) else None,
-                                "facet_count": facet_count or 0,
-                                "entity_count": entity_count or 0,
-                                "created_at": created_at,
-                                "dataset_id": ep_dataset_id or str(dataset.id),
-                            })
+
+                            all_episodes.append(
+                                {
+                                    "id": ep_id_str,
+                                    "name": ep_name or f"Episode_{ep_id}",
+                                    "summary": props.get("summary") if isinstance(props, dict) else None,
+                                    "facet_count": facet_count or 0,
+                                    "entity_count": entity_count or 0,
+                                    "created_at": created_at,
+                                    "dataset_id": ep_dataset_id or str(dataset.id),
+                                }
+                            )
                 except Exception as e:
                     _logger.warning(f"Error fetching episodes for dataset {dataset.id}: {e}")
                     continue
-            
+
             # Apply pagination
             total = len(all_episodes)
-            paginated = all_episodes[offset:offset + limit]
-            
+            paginated = all_episodes[offset : offset + limit]
+
             return {
                 "episodes": paginated,
                 "total": total,
@@ -648,16 +658,15 @@ def _register_get_entity_network(router: APIRouter) -> None:
     async def get_entity_network(
         entity_id: str,
         dataset_id: Optional[UUID] = Query(
-            default=None,
-            description="Dataset UUID. Required in multi-user mode, optional in single-user mode."
+            default=None, description="Dataset UUID. Required in multi-user mode, optional in single-user mode."
         ),
         user: "User" = Depends(_get_auth_user()),
     ):
         """
         Retrieve entity network showing all connected Episodes and Facets.
-        
+
         This endpoint is used for Layer 3 Entity network view.
-        
+
         Key features:
         - Returns all Episodes and Facets connected to this entity
         - Permission checking in multi-user mode
@@ -678,19 +687,17 @@ def _register_get_entity_network(router: APIRouter) -> None:
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="dataset_id is required in multi-user mode",
                     )
-                
+
                 all_datasets = await get_all_user_permission_datasets(user, "read")
-                authorized_dataset = next(
-                    (ds for ds in all_datasets if ds.id == dataset_id), None
-                )
+                authorized_dataset = next((ds for ds in all_datasets if ds.id == dataset_id), None)
                 if not authorized_dataset:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail=f"Dataset {dataset_id} not found or not accessible",
                     )
-                
+
                 await set_db_context(dataset_id, authorized_dataset.owner_id)
-            
+
             engine = await get_graph_provider()
 
             # Check if entity node exists
@@ -700,7 +707,7 @@ def _register_get_entity_network(router: APIRouter) -> None:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Entity {entity_id} not found",
                 )
-            
+
             entity_name = entity_node.get("name", f"Entity_{entity_id}")
             entity_type = entity_node.get("type", "Entity")
 
@@ -710,11 +717,11 @@ def _register_get_entity_network(router: APIRouter) -> None:
 
             # Use get_edges() to get all connections
             edges = await engine.get_edges(entity_id)
-            
+
             for src_node, relationship_name, tgt_node in edges:
                 src_id = str(src_node.get("id", ""))
                 tgt_id = str(tgt_node.get("id", ""))
-                
+
                 # Determine neighbor node
                 if src_id == entity_id:
                     neighbor_id = tgt_id
@@ -722,10 +729,10 @@ def _register_get_entity_network(router: APIRouter) -> None:
                 else:
                     neighbor_id = src_id
                     neighbor_node = src_node
-                
+
                 neighbor_type = neighbor_node.get("type", "Unknown")
                 neighbor_name = neighbor_node.get("name", f"{neighbor_type}_{neighbor_id}")
-                
+
                 node_data = {
                     "id": neighbor_id,
                     "name": neighbor_name,
@@ -733,7 +740,7 @@ def _register_get_entity_network(router: APIRouter) -> None:
                     "relationship": relationship_name,
                     "dataset_id": str(dataset_id) if dataset_id else None,
                 }
-                
+
                 if neighbor_type == "Episode":
                     connected_episodes.append(node_data)
                 elif neighbor_type == "Facet":
@@ -768,7 +775,7 @@ def _register_get_entity_network(router: APIRouter) -> None:
 
 def _format_node(node: tuple, dataset_id: Optional[UUID] = None) -> dict:
     """Convert node tuple to dict.
-    
+
     Args:
         node: Tuple of (node_id, properties)
         dataset_id: Optional dataset UUID for multi-tenant support
@@ -790,11 +797,11 @@ def _format_node(node: tuple, dataset_id: Optional[UUID] = None) -> dict:
         "type": node_type,
         "properties": filtered,
     }
-    
+
     # Add dataset_id if provided
     if dataset_id is not None:
         result["dataset_id"] = str(dataset_id)
-    
+
     return result
 
 
@@ -862,22 +869,25 @@ def _register_get_procedures_overview(router: APIRouter) -> None:
                     props = {}
                     if row[2]:
                         import json as _json
+
                         try:
                             props = _json.loads(row[2]) if isinstance(row[2], str) else (row[2] or {})
                         except Exception:
                             props = {}
 
-                    procedures.append({
-                        "id": pid,
-                        "name": row[1] or props.get("name", "Procedure"),
-                        "type": "Procedure",
-                        "search_text": props.get("search_text", ""),
-                        "version": props.get("version", 1),
-                        "status": props.get("status", "active"),
-                        "confidence": props.get("confidence", "high"),
-                        "point_count": row[3] if row[3] else 0,
-                        "datasetId": str(ds.id),
-                    })
+                    procedures.append(
+                        {
+                            "id": pid,
+                            "name": row[1] or props.get("name", "Procedure"),
+                            "type": "Procedure",
+                            "search_text": props.get("search_text", ""),
+                            "version": props.get("version", 1),
+                            "status": props.get("status", "active"),
+                            "confidence": props.get("confidence", "high"),
+                            "point_count": row[3] if row[3] else 0,
+                            "datasetId": str(ds.id),
+                        }
+                    )
             except Exception:
                 continue
 
@@ -943,18 +953,28 @@ def _register_get_procedure_subgraph(router: APIRouter) -> None:
             if p_id and p_id not in seen_ids:
                 seen_ids.add(p_id)
                 props = _safe_parse_props(p_props)
-                all_nodes.append(GraphNodeDTO(
-                    id=p_id, name=p_name or "Procedure", type=p_type or "Procedure",
-                    properties=props, datasetId=ds_id,
-                ))
+                all_nodes.append(
+                    GraphNodeDTO(
+                        id=p_id,
+                        name=p_name or "Procedure",
+                        type=p_type or "Procedure",
+                        properties=props,
+                        datasetId=ds_id,
+                    )
+                )
 
             if c_id and rel_name and rel_name in PROCEDURE_RELS and c_id not in seen_ids:
                 seen_ids.add(c_id)
                 c_props_parsed = _safe_parse_props(c_props)
-                all_nodes.append(GraphNodeDTO(
-                    id=c_id, name=c_name or c_type or "", type=c_type or "",
-                    properties=c_props_parsed, datasetId=ds_id,
-                ))
+                all_nodes.append(
+                    GraphNodeDTO(
+                        id=c_id,
+                        name=c_name or c_type or "",
+                        type=c_type or "",
+                        properties=c_props_parsed,
+                        datasetId=ds_id,
+                    )
+                )
                 all_edges.append(GraphEdgeDTO(source=p_id, target=c_id, relationship=rel_name))
 
         return GraphDTO(nodes=all_nodes, edges=all_edges)
@@ -966,6 +986,7 @@ def _safe_parse_props(raw) -> dict:
         return raw
     if isinstance(raw, str) and raw:
         import json
+
         try:
             return json.loads(raw)
         except Exception:

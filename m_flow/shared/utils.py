@@ -55,11 +55,7 @@ def _hash_sensitive(obj: Any, keys: List[str]) -> Any:
     """Recursively replace values for *keys* with deterministic hashes."""
     if isinstance(obj, dict):
         return {
-            k: (
-                str(uuid5(NAMESPACE_OID, v))
-                if k in keys and isinstance(v, str)
-                else _hash_sensitive(v, keys)
-            )
+            k: (str(uuid5(NAMESPACE_OID, v)) if k in keys and isinstance(v, str) else _hash_sensitive(v, keys))
             for k, v in obj.items()
         }
     if isinstance(obj, list):

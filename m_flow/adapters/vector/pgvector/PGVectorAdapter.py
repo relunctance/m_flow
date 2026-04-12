@@ -134,9 +134,7 @@ class PGVectorAdapter(SQLAlchemyAdapter, VectorProvider):
             return collection_name in meta.tables
 
     @retry(
-        retry=retry_if_exception_type(
-            (DuplicateTableError, UniqueViolationError, ProgrammingError)
-        ),
+        retry=retry_if_exception_type((DuplicateTableError, UniqueViolationError, ProgrammingError)),
         stop=stop_after_attempt(5),
         wait=wait_exponential(multiplier=2, min=1, max=6),
     )
@@ -179,9 +177,7 @@ class PGVectorAdapter(SQLAlchemyAdapter, VectorProvider):
         wait=wait_exponential(multiplier=2, min=1, max=6),
     )
     @override_distributed(queued_add_memory_nodes)
-    async def create_memory_nodes(
-        self, collection_name: str, memory_nodes: List[MemoryNode]
-    ) -> None:
+    async def create_memory_nodes(self, collection_name: str, memory_nodes: List[MemoryNode]) -> None:
         """创建或更新内存节点"""
         if not memory_nodes:
             return
@@ -272,7 +268,7 @@ class PGVectorAdapter(SQLAlchemyAdapter, VectorProvider):
         memory_nodes: list[MemoryNode],
     ) -> None:
         """为内存节点建立索引
-        
+
         保留 dataset_id 和 memory_type 字段以支持：
         - Episode Routing 的 dataset 隔离过滤
         - Retrieval 的 memory_type 过滤
@@ -300,9 +296,7 @@ class PGVectorAdapter(SQLAlchemyAdapter, VectorProvider):
 
             return meta.tables[collection_name]
 
-    async def retrieve(
-        self, collection_name: str, memory_node_ids: List[str]
-    ) -> list[VectorSearchHit]:
+    async def retrieve(self, collection_name: str, memory_node_ids: List[str]) -> list[VectorSearchHit]:
         """根据ID检索节点"""
         tbl = await self.get_table(collection_name)
 

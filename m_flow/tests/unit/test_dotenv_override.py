@@ -41,9 +41,7 @@ class TestDotenvOverride:
             load_dotenv(env_file, override=False)
 
             # 验证用户值优先
-            assert os.environ.get(test_var) == user_value, (
-                f"Expected '{user_value}', got '{os.environ.get(test_var)}'"
-            )
+            assert os.environ.get(test_var) == user_value, f"Expected '{user_value}', got '{os.environ.get(test_var)}'"
 
         finally:
             # 清理
@@ -179,9 +177,7 @@ class TestMflowDotenvSourceCode:
             and "import" not in line.lower()
         ]
 
-        assert len(load_dotenv_calls) >= 1, (
-            "No load_dotenv() call found in m_flow/shared/__init__.py"
-        )
+        assert len(load_dotenv_calls) >= 1, "No load_dotenv() call found in m_flow/shared/__init__.py"
 
         for line in load_dotenv_calls:
             assert "override=False" in line, f"Expected override=False in: {line}"

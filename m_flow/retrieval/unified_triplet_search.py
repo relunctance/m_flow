@@ -228,9 +228,7 @@ class UnifiedTripletSearch(BaseGraphRetriever):
             )
 
         if self.save_interaction and context and triplets and completion:
-            await self.save_qa(
-                question=query, answer=completion, context=context_text, triplets=triplets
-            )
+            await self.save_qa(question=query, answer=completion, context=context_text, triplets=triplets)
 
         if session_save:
             await save_conversation_history(
@@ -253,9 +251,7 @@ class UnifiedTripletSearch(BaseGraphRetriever):
             - triplets (List): A list of triples retrieved from the graph.
         """
         nodeset_name = "Interactions"
-        interactions_node_set = MemorySpace(
-            id=uuid5(NAMESPACE_OID, name=nodeset_name), name=nodeset_name
-        )
+        interactions_node_set = MemorySpace(id=uuid5(NAMESPACE_OID, name=nodeset_name), name=nodeset_name)
         source_id = uuid5(NAMESPACE_OID, name=(question + answer + context))
 
         m_flow_user_interaction = MflowUserInteraction(

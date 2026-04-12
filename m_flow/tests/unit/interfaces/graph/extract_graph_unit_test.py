@@ -85,9 +85,7 @@ async def test_basic_node_relationship():
     edge_registry = {}
     prop_tracker = {}
 
-    extracted_nodes, extracted_edges = await extract_graph(
-        concept, node_registry, edge_registry, prop_tracker
-    )
+    extracted_nodes, extracted_edges = await extract_graph(concept, node_registry, edge_registry, prop_tracker)
 
     assert len(extracted_nodes) == 2, f"Should extract 2 nodes, found {len(extracted_nodes)}"
     assert len(extracted_edges) == 1, f"Should extract 1 edge, found {len(extracted_edges)}"
@@ -113,9 +111,7 @@ async def test_document_with_multiple_concepts():
     edge_registry = {}
     prop_tracker = {}
 
-    extracted_nodes, extracted_edges = await extract_graph(
-        fragment, node_registry, edge_registry, prop_tracker
-    )
+    extracted_nodes, extracted_edges = await extract_graph(fragment, node_registry, edge_registry, prop_tracker)
 
     assert len(extracted_nodes) == 5, f"Expected 5 nodes, found {len(extracted_nodes)}"
     assert len(extracted_edges) == 5, f"Expected 5 edges, found {len(extracted_edges)}"
@@ -137,9 +133,7 @@ async def test_duplicate_object_handling():
     edge_registry = {}
     prop_tracker = {}
 
-    extracted_nodes, extracted_edges = await extract_graph(
-        fragment, node_registry, edge_registry, prop_tracker
-    )
+    extracted_nodes, extracted_edges = await extract_graph(fragment, node_registry, edge_registry, prop_tracker)
 
     assert len(extracted_nodes) == 4, f"Expected 4 unique nodes, found {len(extracted_nodes)}"
     assert len(extracted_edges) == 3, f"Expected 3 edges, found {len(extracted_edges)}"
@@ -167,12 +161,8 @@ async def test_deeply_nested_structure():
     edge_registry = {}
     prop_tracker = {}
 
-    nodes_1, edges_1 = await extract_graph(
-        frag_1, node_registry, edge_registry, prop_tracker
-    )
-    nodes_2, edges_2 = await extract_graph(
-        frag_2, node_registry, edge_registry, prop_tracker
-    )
+    nodes_1, edges_1 = await extract_graph(frag_1, node_registry, edge_registry, prop_tracker)
+    nodes_2, edges_2 = await extract_graph(frag_2, node_registry, edge_registry, prop_tracker)
 
     total_nodes = nodes_1 + nodes_2
     total_edges = edges_1 + edges_2
@@ -191,9 +181,7 @@ async def test_empty_reference_list():
     edge_registry = {}
     prop_tracker = {}
 
-    extracted_nodes, extracted_edges = await extract_graph(
-        fragment, node_registry, edge_registry, prop_tracker
-    )
+    extracted_nodes, extracted_edges = await extract_graph(fragment, node_registry, edge_registry, prop_tracker)
 
     assert len(extracted_nodes) == 2, f"Expected 2 nodes, found {len(extracted_nodes)}"
     assert len(extracted_edges) == 1, f"Expected 1 edge, found {len(extracted_edges)}"
@@ -234,9 +222,7 @@ async def test_weighted_edge_relationships():
     edge_registry = {}
     prop_tracker = {}
 
-    extracted_nodes, extracted_edges = await extract_graph(
-        org, node_registry, edge_registry, prop_tracker
-    )
+    extracted_nodes, extracted_edges = await extract_graph(org, node_registry, edge_registry, prop_tracker)
 
     # 6 nodes: 1 organization + 5 team members
     assert len(extracted_nodes) == 6, f"Expected 6 nodes, found {len(extracted_nodes)}"

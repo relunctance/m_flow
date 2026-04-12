@@ -10,7 +10,7 @@ Tests:
 
 import pytest
 from uuid import uuid4
-from m_flow.adapters.vector.models import VectorSearchHit, VectorSearchHit
+from m_flow.adapters.vector.models import VectorSearchHit
 
 
 class TestBackwardAlias:
@@ -60,17 +60,13 @@ class TestVectorSearchHitNewFields:
 
     def test_raw_distance_zero(self):
         """Test that raw_distance can be 0 (perfect match)."""
-        result = VectorSearchHit(
-            id=uuid4(), payload={}, score=0.0, raw_distance=0.0, collection_name="test"
-        )
+        result = VectorSearchHit(id=uuid4(), payload={}, score=0.0, raw_distance=0.0, collection_name="test")
 
         assert result.raw_distance == 0.0
 
     def test_raw_distance_large(self):
         """Test that raw_distance can be large values."""
-        result = VectorSearchHit(
-            id=uuid4(), payload={}, score=1.0, raw_distance=2.5, collection_name="Episode_summary"
-        )
+        result = VectorSearchHit(id=uuid4(), payload={}, score=1.0, raw_distance=2.5, collection_name="Episode_summary")
 
         assert result.raw_distance == 2.5
 
@@ -144,15 +140,9 @@ class TestVectorSearchHitGapCalculation:
     def test_gap_between_results(self):
         """Simulate calculating gap between top results."""
         results = [
-            VectorSearchHit(
-                id=uuid4(), payload={}, score=0.0, raw_distance=0.35, collection_name="test"
-            ),
-            VectorSearchHit(
-                id=uuid4(), payload={}, score=0.5, raw_distance=0.52, collection_name="test"
-            ),
-            VectorSearchHit(
-                id=uuid4(), payload={}, score=1.0, raw_distance=0.80, collection_name="test"
-            ),
+            VectorSearchHit(id=uuid4(), payload={}, score=0.0, raw_distance=0.35, collection_name="test"),
+            VectorSearchHit(id=uuid4(), payload={}, score=0.5, raw_distance=0.52, collection_name="test"),
+            VectorSearchHit(id=uuid4(), payload={}, score=1.0, raw_distance=0.80, collection_name="test"),
         ]
 
         # Simulate gap calculation
@@ -165,9 +155,7 @@ class TestVectorSearchHitGapCalculation:
     def test_single_result_gap(self):
         """When there's only one result, gap should be 0."""
         results = [
-            VectorSearchHit(
-                id=uuid4(), payload={}, score=0.0, raw_distance=0.35, collection_name="test"
-            ),
+            VectorSearchHit(id=uuid4(), payload={}, score=0.0, raw_distance=0.35, collection_name="test"),
         ]
 
         # Simulate gap calculation with single result

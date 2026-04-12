@@ -221,9 +221,7 @@ def get_coreference_router() -> APIRouter:
             )
 
             if include_sessions and "sessions" in stats:
-                response.sessions = [
-                    SessionInfo(**s) for s in stats["sessions"]
-                ]
+                response.sessions = [SessionInfo(**s) for s in stats["sessions"]]
 
             return response
         except ImportError as e:
