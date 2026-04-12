@@ -52,7 +52,7 @@ Retrieval is **graph-routed**: the system casts a wide net across all levels, pr
 
 All benchmarks use gpt-5-mini (answer) + gpt-4o-mini (judge) + top-k=10.
 
-### LoCoMo-10 (long-term conversational memory, 1540 questions)
+### LoCoMo-10
 
 | System | LLM-Judge |
 |--------|:---------:|
@@ -61,7 +61,7 @@ All benchmarks use gpt-5-mini (answer) + gpt-4o-mini (judge) + top-k=10.
 | Zep Cloud | 73.4% |
 | Supermemory Cloud | 64.4% |
 
-### LongMemEval Oracle (long-term interactive memory, first 100 questions)
+### LongMemEval
 
 | System | LLM-Judge |
 |--------|:---------:|
