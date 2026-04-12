@@ -2,7 +2,7 @@
 
 # M-flow
 
-**A memory engine that turns Graph RAG into a cognitive model, redefining the fundamental logic of retrieval.**
+**Graph RAG finds what's similar. M-flow finds what's relevant.**
 
 [m-flow.ai](https://m-flow.ai) ·
 [flowelement.ai](https://flowelement.ai) ·
