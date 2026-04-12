@@ -69,6 +69,7 @@ All benchmarks use gpt-5-mini (answer) + gpt-4o-mini (judge) + top-k=10.
 | Supermemory Cloud | 74% |
 | Mem0 | 71% |
 | Zep Cloud | 61% |
+| Cognee | 57% |
 
 Per-category breakdowns, reproduction scripts, raw data, and methodology for all systems: [mflow-benchmarks](https://github.com/FlowElement-ai/mflow-benchmarks)
 
