@@ -2,9 +2,7 @@
 
 # M-flow
 
-**A memory engine that focuses on reasoning and association.**
-
-M-flow 是一款重构检索架构、侧重推理与联想的记忆引擎。
+**A memory engine that turns Graph RAG into a cognitive model, redefining the fundamental logic of retrieval.**
 
 [m-flow.ai](https://m-flow.ai) ·
 [flowelement.ai](https://flowelement.ai) ·
@@ -24,16 +22,13 @@ M-flow 是一款重构检索架构、侧重推理与联想的记忆引擎。
 
 ## What is M-flow?
 
-M-flow is not a vector database or a RAG framework. It is a **cognitive memory engine** — a system that doesn't just store text, but *understands* it, distilling incoming knowledge into structured layers and weaving them into the right place of a persistent architecture.
+The fundamental shift is this: **existing systems build graphs but still retrieve by embedding distance. M-flow makes the graph the retrieval mechanism itself.**
 
-Where traditional retrieval matches queries by surface similarity, M-flow **reasons through relationships** — tracing connections, weighing context, and reaching answers the way cognition does.
+RAG embeds chunks and ranks by vector similarity. GraphRAG goes further — it extracts entities, builds a knowledge graph, and generates community summaries. But when a query arrives, retrieval still reduces to embedding the query and matching against stored text. The graph informs what gets embedded; it does not participate in how results are scored. The retrieval step remains **similarity-driven**.
 
-Most AI memory systems fall into two categories:
+M-flow takes a different approach: the graph is not a preprocessing step — it is the scoring engine. When a query arrives, vector search casts a wide net across multiple granularities to find entry points. Then **the graph takes over** — propagating evidence along typed, semantically weighted edges, and scoring each knowledge unit by the tightest chain of reasoning that connects it to the query.
 
-- **Context Window** — The model re-reads everything from scratch. Exhaustive, linear, forgetful.
-- **Similarity Search** — External memory exists, but retrieval is surface-level — matching by vector shape, blind to structure. Approximate, lossy.
-
-M-flow introduces a third paradigm: a **Cognitive Engine** where memory becomes a mind. A query at any granularity finds a precise anchor, then expands outward — surfacing related context and associative content across different levels of detail.
+The sets of "similar" and "relevant" results overlap — but they are not the same. A discussion of "cost overruns in Q3" is highly relevant to a query about "budget impact" despite low surface similarity. A passage about "budget templates" is maximally similar but answers a different question entirely. This difference in retrieval logic — **from distance-based ranking to path-based reasoning** — is what drives M-flow's consistent advantage across benchmarks.
 
 ## How It Works
 
@@ -48,7 +43,7 @@ M-flow organizes knowledge into a four-level **Cone Graph** — a layered hierar
 
 Retrieval is **graph-routed**: the system casts a wide net across all levels, projects hits into the knowledge graph, propagates cost along every possible path, and scores each Episode by its **tightest chain of evidence**. One strong path is enough — the way a single association triggers an entire memory.
 
-> For the full technical deep-dive, see [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md) | [检索架构详解（中文）](docs/RETRIEVAL_ARCHITECTURE_ZH.md)
+> For the full technical deep-dive, see [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md)
 
 ## Benchmarks
 
