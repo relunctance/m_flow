@@ -73,27 +73,42 @@ Retrieval is **graph-routed**: the system casts a wide net across all levels, pr
 
 ## Benchmarks
 
-All benchmarks use gpt-5-mini (answer) + gpt-4o-mini (judge) + top-k=10.
+All systems use gpt-5-mini (answer) + gpt-4o-mini (judge). Cat 5 (adversarial) excluded from LoCoMo.
 
 ### LoCoMo-10
 
-| System | LLM-Judge |
-|--------|:---------:|
-| **M-flow** | **81.8%** |
-| Cognee Cloud | 79.4% |
-| Zep Cloud | 73.4% |
-| Supermemory Cloud | 64.4% |
-| Mem0 Cloud (top-k=30) | 50.4% |
+**Aligned (top-k = 10)**
+
+| System | LLM-Judge | Answer LLM | Judge LLM | Top-K |
+|--------|:---------:|------------|-----------|:-----:|
+| **M-flow** | **81.8%** | gpt-5-mini | gpt-4o-mini | 10 |
+| Cognee Cloud | 79.4% | gpt-5-mini | gpt-4o-mini | 10 |
+| Zep Cloud (7e+3n) | 73.4% | gpt-5-mini | gpt-4o-mini | 10 |
+| Supermemory | 64.4% | gpt-5-mini | gpt-4o-mini | 10 |
+
+**With vendor-default retrieval budgets**
+
+| System | LLM-Judge | Answer LLM | Judge LLM | Top-K |
+|--------|:---------:|------------|-----------|:-----:|
+| **M-flow** | **81.8%** | gpt-5-mini | gpt-4o-mini | 10 |
+| Cognee Cloud | 79.4% | gpt-5-mini | gpt-4o-mini | 10 |
+| Zep Cloud (20e+20n) | 78.4% | gpt-5-mini | gpt-4o-mini | 40 |
+| Mem0ᵍ Cloud (published) | 68.5% | — | — | — |
+| Mem0 Cloud (published) | 67.1% | — | — | — |
+| Supermemory | 64.4% | gpt-5-mini | gpt-4o-mini | 10 |
+| Mem0 Cloud (tested) | 50.4% | gpt-5-mini | gpt-4o-mini | 30 |
 
 ### LongMemEval
 
-| System | LLM-Judge |
-|--------|:---------:|
-| **M-flow** | **89%** |
-| Supermemory Cloud | 74% |
-| Mem0 Cloud | 71% |
-| Zep Cloud | 61% |
-| Cognee | 57% |
+First 100 questions, top-k=10.
+
+| System | LLM-Judge | Temporal (60) | Multi-session (40) |
+|--------|:---------:|:-------------:|:------------------:|
+| **M-flow** | **89%** | **93%** | **82%** |
+| Supermemory Cloud | 74% | 78% | 68% |
+| Mem0 Cloud | 71% | 77% | 63% |
+| Zep Cloud | 61% | 82% | 30% |
+| Cognee | 57% | 67% | 43% |
 
 Per-category breakdowns, reproduction scripts, raw data, and methodology for all systems: [mflow-benchmarks](https://github.com/FlowElement-ai/mflow-benchmarks)
 
