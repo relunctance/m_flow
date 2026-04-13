@@ -21,17 +21,17 @@ CREATE TABLE IF NOT EXISTS tracks (
     unit_price DECIMAL(10,2)
 );
 
-CREATE TABLE IF NOT EXISTS employees (
-    employee_id INTEGER PRIMARY KEY,
-    last_name VARCHAR(20) NOT NULL,
-    first_name VARCHAR(20) NOT NULL,
-    title VARCHAR(30),
-    reports_to INTEGER REFERENCES employees(employee_id)
+CREATE TABLE IF NOT EXISTS "Employee" (
+    "EmployeeId" INTEGER PRIMARY KEY,
+    "LastName" VARCHAR(20) NOT NULL,
+    "FirstName" VARCHAR(20) NOT NULL,
+    "Title" VARCHAR(30),
+    "ReportsTo" INTEGER REFERENCES "Employee"("EmployeeId")
 );
 
 -- Sample data
 
-INSERT INTO employees (employee_id, last_name, first_name, title, reports_to) VALUES
+INSERT INTO "Employee" ("EmployeeId", "LastName", "FirstName", "Title", "ReportsTo") VALUES
     (1, 'Adams', 'Andrew', 'General Manager', NULL),
     (2, 'Edwards', 'Nancy', 'Sales Manager', 1),
     (3, 'Peacock', 'Jane', 'Sales Support Agent', 2),

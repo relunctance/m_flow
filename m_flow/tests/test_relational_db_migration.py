@@ -51,8 +51,7 @@ async def _migrate_and_verify():
     results = await m_flow.search(query_type=RecallMode.TRIPLET_COMPLETION, query_text="Tell me about AC/DC")
     assert any("AC/DC" in r for r in results), "未找到AC/DC"
 
-    db_provider = engine.engine.dialect.name
-    rel_label = "reports_to" if db_provider == "postgresql" else "ReportsTo"
+    rel_label = "ReportsTo"
     graph_provider = (os.getenv("GRAPH_DATABASE_PROVIDER") or "networkx").lower()
 
     nodes_set = set()
