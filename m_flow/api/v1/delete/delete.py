@@ -243,13 +243,68 @@ async def _remove_subgraph(doc_id: str, deletion_mode: str) -> dict:
     }
 
 
+async def _cleanup_orphan_episodic_nodes(graph) -> list[str]:
+    """Remove Episode/Facet/FacetPoint nodes that lost all source evidence.
+
+    After phase-1 deletion removes ContentFragment nodes, DETACH DELETE
+    automatically severs ``includes_chunk`` and ``supported_by`` edges.
+    This function finds nodes that became orphans as a result and removes
+    them together with their vector-store entries.
+
+    Returns list of deleted node IDs (strings).
+    """
+    purged: list[str] = []
+
+    # Step 1: Facets with no remaining supported_by edges → delete their FacetPoints first
+    orphan_facets = await graph.query(
+        "MATCH (f:Node) WHERE f.type = 'Facet' "
+        "AND NOT EXISTS { MATCH (f)-[r:EDGE]->() WHERE r.relationship_name = 'supported_by' } "
+        "RETURN f"
+    )
+    for row in orphan_facets:
+        facet = row[0]
+        fid = str(facet["id"])
+
+        # Delete child FacetPoints
+        fps = await graph.query(
+            "MATCH (f:Node)-[r:EDGE]->(fp:Node) "
+            "WHERE f.id = $id AND r.relationship_name = 'has_point' AND fp.type = 'FacetPoint' "
+            "RETURN fp",
+            {"id": fid},
+        )
+        for fp_row in fps:
+            fp_id = str(fp_row[0]["id"])
+            await graph.delete_node(fp_id)
+            purged.append(fp_id)
+
+        # Delete the Facet itself
+        await graph.delete_node(fid)
+        purged.append(fid)
+
+    # Step 2: Episodes with no remaining includes_chunk edges
+    orphan_episodes = await graph.query(
+        "MATCH (e:Node) WHERE e.type = 'Episode' "
+        "AND NOT EXISTS { MATCH (e)-[r:EDGE]->() WHERE r.relationship_name = 'includes_chunk' } "
+        "RETURN e"
+    )
+    for row in orphan_episodes:
+        eid = str(row[0]["id"])
+        await graph.delete_node(eid)
+        purged.append(eid)
+
+    if purged:
+        _log.info("Cleaned %d orphan episodic nodes (Facet/FacetPoint/Episode)", len(purged))
+
+    return purged
+
+
 async def delete_single_document(
     data_id: str,
     dataset_id: UUID = None,
     mode: str = "soft",
 ) -> dict:
     """Delete a single document and its associated data."""
-    # Delete from graph database
+    # Phase 1: Delete ingestion-layer nodes (Document, Chunk, Digest, orphan Entity)
     graph_result = await _remove_subgraph(data_id, mode)
     _log.info("Graph deletion result: %s", graph_result)
 
@@ -260,7 +315,15 @@ async def delete_single_document(
         if converted is not None:
             uuid_list.append(converted)
 
-    # Delete from vector database
+    # Phase 2: Clean orphan episodic-layer nodes (Episode, Facet, FacetPoint)
+    graph = await get_graph_provider()
+    orphan_ids = await _cleanup_orphan_episodic_nodes(graph)
+    for oid in orphan_ids:
+        converted = _convert_to_uuid(oid)
+        if converted is not None:
+            uuid_list.append(converted)
+
+    # Delete from vector database (covers all node types via dynamic collection discovery)
     await _purge_from_vector_store(uuid_list)
 
     # Delete from relational database
