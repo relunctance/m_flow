@@ -72,11 +72,17 @@ dependencies = [
     "python-magic-bin<0.5 ; platform_system == 'Windows'",
 ]
 
+[tool.uv.sources]
+chinese-coref = { path = "./coreference", editable = true }
+
 # ---------------------------------------------------------------------------
 # Optional dependency groups
 # ---------------------------------------------------------------------------
 
 [project.optional-dependencies]
+
+# Playground (face recognition + coreference resolution)
+playground = ["chinese-coref"]
 
 # LLM providers
 anthropic = ["anthropic>=0.26"]

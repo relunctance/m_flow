@@ -24,6 +24,7 @@ import {
   FileEdit,
   Shield,
   ScrollText,
+  MessageSquare,
 } from "lucide-react";
 
 export default function Home() {
@@ -120,6 +121,16 @@ export default function Home() {
         label: "Lexical Search",
         category: "Retrieve",
         onSelect: () => setCurrentView("retrieve-lexical"),
+      },
+
+      // Playground
+      {
+        id: "playground",
+        icon: <MessageSquare className="h-4 w-4" />,
+        label: "Playground",
+        shortcut: "⌘P",
+        category: "Navigation",
+        onSelect: () => setCurrentView("playground"),
       },
 
       // Monitoring & Audit

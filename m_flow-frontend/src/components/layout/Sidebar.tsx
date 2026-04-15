@@ -39,6 +39,7 @@ import {
   FolderInput,
   BookOpen,
   Trash2,
+  MessageSquare,
 } from "lucide-react";
 
 // ============================================================================
@@ -91,6 +92,11 @@ const mainNavItems: NavItem[] = [
       { id: "retrieve-cypher", label: "Graph Query", icon: <Code2 size={16} strokeWidth={1.5} /> },
       { id: "retrieve-lexical", label: "Keyword Search", icon: <FileSearch size={16} strokeWidth={1.5} /> },
     ],
+  },
+  {
+    id: "playground",
+    label: "Playground",
+    icon: <MessageSquare size={18} strokeWidth={1.5} />,
   },
   {
     id: "audit",

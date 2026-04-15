@@ -295,6 +295,7 @@ def _mount_routers() -> None:
     from m_flow.api.v1.pipeline.routers import get_pipeline_router
     from m_flow.api.v1.maintenance.routers import get_maintenance_router
     from m_flow.api.v1.coreference import get_coreference_router
+    from m_flow.api.v1.playground import get_playground_router
 
     # Authentication routes
     auth_prefix = "/api/v1/auth"
@@ -327,6 +328,7 @@ def _mount_routers() -> None:
         (get_pipeline_router, "/api/v1/pipeline", "pipeline"),
         (get_maintenance_router, "/api/v1/maintenance", "maintenance"),
         (get_coreference_router, "/api/v1", "coreference"),
+        (get_playground_router, "/api/v1/playground", "playground"),
     ]
     for router_fn, prefix, tag in route_map:
         app.include_router(router_fn(), prefix=prefix, tags=[tag])

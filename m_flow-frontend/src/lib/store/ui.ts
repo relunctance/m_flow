@@ -43,6 +43,9 @@ export type View =
   | "permissions"
   | "audit"
   
+  // Playground
+  | "playground"
+  
   // Docs
   | "docs"
   | "integration-examples"

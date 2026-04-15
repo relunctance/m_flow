@@ -53,6 +53,9 @@ const UserManagementPage = dynamic(() => import("@/components/users").then(m => 
 const LearnPage = dynamic(() => import("@/components/learn").then(m => ({ default: m.LearnPage })), { loading: PageLoader });
 
 
+// Playground
+const PlaygroundPage = dynamic(() => import("@/components/playground").then(m => ({ default: m.PlaygroundPage })), { loading: PageLoader });
+
 // Legacy Components
 const FileUpload = dynamic(() => import("@/components/upload").then(m => ({ default: m.FileUpload })), { loading: PageLoader });
 const HealthPage = dynamic(() => import("@/components/system").then(m => ({ default: m.HealthPage })), { loading: PageLoader });
@@ -121,6 +124,10 @@ export function MainContent() {
       // ===== User Management =====
       case "users":
         return <UserManagementPage />;
+      
+      // ===== Playground =====
+      case "playground":
+        return <PlaygroundPage />;
       
       // ===== Admin =====
       case "permissions":
