@@ -28,45 +28,42 @@ concurrency:
 
 jobs:
 
-  ############################################################################
-  # ChromaDB — temporarily disabled pending integration stabilisation
-  ############################################################################
-  # chromadb-assertions:
-  #   if: ${{ inputs.databases == 'all' || contains(inputs.databases, 'chromadb') }}
-  #   timeout-minutes: 15
-  #   runs-on: ubuntu-22.04
-  #   name: "chromadb-embedding-store"
-  #   defaults: {run: {shell: bash}}
-  #   services:
-  #     chromadb:
-  #       image: chromadb/chroma:0.6.3
-  #       env:
-  #         CHROMA_SERVER_AUTH_CREDENTIALS: "test-token"
-  #         CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER: "chromadb.auth.token.TokenAuthCredentialsProvider"
-  #         CHROMA_SERVER_AUTH_PROVIDER: "chromadb.auth.token.TokenAuthServerProvider"
-  #       ports: ["3002:8000"]
-  #   env:
-  #     ENV: 'dev'
-  #     VECTOR_DB_PROVIDER: chromadb
-  #     VECTOR_DB_URL: http://localhost:3002
-  #     VECTOR_DB_KEY: test-token
-  #     LLM_MODEL: ${{ secrets.LLM_MODEL }}
-  #     LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
-  #     LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-  #     LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
-  #     EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-  #     EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-  #     EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-  #     EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
-  #   steps:
-  #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
-  #       with: {fetch-depth: 0}
-  #     - uses: ./.github/actions/m_flow_setup
-  #       with: {python-version: "${{ inputs.python-version }}"}
-  #     - run: poetry install -E chromadb
-  #       name: "Install ChromaDB extras"
-  #     - name: "Execute ChromaDB assertions"
-  #       run: uv run python ./m_flow/tests/test_chromadb.py
+  # ── ChromaDB embedding store ──────────────────────────────────────────
+  chromadb-assertions:
+    if: ${{ inputs.databases == 'all' || contains(inputs.databases, 'chromadb') }}
+    timeout-minutes: 15
+    runs-on: ubuntu-22.04
+    name: "chromadb-embedding-store"
+    defaults: {run: {shell: bash}}
+    services:
+      chromadb:
+        image: chromadb/chroma:latest
+        env:
+          CHROMA_SERVER_AUTH_CREDENTIALS: "test-token"
+          CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER: "chromadb.auth.token.TokenAuthCredentialsProvider"
+          CHROMA_SERVER_AUTH_PROVIDER: "chromadb.auth.token.TokenAuthServerProvider"
+        ports: ["3002:8000"]
+    env:
+      ENV: 'dev'
+      VECTOR_DB_PROVIDER: chromadb
+      VECTOR_DB_URL: http://localhost:3002
+      VECTOR_DB_KEY: test-token
+      LLM_MODEL: ${{ secrets.LLM_MODEL }}
+      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
+      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
+      EMBEDDING_DIMENSIONS: "1536"
+      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
+      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
+      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with: {fetch-depth: 0}
+      - uses: ./.github/actions/m_flow_setup
+        with: {python-version: "${{ inputs.python-version }}", extra-dependencies: "chromadb"}
+      - name: "Execute ChromaDB assertions"
+        run: uv run python ./m_flow/tests/test_chromadb.py
 
   # ── PGVector embedding store ───────────────────────────────────────────
   pgvector-assertions:
