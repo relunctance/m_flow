@@ -14,9 +14,11 @@ from m_flow.shared.logging_utils import get_logger
 
 _log = get_logger(__name__)
 
+
 def get_face_api_key() -> str:
     """Read FACE_API_KEY lazily from env (supports dotenv loaded after module import)."""
     return os.environ.get("FACE_API_KEY", "")
+
 
 _IN_DOCKER = os.path.exists("/.dockerenv")
 
