@@ -329,7 +329,9 @@ class MflowClient:
             dataset_ids: List[Optional[str]]
             if datasets:
                 available = await self.list_datasets()
-                name_to_id = {str(ds.get("name")): str(ds.get("id")) for ds in available if ds.get("name") and ds.get("id")}
+                name_to_id = {
+                    str(ds.get("name")): str(ds.get("id")) for ds in available if ds.get("name") and ds.get("id")
+                }
                 missing = [name for name in datasets if name not in name_to_id]
                 if missing:
                     raise ValueError(f"Unknown dataset name(s): {', '.join(missing)}")
@@ -338,20 +340,21 @@ class MflowClient:
                 dataset_ids = [None]
 
             url = f"{self._base_url}/api/v1/procedural/extract-from-episodic"
-            last_response: Dict[str, Any] = {}
+            all_results: List[Dict[str, Any]] = []
             for dataset_id in dataset_ids:
                 body: Dict[str, Any] = {
                     "dataset_id": dataset_id,
                     "limit": 100,
                     "force_reprocess": False,
+                    "run_in_background": run_in_background,
                 }
                 resp = await self._http.post(url, json=body, headers=self._auth_headers())
                 resp.raise_for_status()
-                last_response = resp.json()
+                all_results.append(resp.json())
 
-            if run_in_background and last_response:
-                last_response.setdefault("run_in_background", True)
-            return last_response
+            if len(all_results) == 1:
+                return all_results[0]
+            return {"status": "success", "datasets_processed": len(all_results), "results": all_results}
 
         from m_flow import learn as _learn
 
