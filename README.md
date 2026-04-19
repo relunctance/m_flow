@@ -137,13 +137,49 @@ flowchart LR
     EN -->|supported path| B
 ```
 
-### Retrieval model at a glance
+### M-flow retrieval at a glance
 
-| System type | What retrieval primarily scores | Role of the graph |
-|-------------|----------------------------------|-------------------|
-| Traditional RAG | Chunk matches from BM25, dense vectors, or hybrid search | None or minimal (similar text can outrank the evidence that actually answers the question) |
-| Common GraphRAG | Candidate matches plus graph expansion, summaries, or reranking | Organizes and enriches context; may support scoring (the graph can remain secondary to candidate similarity) |
-| **M-flow** | Lowest-cost evidence paths through the Cone Graph | Primary relevance mechanism |
+**1. Graph-led retrieval (not similarity-led)**
+
+- Vector / hybrid search only opens entry points
+- Final relevance is determined by graph propagation
+
+> *Vectors find candidates. The graph decides relevance.*
+
+**2. Evidence-path scoring (not flat ranking)**
+
+- Results are ranked by the **strongest supporting path**
+- Retrieval = **path-cost optimization over the graph**
+
+> *One strong chain of evidence is enough.*
+
+**3. Unified multi-granularity retrieval**
+
+- Episodes, Facets, FacetPoints, Entities all act as entry points
+- All granularities are connected in one graph
+
+> *Not just multi-level storage — but multi-level retrieval.*
+
+**4. Semantic edges as first-class signals**
+
+- Edges carry natural-language meaning (`edge_text`)
+- Relationships are searchable and scored
+
+> *Connections carry meaning, not just structure.*
+
+**5. Controlled propagation (not a naive graph walk)**
+
+- Each hop expands context but also adds cost
+- Only coherent, low-cost paths survive
+
+> *Association, but with structure and discipline.*
+
+**6. Adaptive and noise-resistant retrieval**
+
+- Broad matches are penalized
+- Node / edge importance adapts per query
+
+> *Prevents "looks relevant" from beating "is relevant".*
 
 > For the full technical deep-dive, see [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md)
 
