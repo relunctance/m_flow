@@ -21,6 +21,7 @@ class LLMProvider(str, Enum):
     GEMINI = "gemini"
     MISTRAL = "mistral"
     BEDROCK = "bedrock"
+    MINIMAX = "minimax"
 
 
 def create_llm_backend(raise_api_key_error: bool = True) -> Any:
@@ -148,6 +149,16 @@ def create_llm_backend(raise_api_key_error: bool = True) -> Any:
             api_key=cfg.llm_api_key,
             max_completion_tokens=max_tokens,
             streaming=cfg.llm_streaming,
+            instructor_mode=mode,
+        )
+
+    if provider == LLMProvider.MINIMAX:
+        _require_key()
+        from .minimax.adapter import MiniMaxAdapter
+
+        return MiniMaxAdapter(
+            max_completion_tokens=max_tokens,
+            model=cfg.llm_model,
             instructor_mode=mode,
         )
 

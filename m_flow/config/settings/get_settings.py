@@ -33,6 +33,7 @@ class SupportedProvider(str, Enum):
     mistral = "mistral"
     ollama = "ollama"
     bedrock = "bedrock"
+    minimax = "minimax"
     custom = "custom"
 
 
@@ -93,6 +94,10 @@ _MODEL_CATALOG: dict[str, list[dict[str, str]]] = {
     ],
     "bedrock": [
         {"value": "anthropic.claude-haiku-4-5-v1:0", "label": "Claude Haiku 4.5"},
+    ],
+    "minimax": [
+        {"value": "MiniMax-M2.7", "label": "MiniMax M2.7"},
+        {"value": "MiniMax-M2.7-highspeed", "label": "MiniMax M2.7 Highspeed"},
     ],
     "custom": [
         {"value": "deepseek/deepseek-chat", "label": "DeepSeek Chat"},
