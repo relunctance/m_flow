@@ -36,25 +36,25 @@ That distinction matters because similarity and relevance are not identical.
 <u>Similar</u> and <u>relevant</u> sometimes overlap, but they are fundamentally different.  
 Consider a non-technical query: **"Why did I miss my flight?"**
 
-**Traditional retrieval** — matches by surface similarity:
+**Traditional retrieval** — keyword overlap can look related, yet miss the real cause:
 
 ```mermaid
 flowchart LR
-    Q["Query: Why did I\nmiss my flight?"] -->|"embed → similarity"| C1["Document: airport checklist\n(passport, baggage, gate)"]
-    C1 -->|"✗ sounds related,\nbut not causal"| R["good travel tips,\nwrong explanation"]
+    Q["Query: Why did I\nmiss my flight?"] -->|"keyword overlap / similarity"| C1["Document: airport checklist\n(passport, baggage, gate,\nboarding, airport)"]
+    C1 -->|"✗ repeated travel keywords,\nbut not my causal chain"| R["Looks related,\nactually irrelevant answer"]
 ```
 
-**M-flow retrieval** — traces through a causal memory path:
+**M-flow retrieval** — anchor match first, then graph propagation:
 
 ```mermaid
 flowchart LR
-    Q["Query: Why did I\nmiss my flight?"] -->|anchor| FP["FacetPoint\nalarm dismissed at 6:30"]
-    FP -->|"led to"| F["Facet\nleft home 40 min late"]
-    F -->|"caused"| E["Episode\nmissed airport check-in"]
-    E -->|"✓ useful answer"| R["Primary cause:\nlate departure from home"]
+    Q["Query: Why did I\nmiss my flight?"] -->|"anchor match"| FP["FacetPoint\nalarm dismissed at 6:30"]
+    FP -->|"graph propagation"| F["Facet\nleft home 40 min late"]
+    F -->|"supported path"| E["Episode\nmissed airport check-in"]
+    E -->|"✓ evidence-based answer"| R["Primary cause:\nlate departure from home"]
 ```
 
-> **Key idea:** the answer is found through an *evidence path*, not keyword overlap.
+> **Key idea:** similarity can be misled by repeated keywords; M-flow first locks onto an anchor, then retrieves through graph propagation along an evidence path.
 
 The graph finds the answer not by matching words, but by following the chain of evidence. This difference — **from candidate matching to path-cost retrieval** — is what drives M-flow's advantage in our reported benchmarks.
 
@@ -87,16 +87,24 @@ A simple analogy: thinking of classmate A may first bring up the fact that A gre
 
 In the inverted-cone view, each hop can be seen as moving toward a wider semantic cross-section: from a precise cue, to a related fact or facet, to the broader Episode that contains the useful context.
 
-The figure below is a visual aid for this process (supplementary to the text above):
+The figure below is a visual aid for this process in an inverted-cone layout (wide top, narrow bottom; supplementary to the text above):
 
 ```mermaid
-flowchart LR
-    Q["Cue: classmate A"] --> A["Anchor: Entity(A)"]
-    A -->|typed edge + cost| FP1["FacetPoint:\nA grew up in California"]
-    FP1 -->|supported path| F1["Facet:\nCalifornia background"]
-    F1 -->|supported path| E1["Episode:\nschool years context"]
-    F1 -->|low additional cost| FP2["FacetPoint:\nA is a Lakers fan"]
-    FP2 -->|supported path| E2["Episode:\nNBA chat memory"]
+flowchart BT
+    Q["Cue / query\nclassmate A"]
+    A["Anchor (Entity)\nA"]
+    FP1["FacetPoint\nA grew up in California"]
+    F1["Facet\nCalifornia background"]
+    FP2["FacetPoint\nA is a Lakers fan"]
+    E1["Episode\nschool years context"]
+    E2["Episode\nNBA chat memory"]
+
+    Q -->|anchor match| A
+    A -->|typed edge + cost| FP1
+    FP1 -->|graph propagation| F1
+    F1 -->|supported path| E1
+    F1 -->|low additional cost| FP2
+    FP2 -->|supported path| E2
 ```
 
 ### Unified multi-granularity retrieval
