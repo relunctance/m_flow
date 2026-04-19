@@ -244,8 +244,6 @@ All systems use gpt-5-mini (answer) + gpt-4o-mini (judge). Cat 5 (adversarial) e
 
 ### LongMemEval
 
-First 100 questions, top-k=10.
-
 | System | LLM-Judge | Temporal (60) | Multi-session (40) |
 |--------|:---------:|:-------------:|:------------------:|
 | **M-flow** | **89%** | **93%** | **82%** |
