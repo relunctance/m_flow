@@ -57,13 +57,16 @@ flowchart LR
     EP --> R["Answer composed from<br/>the Episode bundle's contents:<br/>Maria was blindsided by a<br/>weekend deadline change<br/>she was not included in"]
 ```
 
-The downstream LLM then composes the final answer from the bundle's content (the Episode together with its Facets and FacetPoints). For the full path-cost mechanism, see [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md).
+ For the full path-cost mechanism, see [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md).
 
 > **Key idea:** similarity matches by overlapping words; M-flow matches by granularity-aligned anchors and then routes through the cone graph to a coherent Episode bundle.
 
-The graph finds the answer not by matching words, but by following the chain of evidence. This difference — **from candidate matching to path-cost retrieval** — is what drives M-flow's advantage in our reported benchmarks.
+M-flow's retrieval is graph-routed: the system casts a wide net across all levels, projects the hits into the knowledge graph, propagates cost along supported evidence paths, and scores each Episode by its strongest chain of evidence.
 
-**M-flow operates like a cognitive system:** it captures signal at the sharpest point of detail, traces associations through structured memory, and arrives at the right answer the way human recall does.
+One strong path is enough — the way a single association can trigger an entire memory.
+
+**M-flow operates like a cognitive system:** This difference — **from candidate matching to path-cost retrieval** — is what drives M-flow's advantage in our reported benchmarks.
+
 
 ## How It Works
 
@@ -76,15 +79,10 @@ M-flow organizes knowledge into a four-level **Cone Graph** — a layered hierar
 | **FacetPoint** | An atomic assertion or fact derived from a Facet | *"Was the P99 target under 500ms?"* |
 | **Entity** | A named thing — person, tool, metric — linked across all Episodes | *"Tell me about GPT-4o"* → surfaces all related contexts |
 
-### Graph-routed Bundle Search
-
-Retrieval is graph-routed: the system casts a wide net across all levels, projects the hits into the knowledge graph, propagates cost along supported evidence paths, and scores each Episode by its strongest chain of evidence.
-
-One strong path is enough — the way a single association can trigger an entire memory.
 
 ### Association as controlled propagation
 
-M-flow treats association as controlled graph propagation, not as a one-shot similarity match.
+M-flow treats association as controlled graph propagation, not as a one-shot match.
 
 A query first lands on the most precise anchor it can find — an Entity, FacetPoint, Facet, or Episode. From that anchor, evidence spreads through nearby typed edges and connected memory units. Each hop expands the semantic field, but each edge also adds cost. This means association is not a random graph walk: only paths with coherent, low-cost connections remain competitive.
 
@@ -139,7 +137,7 @@ flowchart LR
 
 ### M-flow retrieval at a glance
 
-**1. Graph-led retrieval (not similarity-led)**
+**1. Graph-led retrieval**
 
 - Vector / hybrid search only opens entry points
 - Final relevance is determined by graph propagation
@@ -158,28 +156,21 @@ flowchart LR
 - Episodes, Facets, FacetPoints, Entities all act as entry points
 - All granularities are connected in one graph
 
-> *Not just multi-level storage — but multi-level retrieval.*
+> *Not just multi-level storage — but shared retrieval space.*
 
-**4. Semantic edges as first-class signals**
-
-- Edges carry natural-language meaning (`edge_text`)
-- Relationships are searchable and scored
-
-> *Connections carry meaning, not just structure.*
-
-**5. Controlled propagation (not a naive graph walk)**
+**4. Controlled propagation**
 
 - Each hop expands context but also adds cost
 - Only coherent, low-cost paths survive
 
 > *Association, but with structure and discipline.*
 
-**6. Adaptive and noise-resistant retrieval**
+**5. Adaptive and noise-resistant retrieval**
 
 - Broad matches are penalized
 - Node / edge importance adapts per query
 
-> *Prevents "looks relevant" from beating "is relevant".*
+> *Prevents "looks similar" from beating "is relevant".*
 
 > For the full technical deep-dive, see [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md)
 
