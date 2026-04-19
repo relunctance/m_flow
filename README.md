@@ -71,43 +71,66 @@ M-flow organizes knowledge into a four-level **Cone Graph** — a layered hierar
 | **FacetPoint** | An atomic assertion or fact derived from a Facet | *"Was the P99 target under 500ms?"* |
 | **Entity** | A named thing — person, tool, metric — linked across all Episodes | *"Tell me about GPT-4o"* → surfaces all related contexts |
 
-Retrieval is **graph-routed**: the system casts a wide net across all levels, projects hits into the knowledge graph, propagates cost along *supported evidence paths*, and scores each Episode by its **strongest chain of evidence**. One strong path is enough — the way a single association triggers an entire memory.
+### Graph-routed Bundle Search
+
+Retrieval is graph-routed: the system casts a wide net across all levels, projects the hits into the knowledge graph, propagates cost along supported evidence paths, and scores each Episode by its strongest chain of evidence.
+
+One strong path is enough — the way a single association can trigger an entire memory.
 
 ### Association as controlled propagation
 
-**Association is not random wandering.** It is *controlled propagation* over typed edges.
+M-flow treats association as controlled graph propagation, not as a one-shot similarity match.
+
+A query first lands on the most precise anchor it can find — an Entity, FacetPoint, Facet, or Episode. From that anchor, evidence spreads through nearby typed edges and connected memory units. Each hop expands the semantic field, but each edge also adds cost. This means association is not a random graph walk: only paths with coherent, low-cost connections remain competitive.
+
+A simple analogy: thinking of classmate A may first bring up the fact that A grew up in California. That fact opens a wider neighborhood of California-related memories; within that neighborhood, the Lakers may become the next low-cost association. M-flow models this kind of recall as path-cost propagation through a structured memory graph.
+
+In the inverted-cone view, each hop can be seen as moving toward a wider semantic cross-section: from a precise cue, to a related fact or facet, to the broader Episode that contains the useful context.
+
+The figure below is a visual aid for this process (supplementary to the text above):
 
 ```mermaid
 flowchart LR
-    Q["Cue: classmate A"] --> A["Entity: A"]
-    A --> FP1["FacetPoint:\nA grew up in California"]
-    FP1 --> F1["Facet:\nCalifornia background"]
-    F1 --> E1["Episode:\nschool years context"]
-    F1 --> FP2["FacetPoint:\nA is a Lakers fan"]
-    FP2 --> E2["Episode:\nNBA chat memory"]
+    Q["Cue: classmate A"] --> A["Anchor: Entity(A)"]
+    A -->|typed edge + cost| FP1["FacetPoint:\nA grew up in California"]
+    FP1 -->|supported path| F1["Facet:\nCalifornia background"]
+    F1 -->|supported path| E1["Episode:\nschool years context"]
+    F1 -->|low additional cost| FP2["FacetPoint:\nA is a Lakers fan"]
+    FP2 -->|supported path| E2["Episode:\nNBA chat memory"]
 ```
 
-Each hop expands context, but each edge adds cost.  
-Only **coherent, low-cost** paths survive scoring.
+### Unified multi-granularity retrieval
 
-### Multi-granularity anchors can coexist
+Storing knowledge at multiple granularities is useful, but it is not enough.
 
-A query can enter from multiple anchor types at once; the graph then unifies them into one evidence bundle.
+Some memory systems keep separate layers for episodic memories, atomic facts, entities, or summaries. When these layers are queried separately, retrieval tends to work best when the user's query matches the selected layer: an episodic query retrieves Episodes; an atomic query retrieves atomic facts.
+
+M-flow connects these granularities inside one graph. Episodes, Facets, FacetPoints, Entities, and semantic edge descriptions are all searchable entry points, but they are not isolated retrieval silos. A precise query can enter through a FacetPoint and return the Episode it belongs to. A broad query can enter through an Episode summary. An entity query can bridge multiple Episodes through the same Entity node.
+
+The user does not need to choose the right memory layer. M-flow lets the query find the right-granularity anchor, then uses the graph to return the memory bundle with the strongest supporting path.
+
+The figure below only illustrates this mechanism:
 
 ```mermaid
 flowchart LR
-    Q["Query: how did the launch delay happen?"]
-    Q --> EP["Episode anchor:\nlaunch week summary"]
-    Q --> FC["Facet anchor:\nsupplier delay"]
-    Q --> FP["FacetPoint anchor:\nshipment arrived 2 days late"]
-    Q --> EN["Entity anchor:\nVendor X"]
-    EP --> B["Unified evidence bundle"]
-    FC --> B
-    FP --> B
-    EN --> B
+    Q["Query"]
+    Q --> EP["Episode entry"]
+    Q --> FC["Facet entry"]
+    Q --> FP["FacetPoint entry"]
+    Q --> EN["Entity entry"]
+    EP -->|supported path| B["Returned memory bundle"]
+    FC -->|supported path| B
+    FP -->|supported path| B
+    EN -->|supported path| B
 ```
 
-This is why users do **not** need to pick the "correct memory layer" manually.
+### Retrieval model at a glance
+
+| System type | What retrieval primarily scores | Role of the graph |
+|-------------|----------------------------------|-------------------|
+| Traditional RAG | Chunk matches from BM25, dense vectors, or hybrid search | None or minimal (similar text can outrank the evidence that actually answers the question) |
+| Common GraphRAG | Candidate matches plus graph expansion, summaries, or reranking | Organizes and enriches context; may support scoring (the graph can remain secondary to candidate similarity) |
+| **M-flow** | Lowest-cost evidence paths through the Cone Graph | Primary relevance mechanism |
 
 > For the full technical deep-dive, see [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md)
 
@@ -203,9 +226,10 @@ async def main():
     await m_flow.add("M-flow builds persistent memory for AI agents.")
     await m_flow.memorize()
 
-    results = await m_flow.search("How does M-flow work?")
-    for r in results:
-        print(r)
+    # query() defaults to episodic graph-routed Bundle Search.
+    results = await m_flow.query("How does M-flow work?")
+    for item in results.context:
+        print(item)
 
 
 asyncio.run(main())
@@ -216,7 +240,7 @@ asyncio.run(main())
 ```bash
 mflow add "M-flow builds persistent memory for AI agents."
 mflow memorize
-mflow search "How does M-flow work?"
+mflow search "How does M-flow work?" --query-type EPISODIC
 mflow -ui          # Launch the local web console
 ```
 
