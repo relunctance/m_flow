@@ -26,9 +26,13 @@ Retrieval through reasoning and association — M-flow operates like a cognitive
 
 The real shift is not whether a system builds a graph, but what the graph is allowed to do at retrieval time.
 
+### Graph topology encodes relevance.
+
 In most RAG systems, retrieval is still dominated by similarity: the query is embedded, textual units are ranked by vector distance, and structure—if present—mainly helps organize, summarize, or expand context. Many GraphRAG systems add entities, relations, and community structure, but the graph often remains supportive rather than decisive in scoring.
 
 M-flow takes a different approach: the graph is the scoring engine. When a query arrives, vector search casts a wide net across multiple granularities to find entry points. Then **the graph takes over** — propagating evidence along typed, semantically weighted edges, and scoring each knowledge unit by the *strongest* chain of reasoning that connects it to the query.
+
+### Relevance is not a score. It's a path.
 
 That distinction matters because similarity and relevance are not identical.  
 *Similarity* is proximity in representation space. *Relevance* is whether the system can connect the query to the answer through a coherent structure of evidence.
