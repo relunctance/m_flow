@@ -121,6 +121,13 @@ class SearchPayloadDTO(InDTO):
         description="Treat as new conversation turn (resets partial context if enabled)",
     )
 
+    # Structured output for hawk-memory Layer2 integration
+    output_format: str | None = Field(
+        default=None,
+        description="Output format: 'structured' returns {id, text, score, type} per result "
+        "(for hawk-memory Layer2 enrichment). Default: LLM-formatted text.",
+    )
+
 
 class _HistoryEntry(OutDTO):
     """Single search history record."""
@@ -341,6 +348,11 @@ def get_search_router() -> APIRouter:
                 max_points_per_facet=payload.max_points_per_facet,
                 collections=payload.collections,
             )
+            # Structured output formatting for hawk-memory Layer2 integration
+            if payload.output_format == "structured":
+                from m_flow.api.v1.search.structured_formatter import format_structured_results
+                # Return the raw list for structured output (not wrapped in {"results":...})
+                return jsonable_encoder(format_structured_results(results)["results"])
             return jsonable_encoder(results)
         except PermissionDeniedError:
             return []
