@@ -136,13 +136,16 @@ async def no_access_control_search(
 
         if only_context:
             ctx = await context_fn(query_text)
-            return None, ctx, []
+            _logger.info(f"[no_access_control_search] only_context=True, returning empty answer, ctx={str(ctx)[:100]}")
+            return "", ctx, []
 
         ctx = await context_fn(query_text)
         answer = await completion_fn(query_text, ctx, session_id=session_id)
+        _logger.info(f"[no_access_control_search] len(tools)==2, ctx type={type(ctx)}, ctx={str(ctx)[:100]}, answer type={type(answer)}, answer={str(answer)[:200]}")
         return answer, ctx, []
 
     # Single tool mode
     single_tool = tools[0]
     answer = await single_tool(query_text)
+    _logger.info(f"[no_access_control_search] single_tool, answer={str(answer)[:100]}")
     return answer, "", []

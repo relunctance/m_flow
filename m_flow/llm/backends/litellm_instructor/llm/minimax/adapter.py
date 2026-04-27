@@ -35,7 +35,7 @@ _RETRY_CEILING_SECS = 120
 _RETRY_BASE_WAIT = 5
 _INSTRUCTOR_MAX_RETRIES = 2
 
-MINIMAX_BASE_URL = "https://api.minimax.io/anthropic"
+MINIMAX_BASE_URL = None  # resolved at runtime from llm_settings.llm_endpoint
 MINIMAX_DEFAULT_MODEL = "MiniMax-M2.7"
 MINIMAX_MODELS = ["MiniMax-M2.7", "MiniMax-M2.7-highspeed"]
 
@@ -46,9 +46,9 @@ class MiniMaxAdapter(LLMBackend):
     Uses MiniMax's Anthropic-compatible endpoint with the ``anthropic_tools``
     instructor mode for reliable schema-validated extraction.
 
-    The adapter targets the overseas endpoint (``https://api.minimax.io/anthropic``)
-    by default. The API key is read from the ``MFLOW_LLM_API_KEY`` environment
-    variable (set ``MINIMAX_API_KEY`` as its value).
+    The base URL is read from the ``LLM_ENDPOINT`` setting (via pydantic
+    settings / .env file). The API key is read from the ``LLM_API_KEY``
+    environment variable (set ``MINIMAX_API_KEY`` as its value).
     """
 
     name = "MiniMax"
@@ -66,9 +66,10 @@ class MiniMaxAdapter(LLMBackend):
         self.model = model or MINIMAX_DEFAULT_MODEL
         self.max_completion_tokens = max_completion_tokens
 
+        base_url = llm_settings.llm_endpoint or "https://api.minimaxi.com/anthropic"
         raw_client = anthropic.AsyncAnthropic(
             api_key=llm_settings.llm_api_key,
-            base_url=MINIMAX_BASE_URL,
+            base_url=base_url,
         )
         self.aclient = instructor.patch(
             create=raw_client.messages.create,

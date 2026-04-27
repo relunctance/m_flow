@@ -589,7 +589,7 @@ async def _search_single_dataset(
                     retrieved_ctx = _build_procedural_structured_json(retrieved_ctx)
                 except Exception:
                     pass
-            return None, retrieved_ctx, [dataset]
+            return "", retrieved_ctx, [dataset]
 
         search_ctx = context if context else await context_fn(query_text)
         answer = await completion_fn(query_text, search_ctx, session_id=session_id)

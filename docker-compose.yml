@@ -28,6 +28,8 @@ services:
     environment:
       <<: *common-env
       DEBUG: "false"  # Set "true" to enable debugpy
+      REQUIRE_AUTHENTICATION: "false"
+      ENABLE_BACKEND_ACCESS_CONTROL: "false"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

@@ -396,8 +396,13 @@ def _convert_to_query_result(
 
     elif isinstance(raw_result, list):
         # Episodic/Chunks/Procedural mode returns List[SearchResult]
+        #也可能返回 List[str]（从无 ACL 路径的 _format_standard_results）
         if not raw_result:
             return QueryResult(answer=None, context=[], datasets=[])
+
+        # If elements are strings (not SearchResult), return as-is
+        if raw_result and isinstance(raw_result[0], str):
+            return QueryResult(answer=None, context=raw_result, datasets=[])
 
         context_list = [r.search_result for r in raw_result]
         dataset_names = list(set(r.dataset_name for r in raw_result if r.dataset_name is not None))
