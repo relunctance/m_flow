@@ -15,7 +15,7 @@ enrichment/deprecation/confidence Layer2 data.
 
 from __future__ import annotations
 
-from typing import Any, Union
+from typing import Any, List, Union
 
 from m_flow.search.types import SearchResult, CombinedSearchResult
 

@@ -350,7 +350,6 @@ def get_search_router() -> APIRouter:
             )
             # Structured output formatting for hawk-memory Layer2 integration
             if payload.output_format == "structured":
-                from fastapi.responses import JSONResponse
                 from m_flow.api.v1.search.structured_formatter import format_structured_results
                 data = format_structured_results(results)
                 return JSONResponse(content=data)
