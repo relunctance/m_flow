@@ -164,6 +164,8 @@ async def search(
     max_points_per_facet: Optional[int] = None,
     # Collection control (TRIPLET / EPISODIC)
     collections: Optional[List[str]] = None,
+    # Structured output control
+    output_format: Optional[str] = None,
     # Procedural inclusion for TRIPLET mode
     # Advanced configuration
     config: Optional[SearchConfig] = None,

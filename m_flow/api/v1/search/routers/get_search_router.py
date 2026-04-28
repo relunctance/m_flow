@@ -350,9 +350,10 @@ def get_search_router() -> APIRouter:
             )
             # Structured output formatting for hawk-memory Layer2 integration
             if payload.output_format == "structured":
+                from fastapi.responses import JSONResponse
                 from m_flow.api.v1.search.structured_formatter import format_structured_results
-                # Return the raw list for structured output (not wrapped in {"results":...})
-                return jsonable_encoder(format_structured_results(results)["results"])
+                data = format_structured_results(results)
+                return JSONResponse(content=data)
             return jsonable_encoder(results)
         except PermissionDeniedError:
             return []

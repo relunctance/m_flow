@@ -32,6 +32,9 @@ class CombinedSearchResult(BaseModel):
 class SearchResult(BaseModel):
     """Single search result with provenance."""
 
+    id: str | None = Field(default=None, description="Episode or memory ID (used in structured output)")
     search_result: Any = Field(description="The actual result content")
     dataset_id: UUID | None = Field(default=None, description="Source dataset ID")
     dataset_name: str | None = Field(default=None, description="Source dataset name")
+    score: float | None = Field(default=None, description="Relevance score (0-1, structured mode only)")
+    type: str | None = Field(default=None, description="Memory type: raw, episodic, procedural (structured mode only)")

@@ -140,6 +140,7 @@ def _assemble_summary_mode(
             attributes={
                 "relationship_name": "episode_summary",
                 "edge_text": summary_text,
+                "episode_id": ep,
             },
         )
         out_edges.append(summary_edge)
@@ -223,6 +224,7 @@ def _assemble_highly_related_summary_mode(
             attributes={
                 "relationship_name": "episode_summary",
                 "edge_text": filtered_summary,
+                "episode_id": ep,
             },
         )
         out_edges.append(summary_edge)

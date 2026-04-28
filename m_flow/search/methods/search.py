@@ -260,15 +260,54 @@ async def _format_standard_results(
 ) -> List[SearchResult]:
     """Format results for non-combined search mode."""
     if not backend_access_control_enabled():
-        # Format without access control
-        formatted = []
+        # Format without access control — return SearchResult objects with episode_id
+        # so structured_formatter can extract real IDs for hawk-memory Layer2 integration
+        output = []
         for item in raw_results:
             prepared = await prepare_search_result(item)
-            formatted.append(prepared["context"] if only_context else item[0])
-        # Flatten single-item list
-        if len(formatted) == 1 and isinstance(formatted[0], list):
-            return formatted[0]
-        return formatted
+            context_val = prepared["context"]
+            result_val = prepared["result"]
+
+            # Try to extract episode_id from Edge objects in context
+            episode_id: str | None = None
+            score_val: float | None = None
+
+            if isinstance(context_val, dict):
+                # Single dataset context: {dataset_name: edges_or_text}
+                for ds_name, val in context_val.items():
+                    if isinstance(val, list) and val and isinstance(val[0], Edge):
+                        first_edge: Edge = val[0]
+                        episode_id = first_edge.attributes.get("episode_id")
+                        # Try to get score from edge vector_distance (lower = better, invert for score)
+                        vec_dist = first_edge.attributes.get("vector_distance")
+                        if vec_dist is not None:
+                            try:
+                                score_val = 1.0 / (1.0 + float(vec_dist))
+                            except (TypeError, ValueError):
+                                score_val = None
+                        break
+            elif isinstance(context_val, list) and context_val and isinstance(context_val[0], Edge):
+                first_edge: Edge = context_val[0]
+                episode_id = first_edge.attributes.get("episode_id")
+                vec_dist = first_edge.attributes.get("vector_distance")
+                if vec_dist is not None:
+                    try:
+                        score_val = 1.0 / (1.0 + float(vec_dist))
+                    except (TypeError, ValueError):
+                        score_val = None
+
+            # Also try to get episode_id from result_val if it's a dict
+            if episode_id is None and isinstance(result_val, dict):
+                episode_id = result_val.get("episode_id")
+
+            entry = SearchResult(
+                id=episode_id,
+                search_result=[result_val] if result_val else None,
+                score=score_val,
+                type="episodic",
+            )
+            output.append(entry)
+        return output
 
     # Access-controlled format with dataset metadata
     output = []
