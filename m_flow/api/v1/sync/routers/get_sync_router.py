@@ -20,7 +20,7 @@ from m_flow.auth.models import User
 from m_flow.auth.permissions.methods import get_specific_user_permission_datasets
 from m_flow.shared.logging_utils import get_logger
 from m_flow.shared.sync.methods import get_running_sync_operations_for_user
-from m_flow.shared.utils import send_telemetry
+from m_flow.shared.utils import send_telemetry, to_iso_z
 
 _log = get_logger()
 
@@ -73,7 +73,7 @@ def get_sync_router() -> APIRouter:
                             "dataset_ids": active.dataset_ids,
                             "dataset_names": active.dataset_names,
                             "progress_percentage": active.progress_percentage,
-                            "timestamp": active.created_at.isoformat() + "Z" if active.created_at else None,
+                            "timestamp": to_iso_z(active.created_at),
                             "message": f"Active sync: {active.run_id}. Wait for completion.",
                         },
                     },
@@ -131,7 +131,7 @@ def get_sync_router() -> APIRouter:
                     "dataset_ids": latest.dataset_ids,
                     "dataset_names": latest.dataset_names,
                     "progress_percentage": latest.progress_percentage,
-                    "created_at": latest.created_at.isoformat() + "Z" if latest.created_at else None,
+                    "created_at": to_iso_z(latest.created_at),
                 }
             return resp
 

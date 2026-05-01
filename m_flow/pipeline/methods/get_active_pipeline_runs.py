@@ -15,6 +15,7 @@ from sqlalchemy import func, select
 from m_flow.adapters.relational import get_db_adapter
 from m_flow.data.models import Dataset
 from m_flow.pipeline.models import WorkflowRun, RunStatus
+from m_flow.shared.utils import to_iso_z
 
 
 async def get_active_pipeline_runs() -> List[Dict[str, Any]]:
@@ -110,7 +111,7 @@ async def get_active_pipeline_runs() -> List[Dict[str, Any]]:
                 "current_step": progress.get("current_step"),
                 "started_at": progress.get("started_at"),
                 "updated_at": progress.get("updated_at"),
-                "created_at": row.created_at.isoformat() + "Z" if row.created_at else None,
+                "created_at": to_iso_z(row.created_at),
             }
         )
 

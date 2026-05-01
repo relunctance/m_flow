@@ -17,6 +17,7 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import relationship
 
 from m_flow.adapters.relational import Base
+from m_flow.shared.utils import to_iso_z
 
 from .DatasetEntry import DatasetEntry
 
@@ -98,9 +99,11 @@ class Dataset(Base):
         return {
             "id": str(self.id),
             "name": self.name,
-            # Add Z suffix to indicate UTC timezone for correct frontend parsing
-            "createdAt": self.created_at.isoformat() + "Z" if self.created_at else None,
-            "updatedAt": self.updated_at.isoformat() + "Z" if self.updated_at else None,
+            # Use ``to_iso_z`` to emit a single ``Z`` suffix that is well-formed
+            # whether the column stored a naive or timezone-aware datetime
+            # (issue #116: ``+ "Z"`` produced ``+00:00Z`` on Postgres).
+            "createdAt": to_iso_z(self.created_at),
+            "updatedAt": to_iso_z(self.updated_at),
             "ownerId": str(self.owner_id),
             "tenantId": str(self.tenant_id) if self.tenant_id else None,
             "data": [item.to_json() for item in self.data],

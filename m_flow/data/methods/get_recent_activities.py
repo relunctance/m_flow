@@ -15,6 +15,7 @@ from uuid import UUID
 from sqlalchemy import select, union_all, desc, literal, cast, String
 
 from m_flow.adapters.relational import get_db_adapter
+from m_flow.shared.utils import to_iso_z
 
 
 async def get_recent_activities(
@@ -88,8 +89,11 @@ async def get_recent_activities(
                 "title": _format_title(row.type, row.title),
                 "description": _format_description(row.type, row.description),
                 "status": _map_status(row.type, row.description),
-                # Ensure UTC timezone is included for correct frontend parsing
-                "created_at": row.created_at.isoformat() + "Z" if row.created_at else None,
+                # Ensure UTC timezone is included for correct frontend parsing.
+                # Uses ``to_iso_z`` so timezone-aware values from Postgres
+                # (``timestamp with time zone``) do not produce ``+00:00Z``
+                # double markers that pydantic rejects (issue #116).
+                "created_at": to_iso_z(row.created_at),
             }
             for row in rows
         ]

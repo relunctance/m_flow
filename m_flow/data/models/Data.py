@@ -19,6 +19,7 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 
 from m_flow.adapters.relational import Base
+from m_flow.shared.utils import to_iso_z
 
 from .DatasetEntry import DatasetEntry
 
@@ -142,9 +143,11 @@ class Data(Base):
             "extension": self.extension,
             "mimeType": self.mime_type,
             "rawDataLocation": self.processed_path,
-            # Add Z suffix to indicate UTC timezone for correct frontend parsing
-            "createdAt": self.created_at.isoformat() + "Z" if self.created_at else None,
-            "updatedAt": self.updated_at.isoformat() + "Z" if self.updated_at else None,
+            # Use ``to_iso_z`` to emit a single ``Z`` suffix that is well-formed
+            # whether the column stored a naive or timezone-aware datetime
+            # (issue #116: ``+ "Z"`` produced ``+00:00Z`` on Postgres).
+            "createdAt": to_iso_z(self.created_at),
+            "updatedAt": to_iso_z(self.updated_at),
             "nodeSet": self.graph_scope,
             "dataSize": self.data_size,
             "tokenCount": self.token_count,

@@ -150,6 +150,47 @@ start_visualization_server = launch_viz_server  # alias
 
 
 # ---------------------------------------------------------------------------
+# Datetime serialization
+# ---------------------------------------------------------------------------
+
+
+def to_iso_z(dt: Optional[datetime]) -> Optional[str]:
+    """Serialize a datetime to an ISO-8601 string ending with a single ``Z``.
+
+    The previous idiom ``dt.isoformat() + "Z"`` is **buggy when ``dt`` is
+    timezone-aware**, because ``isoformat()`` already emits an offset such as
+    ``"+00:00"`` and the appended ``"Z"`` produces a double timezone marker
+    (``"…+00:00Z"``) that pydantic rejects with ``datetime_from_date_parsing``.
+
+    This helper guarantees a single, well-formed UTC marker in every case:
+
+    - ``None`` → ``None`` (passthrough).
+    - timezone-naive datetimes are *assumed* to be UTC (the same assumption
+      the legacy ``+ "Z"`` idiom encoded) and are serialized with a trailing
+      ``Z`` directly.
+    - timezone-aware datetimes are converted to UTC and then serialized with
+      ``Z`` substituted for the ``+00:00`` offset.
+
+    Examples
+    --------
+    >>> from datetime import datetime, timezone, timedelta
+    >>> to_iso_z(None) is None
+    True
+    >>> to_iso_z(datetime(2026, 4, 23, 1, 38, 12, 734433))
+    '2026-04-23T01:38:12.734433Z'
+    >>> to_iso_z(datetime(2026, 4, 23, 1, 38, 12, 734433, tzinfo=timezone.utc))
+    '2026-04-23T01:38:12.734433Z'
+    >>> to_iso_z(datetime(2026, 4, 23, 9, 38, 12, 734433, tzinfo=timezone(timedelta(hours=8))))
+    '2026-04-23T01:38:12.734433Z'
+    """
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.isoformat() + "Z"
+    return dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+# ---------------------------------------------------------------------------
 # Visualization helpers (bokeh logo embedding kept for compat)
 # ---------------------------------------------------------------------------
 
