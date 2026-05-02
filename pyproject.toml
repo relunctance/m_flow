@@ -34,13 +34,11 @@ dependencies = [
     "websockets>=14.0,<16.0.0",
     "python-multipart>=0.0.18,<1.0.0",
     "aiohttp>=3.10.0,<4.0.0",
-
     # -- LLM providers --
     "openai>=1.80.0",
     "litellm>=1.75.0",
     "instructor>=1.8.0,<2.0.0",
     "tiktoken>=0.7.0,<1.0.0",
-
     # -- Data & storage --
     "sqlalchemy>=2.0.30,<3.0.0",
     "aiosqlite>=0.19.0,<1.0.0",
@@ -49,27 +47,24 @@ dependencies = [
     "kuzu>=0.11.0,<0.12",
     "pylance>=0.20.0,<=0.36.0",
     "diskcache>=5.6.0",
-
     # -- Data models & validation --
     "pydantic>=2.10.0,<2.13.0",
     "pydantic-settings>=2.2.0,<3",
     "numpy>=1.26.0,<3.0.0",
-
     # -- Document processing --
     "pypdf>=4.0.0,<7.0.0",
     "filetype>=1.2.0,<2.0.0",
     "jinja2>=3.1.0,<4",
-
     # -- Resilience & observability --
     "tenacity>=8.5.0",
     "aiolimiter>=1.2.0",
     "limits>=4.4.0,<5",
     "structlog>=25.1.0,<26",
-
     # -- Utilities --
     "python-dotenv>=1.0.0,<2.0.0",
     "typing_extensions>=4.12.0,<5.0.0",
     "python-magic-bin<0.5 ; platform_system == 'Windows'",
+    "anthropic",
 ]
 
 [tool.uv.sources]
