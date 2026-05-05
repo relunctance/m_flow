@@ -30,6 +30,16 @@ services:
       DEBUG: "false"  # Set "true" to enable debugpy
       REQUIRE_AUTHENTICATION: "false"
       ENABLE_BACKEND_ACCESS_CONTROL: "false"
+      LLM_API_KEY: "${LLM_API_KEY}"
+      LLM_MODEL: "${LLM_MODEL}"
+      LLM_PROVIDER: "${LLM_PROVIDER}"
+      LLM_ENDPOINT: "${LLM_ENDPOINT}"
+      LLM_API_VERSION: "${LLM_API_VERSION}"
+      LLM_MAX_TOKENS: "${LLM_MAX_TOKENS}"
+      LLM_INSTRUCTOR_MODE: "${LLM_INSTRUCTOR_MODE}"
+      LITELLM_LOG: "${LITELLM_LOG}"
+      BAML_LLM_MODEL: "${BAML_LLM_MODEL}"
+      BAML_LLM_ENDPOINT: "${BAML_LLM_ENDPOINT}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

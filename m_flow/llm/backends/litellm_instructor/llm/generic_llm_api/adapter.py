@@ -51,7 +51,7 @@ class GenericAPIAdapter(LLMBackend):
     name: str
     model: str
     api_key: str
-    default_instructor_mode = "json_mode"
+    default_instructor_mode = "tools"  # json_mode causes TypeError with xinference+litellm
 
     def __init__(
         self,
@@ -113,6 +113,7 @@ class GenericAPIAdapter(LLMBackend):
             max_retries=2,
             api_key=key,
             api_base=base,
+            custom_llm_provider="openai",  # xinference requires openai format
             response_model=response_model,
         )
 

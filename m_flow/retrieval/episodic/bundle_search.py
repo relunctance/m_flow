@@ -333,7 +333,14 @@ async def _vector_search(
                 query_vector=query_vector,
                 limit=limit,
             )
-        except CollectionNotFoundError:
+        except (CollectionNotFoundError, Exception) as e:
+            # CollectionNotFoundError: table doesn't exist yet
+            # LanceError: table exists but is empty/corrupted (e.g. "Invalid range 0..0")
+            # Both should return empty results gracefully
+            if isinstance(e, CollectionNotFoundError):
+                logger.debug(f"Collection not found: {collection_name}")
+            else:
+                logger.debug(f"Vector search failed for {collection_name}: {e}")
             return []
 
     results = await asyncio.gather(*[search_in_collection(c) for c in cfg.collections])

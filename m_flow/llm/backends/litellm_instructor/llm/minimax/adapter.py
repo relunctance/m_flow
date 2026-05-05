@@ -109,6 +109,8 @@ class MiniMaxAdapter(LLMBackend):
                 model=self.model,
                 max_tokens=_RESPONSE_TOKEN_CAP,
                 max_retries=_INSTRUCTOR_MAX_RETRIES,
+                thinking={"type": "disabled"},  # MiniMax returns ThinkingBlock by default; disable to avoid .text attribute errors
+                extra_body={"response_format": {"type": "json_object"}},  # MiniMax-compatible structured output (avoids ANTHROPIC_TOOLS hang)
                 messages=[{"role": "user", "content": merged_content}],
                 response_model=response_model,
             )
